@@ -1,9 +1,11 @@
+import sys
 from config import YOUTUBE_API_KEY, YOUTUBE_SEARCH_QUERIES, MAX_ITEMS_PER_SOURCE, REQUEST_TIMEOUT
 import requests
 
 
 def fetch_youtube() -> list[dict]:
     if not YOUTUBE_API_KEY:
+        print("[youtube] no API key configured, skipping", file=sys.stderr)
         return []
 
     items = []
@@ -35,7 +37,11 @@ def fetch_youtube() -> list[dict]:
                     "link": f"https://www.youtube.com/watch?v={video_id}",
                     "published": snippet["publishedAt"][:10],
                 })
-        except requests.RequestException:
+        except requests.RequestException as e:
+            print(f"[youtube] request error for '{query}': {e}", file=sys.stderr)
+            continue
+        except Exception as e:
+            print(f"[youtube] error for '{query}': {e}", file=sys.stderr)
             continue
 
     seen = set()

@@ -1,47 +1,45 @@
-import feedparser
-from datetime import datetime, timedelta
+import sys
+import requests
+from bs4 import BeautifulSoup
 from config import REQUEST_TIMEOUT, MAX_ITEMS_PER_SOURCE
 
-ZS_NEWS_RSS = "https://www.zsnews.cn/index.php/rss/index/index"
+HOUSE_NEWS_URL = "http://house.zsnews.cn/index/lists/id/1210.html"
+
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+}
 
 
 def fetch_zs_news() -> list[dict]:
     items = []
     try:
-        feed = feedparser.parse(ZS_NEWS_RSS)
-        recent = datetime.now() - timedelta(days=3)
+        resp = requests.get(HOUSE_NEWS_URL, headers=HEADERS, timeout=REQUEST_TIMEOUT)
+        resp.encoding = "utf-8"
+        resp.raise_for_status()
+        soup = BeautifulSoup(resp.text, "html.parser")
 
-        for entry in feed.entries[:MAX_ITEMS_PER_SOURCE]:
-            title = entry.get("title", "")
-            link = entry.get("link", "")
-            summary = entry.get("summary", "")
-            published = entry.get("published", "")
+        for a_el in soup.select("a.l-list-title")[:MAX_ITEMS_PER_SOURCE]:
+            title = a_el.get("title", "").strip()
+            link = a_el.get("href", "")
+            if not title:
+                title = a_el.get_text(strip=True)
 
-            try:
-                from email.utils import parsedate_to_datetime
-                pub_date = parsedate_to_datetime(published)
-                pub_date = pub_date.replace(tzinfo=None)
-                if pub_date < recent:
-                    continue
-            except (ValueError, TypeError):
-                pass
+            date_el = a_el.find_parent("li")
+            if date_el:
+                date_span = date_el.select_one(".l-list-date, .date, span")
+                date = date_span.get_text(strip=True) if date_span else ""
+            else:
+                date = ""
 
-            relevant_keywords = ["房", "楼", "深中", "城建", "规划", "公积金", "政策"]
-            if any(kw in title for kw in relevant_keywords):
+            if title and link:
                 items.append({
                     "title": title,
                     "link": link,
-                    "summary": _clean_html(summary)[:200],
-                    "date": published,
+                    "summary": "",
+                    "date": date,
                 })
-    except Exception:
-        pass
+
+    except Exception as e:
+        print(f"[zs_news] error: {e}", file=sys.stderr)
 
     return items
-
-
-def _clean_html(raw: str) -> str:
-    from html import unescape
-    import re
-    text = re.sub(r"<[^>]+>", "", raw)
-    return unescape(text).strip()

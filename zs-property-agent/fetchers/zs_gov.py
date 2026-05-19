@@ -1,3 +1,4 @@
+import sys
 import requests
 from bs4 import BeautifulSoup
 from config import REQUEST_TIMEOUT, MAX_ITEMS_PER_SOURCE
@@ -30,7 +31,9 @@ def fetch_zs_gov() -> list[dict]:
             if title:
                 items.append({"title": title, "link": link, "date": date})
 
-    except requests.RequestException:
-        pass
+    except requests.RequestException as e:
+        print(f"[zs_gov] request error: {e}", file=sys.stderr)
+    except Exception as e:
+        print(f"[zs_gov] error: {e}", file=sys.stderr)
 
     return items

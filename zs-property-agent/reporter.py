@@ -42,9 +42,8 @@ def _format_gov(item: dict) -> str:
 
 
 def _format_news(item: dict) -> str:
-    summary = item.get("summary", "")
-    detail = f" — {summary}" if summary else ""
-    return f"- [{item['title']}]({item['link']}){detail}"
+    date = f" ({item.get('date', '')})" if item.get("date") else ""
+    return f"- [{item['title']}]({item['link']}){date}"
 
 
 def _format_anjuke(item: dict) -> str:

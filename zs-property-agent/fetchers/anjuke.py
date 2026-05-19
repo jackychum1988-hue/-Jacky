@@ -1,8 +1,9 @@
+import sys
 import requests
 from bs4 import BeautifulSoup
 from config import REQUEST_TIMEOUT, MAX_ITEMS_PER_SOURCE
 
-ANJUKE_URL = "https://zs.fang.anjuke.com/loupan/"
+ANJUKE_URL = "https://zhongshan.anjuke.com/loupan/"
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
@@ -13,7 +14,13 @@ def fetch_anjuke() -> list[dict]:
     items = []
     try:
         resp = requests.get(ANJUKE_URL, headers=HEADERS, timeout=REQUEST_TIMEOUT)
+        resp.encoding = "utf-8"
         resp.raise_for_status()
+
+        if "验证码" in resp.text or "captcha" in resp.text.lower():
+            print("[anjuke] blocked by captcha", file=sys.stderr)
+            return items
+
         soup = BeautifulSoup(resp.text, "html.parser")
 
         for card in soup.select(".list-item")[:MAX_ITEMS_PER_SOURCE]:
@@ -41,7 +48,9 @@ def fetch_anjuke() -> list[dict]:
                     "link": link,
                 })
 
-    except requests.RequestException:
-        pass
+    except requests.RequestException as e:
+        print(f"[anjuke] request error: {e}", file=sys.stderr)
+    except Exception as e:
+        print(f"[anjuke] error: {e}", file=sys.stderr)
 
     return items

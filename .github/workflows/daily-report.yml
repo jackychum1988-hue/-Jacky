@@ -3,11 +3,14 @@ name: Daily ZS Property Report
 on:
   schedule:
     - cron: "0 1 * * *"  # UTC 1:00 = 北京时间 9:00
-  workflow_dispatch:  # 允许手动触发
+  workflow_dispatch:
 
 jobs:
   daily-report:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: zs-property-agent
 
     steps:
       - uses: actions/checkout@v4

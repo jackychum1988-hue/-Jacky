@@ -1,0 +1,30 @@
+name: Villa Scout Brief
+
+on:
+  schedule:
+    # UTC 1:00 Mon = 北京时间周一 9:00, UTC 1:00 Thu = 北京时间周四 9:00
+    - cron: "0 1 * * 1,4"
+  workflow_dispatch:
+
+jobs:
+  scout:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: zhongshan-villa-agent
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run scout
+        env:
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+        run: python main.py scout

@@ -3,10 +3,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# PushPlus
 PUSHPLUS_TOKEN = os.getenv("PUSHPLUS_TOKEN", "")
+PUSHPLUS_URL = "https://www.pushplus.plus/send"
+
+# YouTube API
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY", "")
 
-PUSHPLUS_URL = "https://www.pushplus.plus/send"
+# AI Analysis (OpenAI-compatible: DeepSeek default)
+AI_API_KEY = os.getenv("AI_API_KEY", "")
+AI_API_BASE = os.getenv("AI_API_BASE", "https://api.deepseek.com/v1")
+AI_MODEL = os.getenv("AI_MODEL", "deepseek-chat")
 
 YOUTUBE_SEARCH_QUERIES = [
     "中山 买房",

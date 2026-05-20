@@ -9,6 +9,8 @@ from fetchers import (
     fetch_youtube,
     fetch_facebook,
 )
+from fetchers.content_extractor import extract_article
+from analyzer import analyze
 from reporter import build_report
 from pusher import push_to_wechat
 
@@ -22,6 +24,20 @@ def run_fetcher(name: str, fn) -> tuple[str, list[dict]]:
         print(f"[{name}] failed: {e}")
         traceback.print_exc()
         return name, []
+
+
+def enrich_news_items(results: dict) -> dict:
+    """Extract full article text for zs_news and zs_gov items."""
+    for source in ("zs_news", "zs_gov"):
+        items = results.get(source, [])
+        for item in items:
+            link = item.get("link", "")
+            if link:
+                text = extract_article(link)
+                if text:
+                    item["full_text"] = text
+                    print(f"[enrich] {source}: extracted {len(text)} chars from {link[:60]}")
+    return results
 
 
 def main():
@@ -43,6 +59,18 @@ def main():
             name, items = future.result()
             results[name] = items
 
+    # Extract full article text for news sources
+    print("[main] enriching news items with full content...")
+    results = enrich_news_items(results)
+
+    # AI analysis
+    print("[main] running AI analysis...")
+    ai_analysis = analyze(results)
+    if ai_analysis:
+        print(f"[main] AI analysis: {len(ai_analysis)} chars")
+    else:
+        print("[main] AI analysis skipped (no API key or failed)")
+
     report = build_report(
         anjuke_items=results.get("anjuke", []),
         zs_gov_items=results.get("zs_gov", []),
@@ -50,6 +78,7 @@ def main():
         douyin_items=results.get("douyin", []),
         youtube_items=results.get("youtube", []),
         facebook_items=results.get("facebook", []),
+        ai_analysis=ai_analysis,
     )
 
     title = f"🏠 中山房产日报 {datetime.now().strftime('%m/%d')}"

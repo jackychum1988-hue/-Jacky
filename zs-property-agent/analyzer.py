@@ -1,7 +1,7 @@
 """AI-powered real estate news analyzer via OpenAI-compatible API (DeepSeek default)."""
 import json
 import requests
-from config import AI_API_KEY, AI_API_BASE, AI_MODEL, REQUEST_TIMEOUT
+from config import DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, DEEPSEEK_MODEL, REQUEST_TIMEOUT
 
 SYSTEM_PROMPT = """你是一位资深中山房地产分析师，为"港人中山置业通Jacky"频道提供每日市场情报分析。
 
@@ -52,7 +52,7 @@ SYSTEM_PROMPT = """你是一位资深中山房地产分析师，为"港人中山
 
 def analyze(items_by_source: dict) -> str:
     """Send collected items to LLM and return the analytical report."""
-    if not AI_API_KEY:
+    if not DEEPSEEK_API_KEY:
         return ""
 
     # Build user message with all items
@@ -103,13 +103,13 @@ def analyze(items_by_source: dict) -> str:
 
     try:
         resp = requests.post(
-            f"{AI_API_BASE}/chat/completions",
+            f"{DEEPSEEK_BASE_URL}/chat/completions",
             headers={
-                "Authorization": f"Bearer {AI_API_KEY}",
+                "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
                 "Content-Type": "application/json",
             },
             json={
-                "model": AI_MODEL,
+                "model": DEEPSEEK_MODEL,
                 "messages": [
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": user_message},
@@ -127,13 +127,13 @@ def analyze(items_by_source: dict) -> str:
         # Retry once with longer timeout
         try:
             resp = requests.post(
-                f"{AI_API_BASE}/chat/completions",
+                f"{DEEPSEEK_BASE_URL}/chat/completions",
                 headers={
-                    "Authorization": f"Bearer {AI_API_KEY}",
+                    "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
                     "Content-Type": "application/json",
                 },
                 json={
-                    "model": AI_MODEL,
+                    "model": DEEPSEEK_MODEL,
                     "messages": [
                         {"role": "system", "content": SYSTEM_PROMPT},
                         {"role": "user", "content": user_message[:3000]},

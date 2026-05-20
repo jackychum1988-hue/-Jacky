@@ -11,9 +11,9 @@ PUSHPLUS_URL = "https://www.pushplus.plus/send"
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY", "")
 
 # AI Analysis (OpenAI-compatible: DeepSeek default)
-AI_API_KEY = os.getenv("AI_API_KEY", "")
-AI_API_BASE = os.getenv("AI_API_BASE", "https://api.deepseek.com/v1")
-AI_MODEL = os.getenv("AI_MODEL", "deepseek-chat")
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
+DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
+DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
 
 YOUTUBE_SEARCH_QUERIES = [
     "中山 买房",

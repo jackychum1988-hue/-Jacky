@@ -39,6 +39,8 @@ def build_report(
     douyin_items: list[dict],
     youtube_items: list[dict],
     facebook_items: list[dict],
+    hk_news_items: list[dict],
+    finance_items: list[dict],
     ai_analysis: str = "",
 ) -> str:
     today = datetime.now().strftime("%Y-%m-%d")
@@ -56,12 +58,16 @@ def build_report(
         _add_links_section(lines, "🎙 抖音博主", douyin_items, _format_douyin_link)
         _add_links_section(lines, "📺 YouTube", youtube_items, _format_youtube_link)
         _add_links_section(lines, "📘 Facebook", facebook_items, _format_facebook_link)
+        _add_links_section(lines, "🇭🇰 香港地产", hk_news_items, _format_link)
+        _add_links_section(lines, "💰 财经资讯", finance_items, _format_link)
     else:
         # Apply basic keyword filter to news items in fallback mode
         filtered_news = [i for i in zs_news_items if _is_real_estate(i)]
         _add_section(lines, "📰 【政策与城建】", zs_gov_items, _format_gov)
         _add_section(lines, "📰 【中山日报·楼市城建】", filtered_news, _format_news)
         _add_section(lines, "🏗 【新盘动态】", anjuke_items, _format_anjuke)
+        _add_section(lines, "🇭🇰 【香港地产】", hk_news_items, _format_hk)
+        _add_section(lines, "💰 【财经资讯】", finance_items, _format_hk)
         _add_section(lines, "🎙 【抖音主播动态】", douyin_items, _format_douyin)
         _add_section(lines, "📺 【YouTube 热门短片】", youtube_items, _format_youtube)
         _add_section(lines, "📘 【Facebook 热门帖文】", facebook_items, _format_facebook)
@@ -161,3 +167,8 @@ def _format_facebook(item: dict) -> str:
 def _format_facebook_link(item: dict) -> str:
     title = item.get("title", "") or "查看帖文"
     return f"- [{title}]({item['link']})"
+
+
+def _format_hk(item: dict) -> str:
+    snippet = f" — {item.get('snippet', '')}" if item.get("snippet") else ""
+    return f"- [{item['title']}]({item['link']}){snippet}"

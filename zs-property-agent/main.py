@@ -8,6 +8,8 @@ from fetchers import (
     fetch_douyin,
     fetch_youtube,
     fetch_facebook,
+    fetch_hk_news,
+    fetch_finance_news,
 )
 from fetchers.content_extractor import extract_article
 from analyzer import analyze
@@ -50,10 +52,12 @@ def main():
         ("douyin", fetch_douyin),
         ("youtube", fetch_youtube),
         ("facebook", fetch_facebook),
+        ("hk_news", fetch_hk_news),
+        ("finance", fetch_finance_news),
     ]
 
     results = {}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
         futures = {executor.submit(run_fetcher, name, fn): name for name, fn in fetchers}
         for future in concurrent.futures.as_completed(futures, timeout=60):
             name, items = future.result()
@@ -78,6 +82,8 @@ def main():
         douyin_items=results.get("douyin", []),
         youtube_items=results.get("youtube", []),
         facebook_items=results.get("facebook", []),
+        hk_news_items=results.get("hk_news", []),
+        finance_items=results.get("finance", []),
         ai_analysis=ai_analysis,
     )
 

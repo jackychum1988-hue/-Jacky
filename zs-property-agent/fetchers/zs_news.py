@@ -24,12 +24,11 @@ def fetch_zs_news() -> list[dict]:
             if not title:
                 title = a_el.get_text(strip=True)
 
-            date_el = a_el.find_parent("li")
-            if date_el:
-                date_span = date_el.select_one(".l-list-date, .date, span")
+            date = ""
+            li_el = a_el.find_parent("li")
+            if li_el:
+                date_span = li_el.select_one(".l-list-meta span")
                 date = date_span.get_text(strip=True) if date_span else ""
-            else:
-                date = ""
 
             if title and link:
                 items.append({

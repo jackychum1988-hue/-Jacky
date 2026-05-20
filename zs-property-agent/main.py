@@ -56,6 +56,11 @@ def main():
     push_result = push_to_wechat(title, report)
     print(f"Push result: {push_result}")
 
+    # Write sentinel for dedup across scheduled runs
+    if push_result.get("code") == 200:
+        with open(".sentinel", "w") as f:
+            f.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
     print(report)
     print("=== Done ===")
 

@@ -26,18 +26,19 @@ def main():
     print()
 
     # ③ AI写脚本
-    print("[3/5] AI生成脚本...")
+    print("[3/5] AI生成抖音脚本...")
     script = build_script(topic_info)
     print(f"  标题: {script.get('title')}")
     full = script.get('full_script', '')
     print(f"  脚本长度: {len(full)}字")
+    print(f"  钩子: {script.get('hook', '')[:50]}...")
     print(f"  标签: {' '.join(script.get('hashtags', []))}")
     print()
 
-    # 各平台发布文案
+    # 抖音发布文案
     platform_posts = build_platform_posts(script)
-    for platform in platform_posts:
-        print(f"  {platform}发布文案已生成")
+    douyin_post = platform_posts.get("抖音", {})
+    print(f"  抖音发布文案已生成")
 
     # ④ 视频生成
     print("\n[4/5] 生成视频制作包...")
@@ -63,10 +64,11 @@ def main():
 
     # 输出结果摘要
     print("\n" + "=" * 50)
-    print("📊 生成完成")
+    print("📊 抖音视频生成完成")
     print(f"  选题: {topic_info.get('topic_type')}")
     print(f"  汤品: {topic_info.get('main_soup')}")
     print(f"  标题: {script.get('title')}")
+    print(f"  平台: 抖音")
     print(f"  推送: {'成功' if push_result.get('code') == 200 else '失败/未配置'}")
 
     # 打印完整审核包（本地查看用）

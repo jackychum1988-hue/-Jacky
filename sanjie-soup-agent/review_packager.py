@@ -9,14 +9,17 @@ def build_review_package(
     platform_posts: dict,
     video_result: dict,
 ) -> str:
-    """构建审核包Markdown文本。"""
+    """构建抖音视频审核包Markdown文本。"""
     today = datetime.now().strftime("%Y-%m-%d")
     title = script.get("title", "")
     full_script = script.get("full_script", "")
     hashtags = " ".join(script.get("hashtags", []))
+    hook = script.get("hook", "")
+    interaction = script.get("interaction", "")
+    cta = script.get("cta", "")
 
     lines = [
-        f"🎥 {SHOP_NAME} | {today} 视频审核包",
+        f"🎥 {SHOP_NAME} | {today} 抖音视频审核包",
         "",
         "---",
         "",
@@ -32,7 +35,13 @@ def build_review_package(
         "## 视频标题",
         title,
         "",
-        "## 口播文案",
+        "## 脚本结构",
+        f"- **开场白**：饮汤啦！我系东凤三姐～",
+        f"- **钩子（1.5s）**：{hook}",
+        f"- **互动钩子**：{interaction}",
+        f"- **CTA**：{cta}",
+        "",
+        "## 完整口播文案",
         full_script,
         "",
         "## 话题标签",
@@ -40,31 +49,34 @@ def build_review_package(
         "",
         "---",
         "",
-        "## 各平台发布文案",
+        "## 抖音发布信息",
     ]
 
-    for platform, post in platform_posts.items():
-        lines.append(f"\n### {platform}")
-        lines.append(post.get("title", ""))
-        note = post.get("note", "")
+    douyin_post = platform_posts.get("抖音", {})
+    if douyin_post:
+        lines.append(f"**发布标题**：{douyin_post.get('title', '')}")
+        note = douyin_post.get("note", "")
         if note:
             lines.append(f"\n> {note}")
 
     lines.extend([
-        "",
-        "---",
         "",
         "## 视频制作",
         f"- 制作指导：{video_result.get('production_guide', '未生成')}",
         f"- 制作包：{video_result.get('video_path', '未生成')}",
         "",
         "## 推荐发布时间",
-        "今日 11:30-12:00 或 17:30-18:00",
+        "今日 11:30-12:00 或 17:30-18:00（抖音流量高峰期）",
+        "",
+        "## 发布后操作",
+        "- [ ] 发布后1小时内三姐本人在评论区互动回复",
+        "- [ ] 置顶一条引导评论（如：你今日饮咗汤未？）",
+        "- [ ] 发布后2小时查看完播率和互动数据",
         "",
         "---",
         "",
         "> 🤖 三姐老火靓汤AI智能体自动生成",
-        "> 审核通过后请手动发布至各平台",
+        "> 审核通过后请手动发布至抖音",
     ])
 
     return "\n".join(lines)
@@ -77,7 +89,7 @@ def push_to_wechat(content: str) -> dict:
         return {"code": -1, "msg": "PUSHPLUS_TOKEN not configured"}
 
     today = datetime.now().strftime("%m/%d")
-    title = f"🎥 {SHOP_NAME}视频审核 | {today}"
+    title = f"🎥 {SHOP_NAME}抖音视频审核 | {today}"
 
     payload = {
         "token": PUSHPLUS_TOKEN,

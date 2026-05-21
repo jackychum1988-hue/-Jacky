@@ -120,7 +120,7 @@ def analyze(items_by_source: dict) -> str:
             parts.append("")
 
     # Category 5: Social/blogger
-    social_sources = ("douyin", "youtube", "facebook")
+    social_sources = ("douyin", "xiaohongshu", "bilibili", "youtube", "facebook")
     social_items = []
     for src in social_sources:
         social_items.extend(items_by_source.get(src, []))

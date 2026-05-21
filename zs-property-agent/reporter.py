@@ -37,6 +37,8 @@ def build_report(
     zs_gov_items: list[dict],
     zs_news_items: list[dict],
     douyin_items: list[dict],
+    xiaohongshu_items: list[dict],
+    bilibili_items: list[dict],
     youtube_items: list[dict],
     facebook_items: list[dict],
     hk_news_items: list[dict],
@@ -56,6 +58,8 @@ def build_report(
         _add_links_section(lines, "📰 中山楼市网", zs_news_items, _format_link)
         _add_links_section(lines, "🏗 安居客新盘", anjuke_items, _format_anjuke_link)
         _add_links_section(lines, "🎙 抖音博主", douyin_items, _format_douyin_link)
+        _add_links_section(lines, "📕 小红书", xiaohongshu_items, _format_douyin_link)
+        _add_links_section(lines, "🎬 B站", bilibili_items, _format_douyin_link)
         _add_links_section(lines, "📺 YouTube", youtube_items, _format_youtube_link)
         _add_links_section(lines, "📘 Facebook", facebook_items, _format_facebook_link)
         _add_links_section(lines, "🇭🇰 香港地产", hk_news_items, _format_link)
@@ -69,6 +73,8 @@ def build_report(
         _add_section(lines, "🇭🇰 【香港地产】", hk_news_items, _format_hk)
         _add_section(lines, "💰 【财经资讯】", finance_items, _format_hk)
         _add_section(lines, "🎙 【抖音主播动态】", douyin_items, _format_douyin)
+        _add_section(lines, "📕 【小红书】", xiaohongshu_items, _format_douyin)
+        _add_section(lines, "🎬 【B站】", bilibili_items, _format_douyin)
         _add_section(lines, "📺 【YouTube 热门短片】", youtube_items, _format_youtube)
         _add_section(lines, "📘 【Facebook 热门帖文】", facebook_items, _format_facebook)
 

@@ -47,6 +47,14 @@ jobs:
           path: zs-property-agent/.sentinel
           key: daily-report-${{ steps.check-sent.outputs.today }}
 
+      - name: Restore URL dedup cache
+        id: dedup-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: zs-property-agent/.seen_urls.json
+          key: seen-urls-v1-${{ steps.check-sent.outputs.today }}
+          restore-keys: seen-urls-v1-
+
       - name: Run daily report
         if: steps.check-sent.outputs.skip_if_sent != 'true' || steps.cache.outputs.cache-hit != 'true'
         env:
@@ -61,3 +69,10 @@ jobs:
         with:
           path: zs-property-agent/.sentinel
           key: daily-report-${{ steps.check-sent.outputs.today }}
+
+      - name: Save URL dedup cache
+        if: success()
+        uses: actions/cache/save@v4
+        with:
+          path: zs-property-agent/.seen_urls.json
+          key: seen-urls-v1-${{ steps.check-sent.outputs.today }}

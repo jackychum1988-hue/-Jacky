@@ -6,6 +6,8 @@ from fetchers import (
     fetch_zs_gov,
     fetch_zs_news,
     fetch_douyin,
+    fetch_xiaohongshu,
+    fetch_bilibili,
     fetch_youtube,
     fetch_facebook,
     fetch_hk_news,
@@ -15,6 +17,7 @@ from fetchers.content_extractor import extract_article
 from analyzer import analyze
 from reporter import build_report
 from pusher import push_to_wechat
+from dedup import dedup_results, save_seen_urls
 
 
 def run_fetcher(name: str, fn) -> tuple[str, list[dict]]:
@@ -50,6 +53,8 @@ def main():
         ("zs_gov", fetch_zs_gov),
         ("zs_news", fetch_zs_news),
         ("douyin", fetch_douyin),
+        ("xiaohongshu", fetch_xiaohongshu),
+        ("bilibili", fetch_bilibili),
         ("youtube", fetch_youtube),
         ("facebook", fetch_facebook),
         ("hk_news", fetch_hk_news),
@@ -62,6 +67,10 @@ def main():
         for future in concurrent.futures.as_completed(futures, timeout=60):
             name, items = future.result()
             results[name] = items
+
+    # Dedup across days
+    print("[main] deduplicating against 7-day URL cache...")
+    results = dedup_results(results)
 
     # Extract full article text for news sources
     print("[main] enriching news items with full content...")
@@ -80,6 +89,8 @@ def main():
         zs_gov_items=results.get("zs_gov", []),
         zs_news_items=results.get("zs_news", []),
         douyin_items=results.get("douyin", []),
+        xiaohongshu_items=results.get("xiaohongshu", []),
+        bilibili_items=results.get("bilibili", []),
         youtube_items=results.get("youtube", []),
         facebook_items=results.get("facebook", []),
         hk_news_items=results.get("hk_news", []),
@@ -95,6 +106,7 @@ def main():
     if push_result.get("code") == 200:
         with open(".sentinel", "w") as f:
             f.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        save_seen_urls(results)
 
     print(report)
     print("=== Done ===")

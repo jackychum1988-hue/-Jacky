@@ -8,7 +8,7 @@ from config import (
 )
 
 
-def build_script(topic_info: dict) -> dict:
+def build_script(topic_info: dict, recent_titles: list[str] | None = None) -> dict:
     """调用DeepSeek API生成完整口播脚本和分镜。"""
     if not DEEPSEEK_API_KEY:
         return _fallback_script(topic_info)
@@ -31,12 +31,19 @@ def build_script(topic_info: dict) -> dict:
     combo_drink = cheap_drinks[0]["name"] if cheap_drinks else "豆奶"
     combo_price = soup_price + (cheap_snacks[0]["price"] if cheap_snacks else 6) + (cheap_drinks[0]["price"] if cheap_drinks else 3)
 
+    # 近期标题排除
+    exclusion_block = ""
+    if recent_titles:
+        exclusion_block = "## 15天内已发布的标题（严禁重复使用）\n" + "\n".join(
+            f"- {t}" for t in recent_titles
+        ) + "\n请确保今日标题与以上完全不同。\n\n"
+
     prompt = f"""你是{SHOP_NAME}（{SHOP_LOCATION}）的抖音短视频脚本撰写师。
 {SHOP_PERSONA}
 
 店铺标语：{SHOP_SLOGAN}
 
-## 今日视频信息
+{exclusion_block}## 今日视频信息
 - 选题类型：{topic_type}
 - 主打汤品：{soup_name}（{soup_effect}，{soup_price}元）
 - 切入角度：{angle}

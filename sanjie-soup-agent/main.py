@@ -1,7 +1,7 @@
 import traceback
 from datetime import datetime
 from competitor_watcher import fetch_competitors, summarize_competitors
-from topic_selector import select_topic, save_to_history
+from topic_selector import select_topic, save_to_history, load_history
 from script_writer import build_script, build_platform_posts
 from video_generator import generate_video
 from review_packager import build_review_package, push_to_wechat
@@ -27,7 +27,9 @@ def main():
 
     # ③ AI写脚本
     print("[3/5] AI生成抖音脚本...")
-    script = build_script(topic_info)
+    history = load_history()
+    recent_titles = [h.get("title", "") for h in history[-15:] if h.get("title")]
+    script = build_script(topic_info, recent_titles)
     print(f"  标题: {script.get('title')}")
     full = script.get('full_script', '')
     print(f"  脚本长度: {len(full)}字")

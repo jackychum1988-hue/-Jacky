@@ -58,9 +58,10 @@ def select_topic(competitor_summary: str) -> dict:
 
     menu_text = build_menu_text()
     history = load_history()
+    recent_15 = history[-15:]
     history_text = "\n".join(
-        f"- {h['date']}: {h['topic']}" for h in history[-7:]
-    ) if history else "暂无历史记录"
+        f"- {h['date']}: {h['topic']} | 标题: {h.get('title', '')}" for h in recent_15
+    ) if recent_15 else "暂无历史记录"
 
     now = datetime.now()
     season_info = _get_season_info(now)
@@ -71,7 +72,7 @@ def select_topic(competitor_summary: str) -> dict:
 ## 菜单
 {menu_text}
 
-## 近期已发布主题（避免重复）
+## 近15天已发布主题（严禁重复，必须避开）
 {history_text}
 
 ## 竞品动态
@@ -84,7 +85,9 @@ def select_topic(competitor_summary: str) -> dict:
 {chr(10).join(f'{i+1}. {t}' for i, t in enumerate(TOPIC_TYPES))}
 
 请从以下角度综合判断，选出今日最佳视频主题：
-1. 避免与近期已发布主题重复
+1. **硬性规则：15天内已发布的汤品+选题类型组合绝对不能重复使用。**
+    - 如果某汤品已在15天内出现过，必须选不同的汤品。
+    - 如果某种切入角度近期已用，必须换一个新角度。
 2. 参考竞品热门方向但要有差异化
 3. 结合当前季节/天气，选最应季的汤品
 4. 优先选择价格适中、受众广的汤品（13-18元价位）
@@ -102,7 +105,25 @@ def select_topic(competitor_summary: str) -> dict:
         text = resp.choices[0].message.content.strip()
         if text.startswith("```"):
             text = text.split("\n", 1)[1].rsplit("```", 1)[0]
-        return json.loads(text)
+        topic_info = json.loads(text)
+
+        # 硬校验：15天内不得重复
+        if _is_topic_duplicate(topic_info, recent_15):
+            print("  ⚠ 检测到15天内重复主题，自动重试...")
+            excluded = _build_exclusion_list(recent_15)
+            retry_prompt = prompt + f"\n\n⚠ 以下主题在15天内已使用过，请严格避开：\n{excluded}\n请重新选择一个完全不同的汤品和角度。"
+            resp = client.chat.completions.create(
+                model="deepseek-chat",
+                messages=[{"role": "user", "content": retry_prompt}],
+                temperature=0.9,
+                max_tokens=500,
+            )
+            text = resp.choices[0].message.content.strip()
+            if text.startswith("```"):
+                text = text.split("\n", 1)[1].rsplit("```", 1)[0]
+            topic_info = json.loads(text)
+
+        return topic_info
     except Exception:
         return _fallback_topic()
 
@@ -117,6 +138,32 @@ def _get_season_info(now: datetime) -> str:
         return "秋季，干燥转凉，适合滋补润肺类汤品（花旗参乌鸡汤、板栗煲老鸡汤、猪脚花生汤）"
     else:
         return "冬季，寒冷，适合驱寒暖胃类汤品（胡椒猪肚鸡汤、当归羊肉汤、滋补牛鞭汤）"
+
+
+def _is_topic_duplicate(topic_info: dict, recent_history: list[dict]) -> bool:
+    """检查选题是否在近期历史中重复。
+
+    判断标准：主打汤品相同 且 选题类型相同 → 视为重复。
+    """
+    main_soup = topic_info.get("main_soup", "").strip()
+    topic_type = topic_info.get("topic_type", "").strip()
+
+    if not main_soup or not topic_type:
+        return False
+
+    for h in recent_history:
+        h_topic = h.get("topic", "")
+        if main_soup in h_topic and topic_type in h_topic:
+            return True
+    return False
+
+
+def _build_exclusion_list(recent_history: list[dict]) -> str:
+    """构建近期已用主题的排除列表文本。"""
+    lines = []
+    for h in recent_history:
+        lines.append(f"- {h['date']}: {h.get('topic', '')}")
+    return "\n".join(lines)
 
 
 def _fallback_topic() -> dict:

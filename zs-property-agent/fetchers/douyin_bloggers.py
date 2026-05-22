@@ -16,6 +16,7 @@ def fetch_douyin() -> list[dict]:
             params = {
                 "q": f"site:douyin.com {blogger['query']}",
                 "count": 5,
+                "tbs": "qdr:d",
             }
             resp = requests.get(SEARCH_URL, headers=HEADERS, params=params, timeout=REQUEST_TIMEOUT)
             resp.raise_for_status()

@@ -17,7 +17,7 @@ def fetch_facebook() -> list[dict]:
     items = []
     for query in FB_SEARCH_QUERIES:
         try:
-            params = {"q": query, "count": 5}
+            params = {"q": query, "count": 5, "tbs": "qdr:d"}
             resp = requests.get(
                 "https://www.bing.com/search",
                 headers=HEADERS,

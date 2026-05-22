@@ -64,7 +64,7 @@ def _scrape_eastmoney() -> list[dict]:
 def _bing_search(query: str) -> list[dict]:
     items = []
     try:
-        params = {"q": query, "count": 5}
+        params = {"q": query, "count": 5, "tbs": "qdr:d"}
         resp = requests.get(
             "https://www.bing.com/search",
             headers=HEADERS,

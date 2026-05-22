@@ -6,6 +6,9 @@ on:
     - cron: "0 23 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   daily-video:
     runs-on: ubuntu-latest
@@ -30,6 +33,19 @@ jobs:
           JIMENG_API_KEY: ${{ secrets.JIMENG_API_KEY }}
           VOLCANO_TTS_KEY: ${{ secrets.VOLCANO_TTS_KEY }}
         run: python main.py
+
+      - name: Persist history back to repo
+        if: always()
+        run: |
+          git config user.name "Sanjie Soup Agent"
+          git config user.email "agent@sanjie-soup.local"
+          git add sanjie-soup-agent/history.json
+          if git diff --cached --quiet; then
+            echo "No history change to commit"
+          else
+            git commit -m "auto: update history.json after daily run"
+            git push
+          fi
 
       - name: Upload output artifacts
         uses: actions/upload-artifact@v4

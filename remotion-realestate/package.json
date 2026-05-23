@@ -1,0 +1,30 @@
+{
+  "name": "remotion-realestate",
+  "version": "1.0.0",
+  "description": "Remotion 房产视频组件库 — 暖金奢华 + 大地色系，专为香港/大湾区房产内容打造",
+  "scripts": {
+    "dev": "remotion studio",
+    "build": "remotion bundle",
+    "lint": "eslint src --ext .ts,.tsx",
+    "upgrade": "remotion upgrade"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.0",
+    "@remotion/three": "^4.0.465",
+    "@remotion/transitions": "^4.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "remotion": "^4.0.0",
+    "three": "^0.184.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@remotion/eslint-config": "^4.0.0",
+    "@types/react": "^19.0.0",
+    "@types/three": "^0.184.1",
+    "eslint": "^9.0.0",
+    "prettier": "^3.0.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}

@@ -6,6 +6,7 @@ interface FloatingCardProps {
   texture: Texture | null;
   position: [number, number, number];
   rotationY: number;
+  rotationX?: number;
   width: number;
   height: number;
   opacity: number;
@@ -15,6 +16,7 @@ export const FloatingCard: React.FC<FloatingCardProps> = ({
   texture,
   position,
   rotationY,
+  rotationX = 0,
   width,
   height,
   opacity,
@@ -24,7 +26,7 @@ export const FloatingCard: React.FC<FloatingCardProps> = ({
   return (
     <mesh
       position={position}
-      rotation={[0, rotationY, 0]}
+      rotation={[rotationX, rotationY, 0]}
     >
       <planeGeometry args={[width, height]} />
       <meshBasicMaterial

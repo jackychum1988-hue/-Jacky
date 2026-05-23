@@ -58,8 +58,8 @@ export const IconCloudScene: React.FC = () => {
         antialias: true,
       }}
       camera={{
-        fov: 55,
-        position: [0, 0, 8.5],
+        fov: 50,
+        position: [0, 0.8, 7.5],
         near: 0.1,
         far: 50,
       }}

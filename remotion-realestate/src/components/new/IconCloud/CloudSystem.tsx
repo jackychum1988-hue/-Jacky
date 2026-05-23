@@ -1,52 +1,51 @@
+// CloudSystem.tsx — 球形图标云，Fibonacci 球面均匀分布
 import React, { useMemo } from 'react';
 import { useCurrentFrame } from 'remotion';
 import { FloatingCard } from './FloatingCard';
-import { PROJECTS, LAYERS, LAYER_CONFIG, type ProjectData } from './projectData';
+import { PROJECTS } from './projectData';
 import type { Texture } from 'three';
 
 const FPS = 30;
 const DURATION_SEC = 12;
 const TOTAL_FRAMES = FPS * DURATION_SEC;
-const ENTRANCE_FRAMES = 60; // 2秒入场
-const TOTAL_ROTATION = (270 / 180) * Math.PI; // 270度 total rotation (radians)
+const ENTRANCE_FRAMES = 60;
+const SPHERE_RADIUS = 2.6;        // 球体半径，控制在画面内
+const CARD_W = 0.95;              // 统一卡片宽度
+const CARD_H = 0.63;              // 统一卡片高度
+const FULL_ROLLS = 0.75;          // 12秒内滚动的圈数
 
-// 为每个项目分配轨道参数
+// 18个点 Fibonacci 球面分布
 interface CardState {
-  project: ProjectData;
-  layerIndex: number;
-  orbitRadius: number;
-  cardWidth: number;
-  cardHeight: number;
-  angleOffset: number;    // 初始角度偏移
-  yBase: number;          // 基础高度
-  floatPhase: number;     // 浮动相位 (0-2π)
-  floatPeriod: number;    // 浮动周期 (帧)
-  floatAmp: number;       // 浮动振幅
+  project: (typeof PROJECTS)[number];
+  initX: number;
+  initY: number;
+  initZ: number;
+  floatPhase: number;
+  floatPeriod: number;
+  floatAmp: number;
 }
 
-function buildCardStates(textures: Map<number, Texture | null>): CardState[] {
+const phi_golden = Math.PI * (3 - Math.sqrt(5));
+
+function buildCardStates(): CardState[] {
+  const N = PROJECTS.length;
   const states: CardState[] = [];
 
-  for (let layerIdx = 0; layerIdx < 3; layerIdx++) {
-    const indices = [LAYERS.inner, LAYERS.middle, LAYERS.outer][layerIdx];
-    const config = LAYER_CONFIG[layerIdx];
-    const count = indices.length;
+  for (let i = 0; i < N; i++) {
+    // Fibonacci sphere: y from 1 (top) to -1 (bottom)
+    const yn = 1 - (i / (N - 1)) * 2;
+    const radiusAtY = Math.sqrt(1 - yn * yn);
+    const theta = phi_golden * i;
 
-    for (let i = 0; i < count; i++) {
-      const projectIdx = indices[i];
-      states.push({
-        project: PROJECTS[projectIdx],
-        layerIndex: layerIdx,
-        orbitRadius: config.radius,
-        cardWidth: config.cardWidth,
-        cardHeight: config.cardHeight,
-        angleOffset: (i / count) * Math.PI * 2 + (layerIdx * 0.5), // 层间错开
-        yBase: config.yRange[0] + (i / (count - 1)) * (config.yRange[1] - config.yRange[0]),
-        floatPhase: Math.random() * Math.PI * 2,
-        floatPeriod: 90 + Math.random() * 120, // 3-7秒周期
-        floatAmp: 0.05 + Math.random() * 0.15,
-      });
-    }
+    states.push({
+      project: PROJECTS[i],
+      initX: Math.cos(theta) * radiusAtY * SPHERE_RADIUS,
+      initY: yn * SPHERE_RADIUS,
+      initZ: Math.sin(theta) * radiusAtY * SPHERE_RADIUS,
+      floatPhase: Math.random() * Math.PI * 2,
+      floatPeriod: 90 + Math.random() * 120,
+      floatAmp: 0.04 + Math.random() * 0.1,
+    });
   }
   return states;
 }
@@ -58,49 +57,51 @@ interface CloudSystemProps {
 export const CloudSystem: React.FC<CloudSystemProps> = ({ textures }) => {
   const frame = useCurrentFrame();
 
-  // Use useMemo with a stable seed so card states don't re-randomize every render
-  const cardStates = useMemo(() => buildCardStates(textures), [textures]);
+  const cardStates = useMemo(() => buildCardStates(), []);
 
-  // 全局旋转角度（带入场缓入 ease-out cubic）
-  const globalAngle = (() => {
-    const raw = (frame / TOTAL_FRAMES) * TOTAL_ROTATION;
-    if (frame < ENTRANCE_FRAMES) {
-      const t = frame / ENTRANCE_FRAMES;
-      // ease-out cubic: raw * (1 - (1-t)^3)
-      return raw * (1 - Math.pow(1 - t, 3));
-    }
-    return raw;
-  })();
+  // 入场缓入
+  const easeIn = (t: number) => 1 - Math.pow(1 - t, 3);
 
-  // 入场透明度 (fade in over 2 seconds)
+  const rawRoll = (frame / TOTAL_FRAMES) * Math.PI * 2 * FULL_ROLLS;
+  const rollAngle = frame < ENTRANCE_FRAMES
+    ? rawRoll * easeIn(frame / ENTRANCE_FRAMES)
+    : rawRoll;
+
+  // 入场透明度
   const entranceOpacity = frame < ENTRANCE_FRAMES
     ? frame / ENTRANCE_FRAMES
     : 1;
 
   return (
-    <group>
+    <group
+      rotation={[
+        rollAngle,            // X轴为主：球体滚向屏幕
+        rollAngle * 0.25,     // Y轴微量：增加视觉层次
+        0,
+      ]}
+    >
       {cardStates.map((card, idx) => {
-        // 当前角度 = 全局旋转 * 层速度倍率 + 偏移
-        const speedMult = LAYER_CONFIG[card.layerIndex].speedMultiplier;
-        const angle = globalAngle * speedMult + card.angleOffset;
+        // 基础位置（球面坐标）
+        const { initX, initY, initZ } = card;
 
-        // 3D 位置（绕Y轴圆周运动）
-        const x = Math.cos(angle) * card.orbitRadius;
-        const z = Math.sin(angle) * card.orbitRadius;
-
-        // 垂直浮动（sin波，每张卡独立相位和周期）
-        const floatOffset = Math.sin(
+        // 微小径向浮动
+        const floatR = Math.sin(
           (frame / card.floatPeriod) * Math.PI * 2 + card.floatPhase,
         ) * card.floatAmp;
-        const y = card.yBase + floatOffset;
 
-        // 卡片Y轴旋转：让卡片始终面向轨道切线方向
-        // 垂直于圆心方向 = 面向切线 = -angle + π/2
-        const rotationY = -angle + Math.PI / 2;
+        const dist = Math.sqrt(initX * initX + initY * initY + initZ * initZ) || 1;
+        const nx = initX / dist;
+        const ny = initY / dist;
+        const nz = initZ / dist;
 
-        // 远层卡片稍透明，加深景深感
-        const depthOpacity = card.layerIndex === 0 ? 1 : card.layerIndex === 1 ? 0.85 : 0.7;
-        const opacity = entranceOpacity * depthOpacity;
+        const x = initX + nx * floatR;
+        const y = initY + ny * floatR;
+        const z = initZ + nz * floatR;
+
+        // 卡片朝外（法线沿径向向外）
+        const rotY = Math.atan2(x, z);
+        const horizR = Math.sqrt(x * x + z * z);
+        const rotX = -Math.atan2(y, horizR);
 
         const texture = textures.get(card.project.id) ?? null;
 
@@ -109,10 +110,11 @@ export const CloudSystem: React.FC<CloudSystemProps> = ({ textures }) => {
             key={idx}
             texture={texture}
             position={[x, y, z]}
-            rotationY={rotationY}
-            width={card.cardWidth}
-            height={card.cardHeight}
-            opacity={opacity}
+            rotationY={rotY}
+            rotationX={rotX}
+            width={CARD_W}
+            height={CARD_H}
+            opacity={entranceOpacity}
           />
         );
       })}

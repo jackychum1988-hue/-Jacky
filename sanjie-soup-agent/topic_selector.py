@@ -107,6 +107,11 @@ def select_topic(competitor_summary: str) -> dict:
             text = text.split("\n", 1)[1].rsplit("```", 1)[0]
         topic_info = json.loads(text)
 
+        # 标准化 topic_type：如果是完整描述，截取简写
+        raw_type = topic_info.get("topic_type", "")
+        if "：" in raw_type:
+            topic_info["topic_type"] = raw_type.split("：")[0]
+
         # 硬校验：15天内不得重复
         if _is_topic_duplicate(topic_info, recent_15):
             print("  ⚠ 检测到15天内重复主题，自动重试...")
@@ -122,6 +127,9 @@ def select_topic(competitor_summary: str) -> dict:
             if text.startswith("```"):
                 text = text.split("\n", 1)[1].rsplit("```", 1)[0]
             topic_info = json.loads(text)
+            raw_type = topic_info.get("topic_type", "")
+            if "：" in raw_type:
+                topic_info["topic_type"] = raw_type.split("：")[0]
 
         return topic_info
     except Exception as e:
@@ -208,10 +216,10 @@ def _fallback_topic() -> dict:
 
     soup = available[0]
 
-    # 选没被用过的选题类型
-    available_types = [t for t in TOPIC_TYPES if t.split("：")[0] not in used_types]
+    # 选没被用过的选题类型（只用简写，与AI返回格式一致）
+    available_types = [t.split("：")[0] for t in TOPIC_TYPES if t.split("：")[0] not in used_types]
     if not available_types:
-        available_types = TOPIC_TYPES
+        available_types = [t.split("：")[0] for t in TOPIC_TYPES]
     topic_type = available_types[0]
 
     return {

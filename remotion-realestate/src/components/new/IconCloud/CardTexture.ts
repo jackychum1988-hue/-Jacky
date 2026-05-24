@@ -54,15 +54,15 @@ export function createBadgeTexture(project: {
   // 项目名 — 截断过长的名字
   ctx.fillStyle = '#2c3e50';
   const name = project.name.length > 5 ? project.name.slice(0, 5) + '…' : project.name;
-  ctx.font = 'bold 15px "PingFang SC", "Microsoft YaHei", sans-serif';
+  ctx.font = 'bold 18px "PingFang SC", "Microsoft YaHei", sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(name, RADIUS, RADIUS - 2);
+  ctx.fillText(name, RADIUS, RADIUS);
 
   // 区域标签
   ctx.fillStyle = '#7a8b9a';
-  ctx.font = '11px "PingFang SC", "Microsoft YaHei", sans-serif';
-  ctx.fillText(project.district, RADIUS, RADIUS + 16);
+  ctx.font = '12px "PingFang SC", "Microsoft YaHei", sans-serif';
+  ctx.fillText(project.district, RADIUS, RADIUS + 18);
 
   const texture = new CanvasTexture(canvas);
   texture.minFilter = LinearFilter;

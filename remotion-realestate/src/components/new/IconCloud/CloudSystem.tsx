@@ -10,7 +10,7 @@ const DURATION_SEC = 12;
 const TOTAL_FRAMES = FPS * DURATION_SEC;
 const ENTRANCE_FRAMES = 50;
 const SPHERE_RADIUS = 3.0;
-const BADGE_SIZE = 0.42;         // 圆形徽章尺寸（正方形平面贴圆形纹理）
+const BADGE_SIZE = 0.34;         // 圆形徽章尺寸
 const FULL_ROLLS = 0.45;         // 12秒内 Y 轴圈数（更慢更平滑）
 
 interface BadgeState {

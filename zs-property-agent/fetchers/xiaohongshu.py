@@ -17,7 +17,7 @@ def fetch_xiaohongshu() -> list[dict]:
             params = {
                 "q": f"site:xiaohongshu.com {blogger['query']}",
                 "count": 5,
-                "tbs": "qdr:d",
+                "tbs": "qdr:w",
             }
             resp = requests.get(SEARCH_URL, headers=HEADERS, params=params, timeout=REQUEST_TIMEOUT)
             resp.raise_for_status()

@@ -64,7 +64,10 @@ def analyze(items_by_source: dict) -> str:
     parts = ["今日收集到的中山+香港地产+财经资讯：\n"]
 
     # Category 1: Zhongshan news/policy
-    zs_items = items_by_source.get("zs_gov", []) + items_by_source.get("zs_news", [])
+    zs_items = (items_by_source.get("zs_gov", [])
+                + items_by_source.get("zs_news", [])
+                + items_by_source.get("zs_fang", [])
+                + items_by_source.get("zs_leju", []))
     if zs_items:
         parts.append("## 中山楼市新闻/政策")
         for item in zs_items:
@@ -120,7 +123,7 @@ def analyze(items_by_source: dict) -> str:
             parts.append("")
 
     # Category 5: Social/blogger
-    social_sources = ("douyin", "xiaohongshu", "bilibili", "youtube", "facebook")
+    social_sources = ("douyin", "xiaohongshu", "bilibili", "wechat", "youtube", "facebook")
     social_items = []
     for src in social_sources:
         social_items.extend(items_by_source.get(src, []))

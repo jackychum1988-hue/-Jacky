@@ -50,5 +50,10 @@ BILIBILI_BLOGGERS = [
     {"name": "中山文英说房", "query": "中山文英说房"},
 ]
 
+WECHAT_BLOGGERS = [
+    {"name": "中山房叔", "query": "中山房叔 房产"},
+    {"name": "中山房频", "query": "中山房频 房产"},
+]
+
 REQUEST_TIMEOUT = 15
 MAX_ITEMS_PER_SOURCE = 5

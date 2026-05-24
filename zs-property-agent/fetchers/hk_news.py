@@ -19,7 +19,7 @@ def fetch_hk_news() -> list[dict]:
     items = []
     for query in HK_SEARCH_QUERIES:
         try:
-            params = {"q": query, "count": 5, "tbs": "qdr:d"}
+            params = {"q": query, "count": 5, "tbs": "qdr:w"}
             resp = requests.get(
                 "https://www.bing.com/search",
                 headers=HEADERS,

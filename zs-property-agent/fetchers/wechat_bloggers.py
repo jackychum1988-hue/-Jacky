@@ -1,7 +1,8 @@
+"""WeChat public account (公众号) blogger search via Bing."""
 import sys
 import requests
 from bs4 import BeautifulSoup
-from config import REQUEST_TIMEOUT, MAX_ITEMS_PER_SOURCE, DOUYIN_BLOGGERS
+from config import REQUEST_TIMEOUT, MAX_ITEMS_PER_SOURCE, WECHAT_BLOGGERS
 
 SEARCH_URL = "https://www.bing.com/search"
 HEADERS = {
@@ -9,12 +10,12 @@ HEADERS = {
 }
 
 
-def fetch_douyin() -> list[dict]:
+def fetch_wechat() -> list[dict]:
     items = []
-    for blogger in DOUYIN_BLOGGERS:
+    for blogger in WECHAT_BLOGGERS:
         try:
             params = {
-                "q": f"site:douyin.com {blogger['query']}",
+                "q": f"site:mp.weixin.qq.com {blogger['query']}",
                 "count": 5,
                 "tbs": "qdr:w",
             }
@@ -28,7 +29,6 @@ def fetch_douyin() -> list[dict]:
 
                 title = a_el.get_text(strip=True) if a_el else ""
                 link = a_el.get("href", "") if a_el else ""
-
                 snippet = snippet_el.get_text(strip=True)[:100] if snippet_el else ""
 
                 if title and link:
@@ -39,10 +39,10 @@ def fetch_douyin() -> list[dict]:
                         "snippet": snippet,
                     })
         except requests.RequestException as e:
-            print(f"[douyin] request error for {blogger['name']}: {e}", file=sys.stderr)
+            print(f"[wechat] request error for {blogger['name']}: {e}", file=sys.stderr)
             continue
         except Exception as e:
-            print(f"[douyin] error for {blogger['name']}: {e}", file=sys.stderr)
+            print(f"[wechat] error for {blogger['name']}: {e}", file=sys.stderr)
             continue
 
     return items[:MAX_ITEMS_PER_SOURCE]

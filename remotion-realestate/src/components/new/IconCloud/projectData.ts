@@ -20,6 +20,9 @@ function districtGradient(district: string): [string, string] {
     '坦洲':   ['#c0b8d0', '#a098b8'],  // 淡紫 — 珠海门户
     '市區':   ['#b0c0d0', '#88a0b8'],  // 灰蓝 — 城市地标
     '南頭':   ['#b0b8c8', '#8898b0'],  // 银灰 — 产城融合
+    '火炬':   ['#d8b8a8', '#c89878'],  // 暖橙 — 高新活力
+    '古鎮':   ['#c8d0b8', '#a0b090'],  // 橄榄 — 灯都产业
+    '港口':   ['#b8c8d0', '#90a8b8'],  // 蓝灰 — 港口新城
   };
   return palettes[district] || ['#b8c4d4', '#90a8c0'];
 }
@@ -37,7 +40,7 @@ function makeDataUri(name: string, district: string): string {
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 }
 
-// 18 个中山在售楼盘
+// 38 个中山在售楼盘
 export const PROJECTS: ProjectData[] = [
   // ===== 1-6 市中心核心热门盘 =====
   { id: 1,  name: '江山和鸣',            district: '石岐', tag: '四代宅·使用率145%',  imageUrl: makeDataUri('江山和鸣', '石岐') },
@@ -62,17 +65,34 @@ export const PROJECTS: ProjectData[] = [
   { id: 16, name: '中澳春城',            district: '坦洲', tag: '坦洲熱搜TOP1',       imageUrl: makeDataUri('中澳春城', '坦洲') },
   { id: 17, name: '港航匯',              district: '市區', tag: '精裝公寓·21.8萬起',   imageUrl: makeDataUri('港航匯', '市區') },
   { id: 18, name: '海雅繽紛城',           district: '南頭', tag: '商辦綜合體',          imageUrl: makeDataUri('海雅繽紛城', '南頭') },
-];
 
-// 轨道层级索引
-export const LAYERS = {
-  inner: [0, 1, 2, 3, 4, 5],     // PROJECTS indices
-  middle: [6, 7, 8, 9, 10, 11],
-  outer: [12, 13, 14, 15, 16, 17],
-};
+  // ===== 19-24 東區/石岐/西區/南區（新增核心城区） =====
+  { id: 19, name: '保利香山瑧悦府',        district: '東區', tag: '保利高端·紫馬嶺',    imageUrl: makeDataUri('保利香山瑧悦府', '東區') },
+  { id: 20, name: '朗詩金鐘湖壹號',        district: '東區', tag: '金鐘湖科技住宅',     imageUrl: makeDataUri('朗詩金鐘湖壹號', '東區') },
+  { id: 21, name: '華發學府壹號',          district: '石岐', tag: '學府旁·已交房',      imageUrl: makeDataUri('華發學府壹號', '石岐') },
+  { id: 22, name: '金鷹半山花園',          district: '石岐', tag: '總部經濟區高端住宅',   imageUrl: makeDataUri('金鷹半山花園', '石岐') },
+  { id: 23, name: '華立富華薈',           district: '西區', tag: '富華道·65-107平',    imageUrl: makeDataUri('華立富華薈', '西區') },
+  { id: 24, name: '懿臻山',              district: '南區', tag: '高端住宅·13k-17k',    imageUrl: makeDataUri('懿臻山', '南區') },
 
-export const LAYER_CONFIG = [
-  { name: 'inner', radius: 3.2, cardWidth: 1.2, cardHeight: 0.8, speedMultiplier: 1.0, yRange: [-0.6, 0.6] as [number, number] },
-  { name: 'middle', radius: 5.0, cardWidth: 0.9, cardHeight: 0.6, speedMultiplier: 1.3, yRange: [-1.2, 1.2] as [number, number] },
-  { name: 'outer', radius: 6.8, cardWidth: 0.7, cardHeight: 0.47, speedMultiplier: 1.6, yRange: [-1.8, 1.8] as [number, number] },
+  // ===== 25-30 南區/翠亨（生態+馬鞍島新區） =====
+  { id: 25, name: '碧桂園·鳳凰城',         district: '南區', tag: '大型生態社區·8k起',  imageUrl: makeDataUri('碧桂園·鳳凰城', '南區') },
+  { id: 26, name: '招商臻灣府',            district: '翠亨', tag: '深中通道·79-119平',  imageUrl: makeDataUri('招商臻灣府', '翠亨') },
+  { id: 27, name: '中山粵海城',            district: '翠亨', tag: '一線臨海現房',       imageUrl: makeDataUri('中山粵海城', '翠亨') },
+  { id: 28, name: '中興智慧城·懿禧府',      district: '翠亨', tag: '地鐵上蓋·馬鞍島',    imageUrl: makeDataUri('中興智慧城·懿禧府', '翠亨') },
+  { id: 29, name: '保利天匯·熙岸',         district: '翠亨', tag: '復式·使用率107%',    imageUrl: makeDataUri('保利天匯·熙岸', '翠亨') },
+  { id: 30, name: '雅居樂灣際壹號',         district: '翠亨', tag: '灣區綜合體',         imageUrl: makeDataUri('雅居樂灣際壹號', '翠亨') },
+
+  // ===== 31-33 火炬開發區 =====
+  { id: 31, name: '御峰香林',             district: '火炬', tag: '低密改善·高得房率',   imageUrl: makeDataUri('御峰香林', '火炬') },
+  { id: 32, name: '火炬建發·望江台',       district: '火炬', tag: '一線江景·7.2k起',    imageUrl: makeDataUri('火炬建發·望江台', '火炬') },
+  { id: 33, name: '東方名都',             district: '火炬', tag: '東南亞園林·無邊泳池',  imageUrl: makeDataUri('東方名都', '火炬') },
+
+  // ===== 34-35 坦洲（港人熱門） =====
+  { id: 34, name: '逸駿半島',             district: '坦洲', tag: '近珠海50米·60萬平',  imageUrl: makeDataUri('逸駿半島', '坦洲') },
+  { id: 35, name: '優越香格里',            district: '坦洲', tag: '大型成熟社區',        imageUrl: makeDataUri('優越香格里', '坦洲') },
+
+  // ===== 36-38 古鎮/港口/南頭 =====
+  { id: 36, name: '保利·和光塵樾',         district: '古鎮', tag: '保利高端·14.5k起',  imageUrl: makeDataUri('保利·和光塵樾', '古鎮') },
+  { id: 37, name: '星晨·君悅灣',           district: '港口', tag: '近市區·8k/平',       imageUrl: makeDataUri('星晨·君悅灣', '港口') },
+  { id: 38, name: '鉑灣半島',             district: '南頭', tag: '濱水住宅·2026交房',   imageUrl: makeDataUri('鉑灣半島', '南頭') },
 ];

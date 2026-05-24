@@ -9,10 +9,10 @@ const FPS = 30;
 const DURATION_SEC = 12;
 const TOTAL_FRAMES = FPS * DURATION_SEC;
 const ENTRANCE_FRAMES = 60;
-const SPHERE_RADIUS = 2.6;        // 球体半径，控制在画面内
-const CARD_W = 0.95;              // 统一卡片宽度
-const CARD_H = 0.63;              // 统一卡片高度
-const FULL_ROLLS = 0.75;          // 12秒内滚动的圈数
+const SPHERE_RADIUS = 3.0;        // 球体半径，38卡适配
+const CARD_W = 0.78;              // 卡片宽度（38卡密度适配）
+const CARD_H = 0.52;              // 卡片高度（保持宽高比）
+const FULL_ROLLS = 0.6;           // 12秒内滚动的圈数
 
 // 18个点 Fibonacci 球面分布
 interface CardState {

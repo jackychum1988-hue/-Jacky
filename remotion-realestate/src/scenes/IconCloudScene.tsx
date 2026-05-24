@@ -59,7 +59,7 @@ export const IconCloudScene: React.FC = () => {
       }}
       camera={{
         fov: 50,
-        position: [0, 0.8, 7.5],
+        position: [0, 0.8, 8.2],
         near: 0.1,
         far: 50,
       }}
@@ -81,7 +81,7 @@ export const IconCloudScene: React.FC = () => {
 
       {/* 中心淡光晕（装饰性柔光） */}
       <mesh position={[0, 0, -1]}>
-        <planeGeometry args={[2.5, 2.5]} />
+        <planeGeometry args={[3.0, 3.0]} />
         <meshBasicMaterial
           color="#e8f0f8"
           transparent={true}

@@ -89,7 +89,10 @@ def build_script(topic_info: dict, recent_titles: list[str] | None = None) -> di
         if text.startswith("```"):
             text = text.split("\n", 1)[1].rsplit("```", 0)[0]
         return json.loads(text)
-    except Exception:
+    except Exception as e:
+        print(f"  ❌ DeepSeek API脚本生成失败: {e}")
+        import traceback
+        traceback.print_exc()
         return _fallback_script(topic_info)
 
 

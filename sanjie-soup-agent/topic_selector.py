@@ -124,7 +124,10 @@ def select_topic(competitor_summary: str) -> dict:
             topic_info = json.loads(text)
 
         return topic_info
-    except Exception:
+    except Exception as e:
+        print(f"  ❌ DeepSeek API选題失败: {e}")
+        import traceback
+        traceback.print_exc()
         return _fallback_topic()
 
 
@@ -167,10 +170,54 @@ def _build_exclusion_list(recent_history: list[dict]) -> str:
 
 
 def _fallback_topic() -> dict:
+    """离线话题选择：按历史排除已用汤品，按季节优先推荐。"""
+    history = load_history()
+    recent_15 = history[-15:]
+
+    # 提取15天内已用的所有汤品名称
+    used_soups = set()
+    used_types = set()
+    for h in recent_15:
+        topic = h.get("topic", "")
+        for s in SOUP_MENU:
+            if s["name"] in topic:
+                used_soups.add(s["name"])
+        for t in TOPIC_TYPES:
+            if t.split("：")[0] in topic:
+                used_types.add(t.split("：")[0])
+
+    # 过滤出可用的汤品
+    available = [s for s in SOUP_MENU if s["name"] not in used_soups]
+    if not available:
+        available = SOUP_MENU  # 都轮过了就重新开始
+
+    # 按季节排序：应季在前
+    now = datetime.now()
+    month = now.month
+    if month in [3, 4, 5]:
+        seasonal = ["菜干猪肺汤", "海带排骨汤", "鸡骨草排骨"]
+    elif month in [6, 7, 8]:
+        seasonal = ["玉米排骨汤", "莲藕排骨汤"]
+    elif month in [9, 10, 11]:
+        seasonal = ["花旗参乌鸡汤", "板栗煲老鸡汤", "猪脚花生汤"]
+    else:
+        seasonal = ["胡椒猪肚鸡汤", "当归羊肉汤", "滋补牛鞭汤"]
+
+    # 应季的排前面
+    available.sort(key=lambda s: (s["name"] not in seasonal, s["name"]))
+
+    soup = available[0]
+
+    # 选没被用过的选题类型
+    available_types = [t for t in TOPIC_TYPES if t.split("：")[0] not in used_types]
+    if not available_types:
+        available_types = TOPIC_TYPES
+    topic_type = available_types[0]
+
     return {
-        "topic_type": "单品深挖",
-        "main_soup": "花旗参乌鸡汤",
-        "angle": "花旗参乌鸡足料慢炖，16蚊补血养颜",
-        "reason": "秋季应季滋补，花旗参乌鸡汤受众广、价格适中",
-        "target_audience": "东凤上班族女性、社区居民",
+        "topic_type": topic_type,
+        "main_soup": soup["name"],
+        "angle": f"{soup['name']}{soup['effect']}，{soup['price']}元实惠价",
+        "reason": f"离线模式：按季节和历史轮换，自动避开15天内已用汤品",
+        "target_audience": "东凤上班族、社区居民",
     }

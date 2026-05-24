@@ -14,7 +14,10 @@ function loadImage(url: string): Promise<HTMLImageElement> {
   if (imageCache.has(url)) return Promise.resolve(imageCache.get(url)!);
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.crossOrigin = 'anonymous';
+    // data URI 不需要 crossOrigin，否则会报错
+    if (!url.startsWith('data:')) {
+      img.crossOrigin = 'anonymous';
+    }
     img.onload = () => { imageCache.set(url, img); resolve(img); };
     img.onerror = reject;
     img.src = url;

@@ -3,45 +3,25 @@ import React, { useEffect, useState } from 'react';
 import { ThreeCanvas } from '@remotion/three';
 import { continueRender, delayRender } from 'remotion';
 import { CloudSystem } from '../components/new/IconCloud/CloudSystem';
-import { createCardTexture } from '../components/new/IconCloud/CardTexture';
+import { createBadgeTexture } from '../components/new/IconCloud/CardTexture';
 import { PROJECTS } from '../components/new/IconCloud/projectData';
 import type { Texture } from 'three';
 
 export const IconCloudScene: React.FC = () => {
   const [textures, setTextures] = useState<Map<number, Texture> | null>(null);
-  const [handle] = useState(() => delayRender('Loading card textures for icon cloud'));
+  const [handle] = useState(() => delayRender('Loading badge textures'));
 
   useEffect(() => {
-    const loadTextures = async () => {
-      const map = new Map<number, Texture>();
-      for (const project of PROJECTS) {
-        try {
-          const tex = await createCardTexture({
-            name: project.name,
-            district: project.district,
-            tag: project.tag,
-            imageUrl: project.imageUrl,
-          });
-          map.set(project.id, tex);
-        } catch {
-          // Even if image loading fails, create texture with fallback
-          try {
-            const tex = await createCardTexture({
-              name: project.name,
-              district: project.district,
-              tag: project.tag,
-              imageUrl: '',
-            });
-            map.set(project.id, tex);
-          } catch {
-            // Skip this card if even fallback fails
-          }
-        }
-      }
-      setTextures(map);
-      continueRender(handle);
-    };
-    loadTextures();
+    const map = new Map<number, Texture>();
+    for (const project of PROJECTS) {
+      const tex = createBadgeTexture({
+        name: project.name,
+        district: project.district,
+      });
+      map.set(project.id, tex);
+    }
+    setTextures(map);
+    continueRender(handle);
   }, [handle]);
 
   if (!textures) {
@@ -59,7 +39,7 @@ export const IconCloudScene: React.FC = () => {
       }}
       camera={{
         fov: 50,
-        position: [0, 0.8, 8.2],
+        position: [0, 0.6, 7.5],
         near: 0.1,
         far: 50,
       }}
@@ -67,25 +47,18 @@ export const IconCloudScene: React.FC = () => {
         background: 'transparent',
       }}
     >
-      {/* 柔和环境光 */}
-      <ambientLight intensity={0.7} color="#ffffff" />
+      <ambientLight intensity={0.8} color="#ffffff" />
+      <directionalLight position={[5, 5, 5]} intensity={0.25} color="#ffffff" />
+      <directionalLight position={[-3, -2, -3]} intensity={0.12} color="#c8ddf0" />
 
-      {/* 主方向光（暖白） */}
-      <directionalLight position={[5, 5, 5]} intensity={0.3} color="#ffffff" />
-
-      {/* 补光（淡蓝冷调） */}
-      <directionalLight position={[-3, -2, -3]} intensity={0.15} color="#c8ddf0" />
-
-      {/* 三层卡片轨道 */}
       <CloudSystem textures={textures} />
 
-      {/* 中心淡光晕（装饰性柔光） */}
       <mesh position={[0, 0, -1]}>
         <planeGeometry args={[3.0, 3.0]} />
         <meshBasicMaterial
           color="#e8f0f8"
           transparent={true}
-          opacity={0.05}
+          opacity={0.04}
           side={2}
           depthWrite={false}
         />

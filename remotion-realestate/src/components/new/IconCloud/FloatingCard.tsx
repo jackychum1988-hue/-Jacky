@@ -35,6 +35,7 @@ export const FloatingCard: React.FC<FloatingCardProps> = ({
         opacity={opacity}
         side={2}
         depthWrite={false}
+        depthTest={true}
       />
     </mesh>
   );

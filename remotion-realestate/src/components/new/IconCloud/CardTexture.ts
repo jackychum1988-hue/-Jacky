@@ -1,116 +1,71 @@
-// remotion-realestate/src/components/new/IconCloud/CardTexture.ts
-import { CanvasTexture, LinearFilter, LinearMipmapLinearFilter } from 'three';
+// BadgeTexture.ts — 圆形楼盘图标徽章
+import { CanvasTexture, LinearFilter } from 'three';
 
-const CANVAS_W = 400;
-const CANVAS_H = 280;
-const RADIUS = 14;
-const IMAGE_H = CANVAS_H * 0.62;
-const TEXT_H = CANVAS_H - IMAGE_H;
+const SIZE = 128;
+const RADIUS = SIZE / 2;
 
-// 图片缓存
-const imageCache = new Map<string, HTMLImageElement>();
+// 区域配色
+const districtColors: Record<string, string> = {
+  '東區': '#5b9bd5',
+  '石岐': '#c8a050',
+  '西區': '#4aad8c',
+  '南區': '#5a9a7a',
+  '翠亨': '#4a80b8',
+  '三鄉': '#7a9a50',
+  '坦洲': '#8a70b0',
+  '市區': '#6a88a0',
+  '南頭': '#6a7898',
+  '火炬': '#c88060',
+  '古鎮': '#8a9a60',
+  '港口': '#5a8898',
+};
 
-function loadImage(url: string): Promise<HTMLImageElement> {
-  if (imageCache.has(url)) return Promise.resolve(imageCache.get(url)!);
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    // data URI 不需要 crossOrigin，否则会报错
-    if (!url.startsWith('data:')) {
-      img.crossOrigin = 'anonymous';
-    }
-    img.onload = () => { imageCache.set(url, img); resolve(img); };
-    img.onerror = reject;
-    img.src = url;
-  });
+function colorFor(district: string): string {
+  return districtColors[district] || '#6a88a0';
 }
 
-function roundRect(
-  ctx: CanvasRenderingContext2D,
-  x: number, y: number, w: number, h: number, r: number,
-) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
-  ctx.closePath();
-}
-
-export async function createCardTexture(project: {
+export function createBadgeTexture(project: {
   name: string;
   district: string;
-  tag: string;
-  imageUrl: string;
-}): Promise<CanvasTexture> {
+}): CanvasTexture {
   const canvas = document.createElement('canvas');
-  canvas.width = CANVAS_W;
-  canvas.height = CANVAS_H;
+  canvas.width = SIZE;
+  canvas.height = SIZE;
   const ctx = canvas.getContext('2d')!;
+  const base = colorFor(project.district);
 
-  // 1. 玻璃态半透白底
-  roundRect(ctx, 0, 0, CANVAS_W, CANVAS_H, RADIUS);
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+  // 柔光背景圆
+  ctx.beginPath();
+  ctx.arc(RADIUS, RADIUS, RADIUS - 2, 0, Math.PI * 2);
+  const grad = ctx.createRadialGradient(RADIUS - 15, RADIUS - 15, 5, RADIUS, RADIUS, RADIUS - 2);
+  grad.addColorStop(0, 'rgba(255,255,255,0.85)');
+  grad.addColorStop(0.7, base + '30');
+  grad.addColorStop(1, base + '15');
+  ctx.fillStyle = grad;
   ctx.fill();
 
-  // 2. 尝试加载楼盘图片
-  if (project.imageUrl) {
-    try {
-      const img = await loadImage(project.imageUrl);
-      ctx.save();
-      roundRect(ctx, 1, 1, CANVAS_W - 2, IMAGE_H, RADIUS);
-      ctx.clip();
-      // Scale image to cover the image area
-      const scale = Math.max((CANVAS_W - 2) / img.width, IMAGE_H / img.height);
-      const dw = img.width * scale;
-      const dh = img.height * scale;
-      const dx = (CANVAS_W - 2 - dw) / 2;
-      const dy = (IMAGE_H - dh) / 2;
-      ctx.drawImage(img, dx, dy, dw, dh);
-      ctx.restore();
-    } catch {
-      // fallback: 淡蓝色占位
-      roundRect(ctx, 1, 1, CANVAS_W - 2, IMAGE_H, RADIUS);
-      ctx.fillStyle = 'rgba(180, 200, 220, 0.25)';
-      ctx.fill();
-    }
-  } else {
-    // no imageUrl: placeholder
-    roundRect(ctx, 1, 1, CANVAS_W - 2, IMAGE_H, RADIUS);
-    ctx.fillStyle = 'rgba(180, 200, 220, 0.25)';
-    ctx.fill();
-  }
-
-  // 3. 下半部文字区域 — 加一条淡分隔线
-  ctx.strokeStyle = 'rgba(180, 200, 220, 0.3)';
-  ctx.lineWidth = 1;
+  // 边框
   ctx.beginPath();
-  ctx.moveTo(16, IMAGE_H);
-  ctx.lineTo(CANVAS_W - 16, IMAGE_H);
+  ctx.arc(RADIUS, RADIUS, RADIUS - 2, 0, Math.PI * 2);
+  ctx.strokeStyle = base + '55';
+  ctx.lineWidth = 1.5;
   ctx.stroke();
 
-  // 4. 项目名
+  // 项目名 — 截断过长的名字
   ctx.fillStyle = '#2c3e50';
-  ctx.font = 'bold 17px "PingFang SC", "Microsoft YaHei", sans-serif';
-  ctx.fillText(project.name, 16, IMAGE_H + 26);
+  const name = project.name.length > 5 ? project.name.slice(0, 5) + '…' : project.name;
+  ctx.font = 'bold 15px "PingFang SC", "Microsoft YaHei", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(name, RADIUS, RADIUS - 2);
 
-  // 5. 区域 + 标签
+  // 区域标签
   ctx.fillStyle = '#7a8b9a';
-  ctx.font = '13px "PingFang SC", "Microsoft YaHei", sans-serif';
-  ctx.fillText(`${project.district} · ${project.tag}`, 16, IMAGE_H + 48);
-
-  // 6. 边框
-  roundRect(ctx, 0.5, 0.5, CANVAS_W - 1, CANVAS_H - 1, RADIUS);
-  ctx.strokeStyle = 'rgba(180, 200, 220, 0.5)';
-  ctx.lineWidth = 1;
-  ctx.stroke();
+  ctx.font = '11px "PingFang SC", "Microsoft YaHei", sans-serif';
+  ctx.fillText(project.district, RADIUS, RADIUS + 16);
 
   const texture = new CanvasTexture(canvas);
-  texture.minFilter = LinearMipmapLinearFilter;
+  texture.minFilter = LinearFilter;
   texture.magFilter = LinearFilter;
   return texture;
 }

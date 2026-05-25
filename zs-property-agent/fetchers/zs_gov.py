@@ -1,7 +1,7 @@
 import sys
 import requests
 from bs4 import BeautifulSoup
-from config import REQUEST_TIMEOUT, MAX_ITEMS_PER_SOURCE
+from config import REQUEST_TIMEOUT, MAX_ITEMS_PER_SOURCE, filter_recent
 
 ZS_GOV_URL = "http://jsj.zs.gov.cn/zwgk/zcwj/"
 HEADERS = {
@@ -36,4 +36,4 @@ def fetch_zs_gov() -> list[dict]:
     except Exception as e:
         print(f"[zs_gov] error: {e}", file=sys.stderr)
 
-    return items
+    return filter_recent(items)

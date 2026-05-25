@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -57,3 +58,22 @@ WECHAT_BLOGGERS = [
 
 REQUEST_TIMEOUT = 15
 MAX_ITEMS_PER_SOURCE = 5
+
+
+def filter_recent(items: list[dict], date_key: str = "date", days: int = 7) -> list[dict]:
+    """Keep only items with dates within the last N days. Items missing or unparseable dates pass through."""
+    cutoff = datetime.now() - timedelta(days=days)
+    result = []
+    for item in items:
+        raw = item.get(date_key, "")
+        if not raw:
+            result.append(item)
+            continue
+        try:
+            raw_clean = raw.strip().replace("年", "-").replace("月", "-").replace("日", "").replace("/", "-")
+            d = datetime.strptime(raw_clean[:10], "%Y-%m-%d")
+            if d >= cutoff:
+                result.append(item)
+        except ValueError:
+            result.append(item)
+    return result

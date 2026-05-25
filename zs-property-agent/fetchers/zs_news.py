@@ -1,7 +1,7 @@
 import sys
 import requests
 from bs4 import BeautifulSoup
-from config import REQUEST_TIMEOUT, MAX_ITEMS_PER_SOURCE
+from config import REQUEST_TIMEOUT, MAX_ITEMS_PER_SOURCE, filter_recent
 
 HOUSE_NEWS_URL = "http://house.zsnews.cn/index/lists/id/1210.html"
 
@@ -41,4 +41,4 @@ def fetch_zs_news() -> list[dict]:
     except Exception as e:
         print(f"[zs_news] error: {e}", file=sys.stderr)
 
-    return items
+    return filter_recent(items)

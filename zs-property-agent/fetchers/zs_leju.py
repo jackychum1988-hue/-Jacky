@@ -2,7 +2,7 @@
 import sys
 import requests
 from bs4 import BeautifulSoup
-from config import REQUEST_TIMEOUT, MAX_ITEMS_PER_SOURCE
+from config import REQUEST_TIMEOUT, MAX_ITEMS_PER_SOURCE, filter_recent
 
 LEJU_URL = "https://zs.leju.com/news/"
 HEADERS = {
@@ -25,8 +25,15 @@ def fetch_zs_leju() -> list[dict]:
                 continue
             if "leju.com" not in link:
                 continue
-            items.append({"title": title, "link": link, "snippet": ""})
+
+            date = ""
+            parent = a_el.find_parent(["li", "div", "p"])
+            if parent:
+                date_el = parent.select_one(".date, .time, .news-date, span:last-child")
+                date = date_el.get_text(strip=True) if date_el else ""
+
+            items.append({"title": title, "link": link, "snippet": "", "date": date})
     except Exception as e:
         print(f"[zs_leju] error: {e}", file=sys.stderr)
 
-    return items[:MAX_ITEMS_PER_SOURCE]
+    return filter_recent(items[:MAX_ITEMS_PER_SOURCE])

@@ -2,7 +2,7 @@ import json
 from openai import OpenAI
 from config import (
     DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL,
-    SOUP_MENU, SNACK_MENU, DRINK_MENU,
+    SOUP_MENU, SNACK_MENU, DRINK_MENU, SOUP_HOOK_MAP,
     SHOP_NAME, SHOP_LOCATION, SHOP_SLOGAN, SHOP_PERSONA,
     PLATFORMS,
 )
@@ -38,6 +38,12 @@ def build_script(topic_info: dict, recent_titles: list[str] | None = None) -> di
             f"- {t}" for t in recent_titles
         ) + "\n请确保今日标题与以上完全不同。\n\n"
 
+    # 汤品专属钩子
+    hook_info = SOUP_HOOK_MAP.get(soup_name, {})
+    hook_angle = hook_info.get("hook_angle", "")
+    hook_visual = hook_info.get("visual", "")
+    hook_sample = hook_info.get("sample_hook", "")
+
     prompt = f"""你是{SHOP_NAME}（{SHOP_LOCATION}）的抖音短视频脚本撰写师。
 {SHOP_PERSONA}
 
@@ -48,34 +54,62 @@ def build_script(topic_info: dict, recent_titles: list[str] | None = None) -> di
 - 主打汤品：{soup_name}（{soup_effect}，{soup_price}元）
 - 切入角度：{angle}
 - 推荐套餐：{soup_name}({soup_price}元)+{combo_snack}+{combo_drink}={combo_price}元
+- 🎯 钩子方向：{hook_angle}
+- 🎬 对应画面：{hook_visual}
+- 📝 钩子参考句式：{hook_sample}
 
-## 脚本要求（抖音专属）
+## 🔴 前三秒黄金法则（严格遵守）
+
+⚠ **前三秒绝对不允许用「饮汤啦！我系东凤三姐～」开头！**
+
+开场白移到 CTA 之前，用于收尾。前三秒必须直接进入画面+钩子：
+
+```
+第1帧(0-1.5s)：制作过程动作特写 + 大字标题（钩子句，黄字黑边）
+第2帧(1.5-5s)：三姐画外音念钩子文案，画面继续展示制作过程
+第3帧(5-18s)：制作穿插——边展示边讲解，每5秒切换一个画面步骤
+第4帧(18-25s)：成品汤品特写 + 大字「仅售{soup_price}元」+ 功效标签浮层
+第5帧(25-28s)：互动钩子——抛问题给观众
+第6帧(28-35s)：三姐出镜/门头 + 「饮汤啦！我系东凤三姐～」+ 行动号召
+```
+
+## 钩子要求
+
+- 必须围绕**该汤品的制作工艺/食材处理**展开，不能只讲价格
+- 用「不...就...」「等于...」「你做错咗...」「...系假嘅！」句式制造紧迫感
+- 钩子句 = 视频第一帧的大字标题，要简洁有力（12字以内）
+- 钩子句必须和画面同步——嘴巴说「猪肺洗唔干净」，画面就要看到猪肺在冲洗
+
+## 画面穿插要求（重点⚠）
+
+每个口播段落必须标注对应的画面，格式：
+```
+【口播】猪肺一定要灌水冲到水清，冲唔干净等于饮污糟水
+【画面】猪肺在水龙头下灌水冲洗特写，水从浑浊变清澈
+```
+
+文案和画面必须一一对应，不可出现「口播讲功效、画面拍门头」的脱节。
+
+## 基本要求
 - 时长：20-35秒（抖音黄金时长，不超35秒）
 - 语言：粤语口播风格，接地气，有网感
-- 固定开场白：每条必须以「饮汤啦！我系东凤三姐～」开头（这条不算在钩子里）
-- 节奏：每5-8秒一个信息转折，保持注意力不滑落
-- 参考风格："回答我"式反问句式，加强互动感和情绪张力
-- 结构必须包含：
-  1. 开场白：「饮汤啦！我系东凤三姐～」
-  2. 强钩子（前1.5秒必须抓注意力——可以是反问/惊人事实/价格冲击）
-  3. 内容主体（讲汤品特点、功效、做法、性价比，分2-3个节奏点）
-  4. 互动钩子（抛一个问题给观众，引导评论区互动）
-  5. 结尾CTA（引导点赞/收藏/导航到店）
+- 节奏：每5-8秒一个信息转折
 - 人设：三姐是懂煲汤、接地气、为街坊着想的广东阿姐
-- 关键信息（价格、功效）用口语重复强调至少两次
-- 结尾加入固定互动话术：「你今日饮咗汤未？评论区话我知～」
+- 关键信息（价格、功效）重复强调至少两次
+- 结尾固定互动：「你今日饮咗汤未？评论区话我知～」
 
 ## 输出格式
-请严格按JSON格式返回（不要markdown代码块）：
+返回JSON（不要markdown代码块）：
 {{
-  "title": "视频标题（用于封面，15字以内，有吸引力，含emoji）",
-  "hook": "强钩子（前1.5秒，一句有冲击力的话，不含开场白）",
-  "body": "口播正文（15-25秒，分2-3个节奏点，每段不超过8秒）",
-  "interaction": "互动问题（抛给观众，引发评论区讨论）",
-  "cta": "结尾行动号召（引导点赞收藏到店，含固定互动话术）",
-  "full_script": "完整口播文案（开场白+钩子+正文+互动+CTA，可直接读稿）",
-  "hashtags": ["话题标签1", "话题标签2", ...],
-  "scene_notes": ["分镜1：画面建议+字幕强调点", "分镜2：画面建议+字幕强调点", ...]
+  "title": "视频标题（封面用，15字以内，含emoji，有冲击力）",
+  "hook": "钩子句（前1.5秒大字标题，12字以内，制作工艺相关）",
+  "hook_voiceover": "钩子画外音（三姐念钩子的完整句子，可与hook展开不同）",
+  "body": "制作穿插文案（15-18秒，每段标注[口播]+[画面]，分2-3个步骤）",
+  "interaction": "互动问题（抛给观众引发评论）",
+  "cta": "结尾CTA（含「饮汤啦！我系东凤三姐～」+行动号召+固定互动）",
+  "full_script": "完整口播文案（画外音钩子+穿插讲解+互动+CTA，可直接读稿）",
+  "hashtags": ["标签1", "标签2", ...],
+  "scene_notes": ["分镜1：动作描述+字幕内容", "分镜2：动作描述+字幕内容", ...]
 }}"""
 
     try:
@@ -120,22 +154,33 @@ def _fallback_script(topic_info: dict) -> dict:
     soup_price = soup_info["price"] if soup_info else "?"
     soup_effect = soup_info["effect"] if soup_info else "?"
 
+    hook_info = SOUP_HOOK_MAP.get(soup_name, {})
+    sample_hook = hook_info.get("sample_hook", f"喂！{soup_price}蚊喺东凤可以食到啲乜？")
+    hook_visual = hook_info.get("visual", f"{soup_name}制作过程特写")
+
     opening = "饮汤啦！我系东凤三姐～"
 
+    # 用钩子方向构造标题
+    if hook_info.get("hook_angle"):
+        title = f"⚠{hook_info['hook_angle']}做错咗？{soup_name}{soup_price}蚊"
+    else:
+        title = f"🔥东凤街坊都话正！{soup_name}{soup_price}蚊"
+
     return {
-        "title": f"🔥东凤街坊都话正！{soup_name}{soup_price}蚊",
-        "hook": f"喂！{soup_price}蚊喺东凤可以食到啲乜？连个饭盒都买唔到啦！",
-        "body": f"我呢度{soup_name}，{soup_effect}，足料足火候。每日凌晨起身开火，瓦罐慢炖几个钟，一滴味精都唔落。饮过嘅街坊都话：比阿妈煲嘅仲正！",
-        "interaction": f"你哋平时最钟意饮咩汤？留言话我知，下次三姐亲手煲俾你试！",
-        "cta": f"钟意饮汤嘅朋友，点赞收藏，带朋友一齐嚟东凤揾三姐！你今日饮咗汤未？评论区话我知～",
-        "full_script": f"{opening}\n喂！{soup_price}蚊喺东凤可以食到啲乜？连个饭盒都买唔到啦！\n我呢度{soup_name}，{soup_effect}，足料足火候。每日凌晨起身开火，瓦罐慢炖几个钟，一滴味精都唔落。饮过嘅街坊都话：比阿妈煲嘅仲正！\n你哋平时最钟意饮咩汤？留言话我知，下次三姐亲手煲俾你试！\n钟意饮汤嘅朋友，点赞收藏，带朋友一齐嚟东凤揾三姐！你今日饮咗汤未？评论区话我知～",
+        "title": title,
+        "hook": sample_hook,
+        "hook_voiceover": sample_hook,
+        "body": f"【口播】{sample_hook}\n【画面】{hook_visual}\n\n【口播】{soup_name}，{soup_effect}，我三姐每日凌晨起身开火，瓦罐慢炖几个钟，一滴味精都唔落。\n【画面】瓦罐热气腾腾+舀汤慢动作\n\n【口播】饮过嘅街坊都话：比阿妈煲嘅仲正！{soup_price}蚊搞掂！\n【画面】食客喝汤满足表情+价格大字浮层「仅售{soup_price}元」",
+        "interaction": f"你哋识唔识{soup_name}点煲？留言话我知你嘅秘方！",
+        "cta": f"{opening}\n钟意饮汤嘅朋友，点赞收藏，带朋友一齐嚟东凤揾三姐！你今日饮咗汤未？评论区话我知～",
+        "full_script": f"{sample_hook}\n\n{soup_name}，{soup_effect}，我三姐每日凌晨起身开火，瓦罐慢炖几个钟，一滴味精都唔落。\n\n饮过嘅街坊都话：比阿妈煲嘅仲正！{soup_price}蚊搞掂！\n\n你哋识唔识{soup_name}点煲？留言话我知你嘅秘方！\n\n{opening}\n钟意饮汤嘅朋友，点赞收藏，带朋友一齐嚟东凤揾三姐！你今日饮咗汤未？评论区话我知～",
         "hashtags": ["#东凤美食", "#老火靓汤", "#中山探店", f"#{soup_name}", "#三姐煲汤"],
         "scene_notes": [
-            "画面1：三姐面对镜头微笑+「饮汤啦」大字标题动画（品牌色黄底红字）- 开场白",
-            "画面2：瓦罐汤热气腾腾特写+BGM切入 - 对应钩子",
-            "画面3：凌晨后厨煲汤过程快放 - 对应「凌晨起身开火」",
-            "画面4：汤品舀起特写（慢动作）+价格标签浮层「仅售XX元」- 对应价格强调",
-            "画面5：食客喝汤满足表情抓拍 - 对应「比阿妈煲嘅仲正」",
-            "画面6：片尾：门头招牌+地址定位+营业时间+「点赞收藏」动画引导",
+            f"分镜1（0-1.5s）：{hook_visual} + 大字标题「{sample_hook}」黄字黑边 - 画面钩子",
+            f"分镜2（1.5-5s）：继续{hook_visual}，三姐画外音念钩子文案",
+            f"分镜3（5-18s）：后厨煲汤过程快放 + 瓦罐特写 + 舀汤慢动作",
+            f"分镜4（18-25s）：成品汤品特写 + 大字浮层「仅售{soup_price}元」+ 「{soup_effect}」功效标签",
+            "分镜5（25-28s）：三姐出镜/手持汤碗微笑 - 互动提问",
+            "分镜6（28-35s）：片尾：门头招牌+地址定位+营业时间+「点赞收藏」动画+开场白字幕「饮汤啦！我系东凤三姐～」",
         ],
     }

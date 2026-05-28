@@ -1,0 +1,198 @@
+{
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "durationInFrames": 1350,
+  "elements": [
+    {
+      "type": "HookCard",
+      "enterAt": 0,
+      "exitAt": 140,
+      "animation": "spring",
+      "position": "safe-top",
+      "offset": {
+        "x": 0,
+        "y": 20
+      },
+      "props": {
+        "label": "中山楼市周报 · 5月第5周",
+        "headline": "5个新盘动态",
+        "subline": "2026.05.25 - 2026.05.31 · 覆盖4区 · 均价约535.0万起 · 港人置业速览",
+        "icon": "building",
+        "color": "#F5A623"
+      }
+    },
+    {
+      "type": "StatCard",
+      "enterAt": 140,
+      "exitAt": 320,
+      "animation": "spring",
+      "position": "safe-top",
+      "offset": {
+        "x": 0,
+        "y": 20
+      },
+      "props": {
+        "stats": [
+          {
+            "icon": "building",
+            "value": "5",
+            "label": "在售新盘",
+            "enLabel": "Active Listings"
+          },
+          {
+            "icon": "currency",
+            "value": "535.0",
+            "label": "均价(万)",
+            "enLabel": "Avg Price (10K RMB)"
+          },
+          {
+            "icon": "mapPin",
+            "value": "4",
+            "label": "覆盖区域",
+            "enLabel": "Districts Covered"
+          },
+          {
+            "icon": "trending",
+            "value": "95.0",
+            "label": "最低入手(万)",
+            "enLabel": "Entry Price"
+          }
+        ],
+        "columns": 2,
+        "color": "#1A56DB"
+      }
+    },
+    {
+      "type": "TimelineCard",
+      "enterAt": 320,
+      "exitAt": 560,
+      "animation": "spring",
+      "position": "safe-top",
+      "offset": {
+        "x": 0,
+        "y": 20
+      },
+      "props": {
+        "title": "热门区域排行",
+        "steps": [
+          {
+            "label": "三乡",
+            "desc": "2个新盘 · 均价687.5万"
+          },
+          {
+            "label": "火炬",
+            "desc": "1个新盘 · 均价800.0万"
+          },
+          {
+            "label": "东区",
+            "desc": "1个新盘 · 均价150.0万"
+          },
+          {
+            "label": "翠亨",
+            "desc": "1个新盘 · 均价350.0万"
+          }
+        ],
+        "color": "#10B981"
+      }
+    },
+    {
+      "type": "DataComparisonCard",
+      "enterAt": 560,
+      "exitAt": 710,
+      "animation": "spring",
+      "position": "safe-top",
+      "offset": {
+        "x": 0,
+        "y": 20
+      },
+      "props": {
+        "leftLabel": "时代中国",
+        "leftValue": "95.0",
+        "leftUnit": "万",
+        "rightLabel": "华发观山水",
+        "rightValue": "1280.0",
+        "rightUnit": "万",
+        "delta": "价差13.5倍",
+        "color": "#8B5CF6"
+      }
+    },
+    {
+      "type": "DataComparisonCard",
+      "enterAt": 710,
+      "exitAt": 860,
+      "animation": "spring",
+      "position": "safe-top",
+      "offset": {
+        "x": 0,
+        "y": 20
+      },
+      "props": {
+        "leftLabel": "中山均价",
+        "leftValue": "535.0",
+        "leftUnit": "万人民币",
+        "rightLabel": "香港参考",
+        "rightValue": "800",
+        "rightUnit": "万港币",
+        "delta": "1.5倍价差",
+        "color": "#F5A623"
+      }
+    },
+    {
+      "type": "HookCard",
+      "enterAt": 860,
+      "exitAt": 1040,
+      "animation": "spring",
+      "position": "safe-top",
+      "offset": {
+        "x": 0,
+        "y": 20
+      },
+      "props": {
+        "label": "港人视角",
+        "headline": "最低入场95.0万（时代中国） · 最热区域：三乡",
+        "subline": "深中通道1小时直达 · 港车北上更方便",
+        "icon": "mapPin",
+        "color": "#06B6D4"
+      }
+    },
+    {
+      "type": "CTACard",
+      "enterAt": 1040,
+      "exitAt": 1190,
+      "animation": "spring",
+      "position": "safe-top",
+      "offset": {
+        "x": 0,
+        "y": 20
+      },
+      "props": {
+        "headline": "想睇楼？即刻联络 Jacky！",
+        "contact": "+852 6672 2526",
+        "color": "#F5A623",
+        "enHeadline": "Want a Viewing? Contact Jacky Now!",
+        "tags": [
+          "港人尊享优惠",
+          "免费专车接送",
+          "粤语全程讲解"
+        ]
+      }
+    },
+    {
+      "type": "EndCard",
+      "enterAt": 1190,
+      "exitAt": 0,
+      "animation": "spring",
+      "position": "safe-top",
+      "offset": {
+        "x": 0,
+        "y": 20
+      },
+      "props": {
+        "channelName": "港人中山置业通 Jacky",
+        "subscribeText": "关注我，带你睇更多中山好楼",
+        "color": "#F5A623"
+      }
+    }
+  ]
+}

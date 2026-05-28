@@ -1,5 +1,17 @@
 // overlay 组件库统一导出
-export { useOverlayAnimation, useTypewriterProgress, positionToStyle, hexToRgb } from './animation';
+export {
+  useOverlayAnimation,
+  useTypewriterProgress,
+  positionToStyle,
+  hexToRgb,
+  hexToRgba,
+  textGlow,
+  V,
+  C,
+  F,
+  EN_RATIO,
+  enFontSize,
+} from './animation';
 export type { OverlayElementBase, OverlayTiming, AnimationType, Position9 } from './animation';
 
 export { KeywordTag } from './KeywordTag';
@@ -10,6 +22,33 @@ export { QuoteBar } from './QuoteBar';
 export { Spotlight } from './Spotlight';
 export { ArrowPointer } from './ArrowPointer';
 export { IconBounce } from './IconBounce';
+export { HookCard } from './HookCard';
+export { PriceRevealCard } from './PriceRevealCard';
+export { WarningCard } from './WarningCard';
+export { BenefitCard } from './BenefitCard';
+export { ClimaxCard } from './ClimaxCard';
+export { CTACard } from './CTACard';
+export { DataComparisonCard } from './DataComparisonCard';
+export { TimelineCard } from './TimelineCard';
+export { TestimonialCard } from './TestimonialCard';
+export { LocationCard } from './LocationCard';
+export { QACard } from './QACard';
+export { ChecklistCard } from './ChecklistCard';
+export { RevealCard } from './RevealCard';
+export { StatCard } from './StatCard';
+export { ProcessCard } from './ProcessCard';
+export { FeatureGrid } from './FeatureGrid';
+export { EndCard } from './EndCard';
+export { AmenityCard } from './AmenityCard';
+export type { AmenityItem } from './AmenityCard';
+export { AppleHeroCard } from './AppleHeroCard';
+export { AppleFeatureCard } from './AppleFeatureCard';
+export { AppleMetricCard } from './AppleMetricCard';
+export { AppleCTACard } from './AppleCTACard';
+export { RankingBarChart } from './RankingBarChart';
+export { TrendLineChart } from './TrendLineChart';
+export { RankingChangeList } from './RankingChangeList';
+export { ICON_MAP } from './iconMap';
 
 import type React from 'react';
 import { KeywordTag } from './KeywordTag';
@@ -20,6 +59,31 @@ import { QuoteBar } from './QuoteBar';
 import { Spotlight } from './Spotlight';
 import { ArrowPointer } from './ArrowPointer';
 import { IconBounce } from './IconBounce';
+import { HookCard } from './HookCard';
+import { PriceRevealCard } from './PriceRevealCard';
+import { WarningCard } from './WarningCard';
+import { BenefitCard } from './BenefitCard';
+import { ClimaxCard } from './ClimaxCard';
+import { CTACard } from './CTACard';
+import { DataComparisonCard } from './DataComparisonCard';
+import { TimelineCard } from './TimelineCard';
+import { TestimonialCard } from './TestimonialCard';
+import { LocationCard } from './LocationCard';
+import { QACard } from './QACard';
+import { ChecklistCard } from './ChecklistCard';
+import { RevealCard } from './RevealCard';
+import { StatCard } from './StatCard';
+import { ProcessCard } from './ProcessCard';
+import { FeatureGrid } from './FeatureGrid';
+import { EndCard } from './EndCard';
+import { AmenityCard } from './AmenityCard';
+import { AppleHeroCard } from './AppleHeroCard';
+import { AppleFeatureCard } from './AppleFeatureCard';
+import { AppleMetricCard } from './AppleMetricCard';
+import { AppleCTACard } from './AppleCTACard';
+import { RankingBarChart } from './RankingBarChart';
+import { TrendLineChart } from './TrendLineChart';
+import { RankingChangeList } from './RankingChangeList';
 
 // type → component 映射表，供 PipOverlay JSON 驱动使用
 export const overlayComponentMap: Record<string, React.FC<any>> = {
@@ -31,4 +95,29 @@ export const overlayComponentMap: Record<string, React.FC<any>> = {
   Spotlight,
   ArrowPointer,
   IconBounce,
+  HookCard,
+  PriceRevealCard,
+  WarningCard,
+  BenefitCard,
+  ClimaxCard,
+  CTACard,
+  DataComparisonCard,
+  TimelineCard,
+  TestimonialCard,
+  LocationCard,
+  QACard,
+  ChecklistCard,
+  RevealCard,
+  StatCard,
+  ProcessCard,
+  FeatureGrid,
+  EndCard,
+  AmenityCard,
+  AppleHeroCard,
+  AppleFeatureCard,
+  AppleMetricCard,
+  AppleCTACard,
+  RankingBarChart,
+  TrendLineChart,
+  RankingChangeList,
 };

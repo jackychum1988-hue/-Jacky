@@ -1,0 +1,66 @@
+name: Weekly Ranking Video
+on:
+  schedule:
+    - cron: '0 0 * * 1' # UTC Mon 00:00 = Beijing Mon 08:00
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ----- Python: data pipeline -----
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: pip install -r zs-ranking-agent/requirements.txt
+
+      - name: Run ranking data pipeline
+        id: pipeline
+        run: |
+          cd zs-ranking-agent
+          python main.py
+          echo "timeline_path=$(pwd)/output/timeline-latest.json" >> $GITHUB_OUTPUT
+
+      - name: Upload timeline JSON as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ranking-timeline
+          path: zs-ranking-agent/output/timeline-*.json
+          retention-days: 30
+
+      # ----- Node.js: video rendering -----
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Remotion dependencies
+        run: cd remotion-realestate && npm ci
+
+      - name: Render ranking overlay video
+        run: |
+          cd remotion-realestate
+          npx ts-node scripts/render_ranking.ts \
+            ../zs-ranking-agent/output/timeline-latest.json \
+            "out/zhongshan-ranking-$(date +%Y-%m-%d).mov"
+
+      - name: Upload video as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ranking-video
+          path: remotion-realestate/out/zhongshan-ranking-*.mov
+          retention-days: 7
+
+      # ----- Push history.json back to repo -----
+      - name: Commit updated history
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add zs-ranking-agent/history.json
+          git diff --staged --quiet || git commit -m "auto: update ranking history after weekly run"
+          git push

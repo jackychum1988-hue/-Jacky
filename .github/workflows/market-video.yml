@@ -49,16 +49,27 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Cache Remotion node_modules
-        uses: actions/cache@v4
-        with:
-          path: remotion-realestate/node_modules
-          key: remotion-node-modules-${{ hashFiles('remotion-realestate/package-lock.json') }}
-          restore-keys: remotion-node-modules-
-
       - name: Install Remotion dependencies
         working-directory: remotion-realestate
         run: npm ci
+
+      - name: Debug environment
+        working-directory: remotion-realestate
+        run: |
+          echo "=== Node version ==="
+          node --version
+          echo "=== npm version ==="
+          npm --version
+          echo "=== tsx available ==="
+          npx tsx --version || echo "tsx NOT found"
+          echo "=== render_pip.ts exists ==="
+          ls -l scripts/render_pip.ts || echo "render_pip.ts NOT found"
+          echo "=== src/index.ts exists ==="
+          ls -l src/index.ts || echo "src/index.ts NOT found"
+          echo "=== node_modules/.bin ==="
+          ls node_modules/.bin/tsx || echo "tsx binary NOT in node_modules"
+          echo "=== package.json scripts ==="
+          node -e "console.log(JSON.parse(require('fs').readFileSync('package.json')).scripts)"
 
       - name: Render ProRes 4444 MOV
         working-directory: remotion-realestate

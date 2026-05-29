@@ -1,6 +1,6 @@
 import sys
 import requests
-from config import YOUTUBE_API_KEY, YOUTUBE_KOLS, MAX_ITEMS_PER_SOURCE, REQUEST_TIMEOUT, Platform
+from config import YOUTUBE_API_KEY, YOUTUBE_KOLS, YOUTUBE_DISCOVERY_QUERIES, MAX_ITEMS_PER_SOURCE, REQUEST_TIMEOUT, Platform
 
 YOUTUBE_API_URL = "https://www.googleapis.com/youtube/v3"
 SEARCH_URL = "https://www.bing.com/search"
@@ -120,6 +120,20 @@ def fetch_youtube() -> list[dict]:
             items.extend(kol_items)
         except Exception as e:
             print(f"[youtube] unexpected error for '{kol['name']}': {e}", file=sys.stderr)
+            continue
+
+    # Discovery: search for new Zhongshan creators via broad queries
+    for query in YOUTUBE_DISCOVERY_QUERIES:
+        try:
+            discovery_kol = {"name": f"[发现] {query}", "query": query}
+            kol_items = _fetch_via_api(discovery_kol)
+            if not kol_items:
+                kol_items = _fetch_via_bing(discovery_kol)
+            for item in kol_items:
+                item["author"] = f"[发现·YouTube] {item.get('author', '')}"
+            items.extend(kol_items)
+        except Exception as e:
+            print(f"[youtube] discovery error for '{query[:40]}': {e}", file=sys.stderr)
             continue
 
     seen = set()

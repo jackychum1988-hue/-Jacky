@@ -56,6 +56,15 @@ YOUTUBE_KOLS = [
     {"name": "灣區博士沈永年", "query": "灣區博士沈永年 大灣區"},
 ]
 
+# === YouTube discovery queries (find NEW Zhongshan property creators) ===
+YOUTUBE_DISCOVERY_QUERIES = [
+    "中山 買樓 香港人 介紹",
+    "中山 睇樓 香港 2025",
+    "大灣區 中山 房產 香港",
+    "中山 新樓 港人 置業",
+    "深中通道 中山 樓盤 介紹",
+]
+
 # === 小红书 KOLs ===
 XIAOHONGSHU_KOLS = [
     {"name": "罗宾Sir/湾区王", "query": "罗宾Sir 中山 买房 湾区王"},

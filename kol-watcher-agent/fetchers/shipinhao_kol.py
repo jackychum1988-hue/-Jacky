@@ -5,7 +5,7 @@ from config import SHIPINHAO_KOLS, MAX_ITEMS_PER_SOURCE, REQUEST_TIMEOUT, Platfo
 
 SEARCH_URL = "https://www.bing.com/search"
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 }
 
 

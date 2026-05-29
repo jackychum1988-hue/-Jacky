@@ -5,7 +5,7 @@ from config import YOUTUBE_API_KEY, YOUTUBE_KOLS, MAX_ITEMS_PER_SOURCE, REQUEST_
 YOUTUBE_API_URL = "https://www.googleapis.com/youtube/v3"
 SEARCH_URL = "https://www.bing.com/search"
 BING_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 }
 
 
@@ -78,7 +78,7 @@ def _fetch_via_bing(kol: dict) -> list[dict]:
     items = []
     try:
         params = {
-            "q": f"site:youtube.com {kol['query']}",
+            "q": f"youtube {kol['query']}",
             "count": 5,
         }
         resp = requests.get(SEARCH_URL, headers=BING_HEADERS, params=params, timeout=REQUEST_TIMEOUT)
@@ -93,7 +93,7 @@ def _fetch_via_bing(kol: dict) -> list[dict]:
             link = a_el.get("href", "") if a_el else ""
             snippet = snippet_el.get_text(strip=True)[:150] if snippet_el else ""
 
-            if title and "youtube.com" in link:
+            if title and link:
                 items.append({
                     "title": title,
                     "url": link,

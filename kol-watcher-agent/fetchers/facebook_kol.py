@@ -5,7 +5,7 @@ from config import FACEBOOK_QUERIES, MAX_ITEMS_PER_SOURCE, REQUEST_TIMEOUT, Plat
 
 SEARCH_URL = "https://www.bing.com/search"
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 }
 
 
@@ -14,7 +14,7 @@ def fetch_facebook() -> list[dict]:
     for query in FACEBOOK_QUERIES:
         try:
             params = {
-                "q": f"site:facebook.com {query}",
+                "q": f"facebook {query}",
                 "count": 5,
                 "tbs": "qdr:w",
             }
@@ -30,7 +30,7 @@ def fetch_facebook() -> list[dict]:
                 link = a_el.get("href", "") if a_el else ""
                 snippet = snippet_el.get_text(strip=True)[:150] if snippet_el else ""
 
-                if title and "facebook.com" in link:
+                if title and link:
                     items.append({
                         "title": title,
                         "url": link,

@@ -1,0 +1,68 @@
+name: KOL Competitor Weekly Report
+
+on:
+  push:
+    paths:
+      - "kol-watcher-agent/**"
+      - ".github/workflows/kol-watch-weekly.yml"
+  schedule:
+    - cron: "23 23 * * 1"   # 每周一 UTC 23:23 = 北京时间 7:23
+  workflow_dispatch:
+
+jobs:
+  weekly-report:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: kol-watcher-agent
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check if already sent today
+        id: check-sent
+        run: |
+          TODAY=$(TZ='Asia/Shanghai' date +%Y-%m-%d)
+          echo "today=$TODAY" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "skip_if_sent=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip_if_sent=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Restore sentinel
+        id: cache
+        uses: actions/cache/restore@v4
+        with:
+          path: kol-watcher-agent/.sentinel
+          key: kol-weekly-${{ steps.check-sent.outputs.today }}
+
+      - name: Run weekly KOL report
+        if: steps.check-sent.outputs.skip_if_sent != 'true' || steps.cache.outputs.cache-hit != 'true'
+        env:
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: python main.py --mode weekly
+
+      - name: Save sentinel
+        if: success()
+        uses: actions/cache/save@v4
+        with:
+          path: kol-watcher-agent/.sentinel
+          key: kol-weekly-${{ steps.check-sent.outputs.today }}
+
+      - name: Upload weekly report artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kol-weekly-report
+          path: kol-watcher-agent/output/

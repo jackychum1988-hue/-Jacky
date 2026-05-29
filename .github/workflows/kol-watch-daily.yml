@@ -1,0 +1,76 @@
+name: KOL Competitor Daily Watch
+
+on:
+  push:
+    paths:
+      - "kol-watcher-agent/**"
+      - ".github/workflows/kol-watch-daily.yml"
+  schedule:
+    - cron: "23 23 * * *"   # UTC 23:23 = 北京时间 7:23
+  workflow_dispatch:
+
+jobs:
+  daily-watch:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: kol-watcher-agent
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check if already sent today
+        id: check-sent
+        run: |
+          TODAY=$(TZ='Asia/Shanghai' date +%Y-%m-%d)
+          echo "today=$TODAY" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "skip_if_sent=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip_if_sent=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Restore sentinel
+        id: cache
+        uses: actions/cache/restore@v4
+        with:
+          path: kol-watcher-agent/.sentinel
+          key: kol-daily-${{ steps.check-sent.outputs.today }}
+
+      - name: Restore URL dedup cache
+        id: dedup-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: kol-watcher-agent/.seen_urls.json
+          key: kol-seen-urls-v1-${{ steps.check-sent.outputs.today }}
+          restore-keys: kol-seen-urls-v1-
+
+      - name: Run daily KOL watch
+        if: steps.check-sent.outputs.skip_if_sent != 'true' || steps.cache.outputs.cache-hit != 'true'
+        env:
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: python main.py --mode daily
+
+      - name: Save sentinel
+        if: success()
+        uses: actions/cache/save@v4
+        with:
+          path: kol-watcher-agent/.sentinel
+          key: kol-daily-${{ steps.check-sent.outputs.today }}
+
+      - name: Save URL dedup cache
+        if: success()
+        uses: actions/cache/save@v4
+        with:
+          path: kol-watcher-agent/.seen_urls.json
+          key: kol-seen-urls-v1-${{ steps.check-sent.outputs.today }}

@@ -80,6 +80,7 @@ def _fetch_via_bing(kol: dict) -> list[dict]:
         params = {
             "q": f"youtube {kol['query']}",
             "count": 5,
+            "tbs": "qdr:w",
         }
         resp = requests.get(SEARCH_URL, headers=BING_HEADERS, params=params, timeout=REQUEST_TIMEOUT)
         resp.raise_for_status()

@@ -1,9 +1,16 @@
 """DeepSeek AI analyzer for KOL competitor content — daily + weekly modes."""
 import json
 import requests
+from datetime import datetime
 from config import DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, DEEPSEEK_MODEL, REQUEST_TIMEOUT
 
 DAILY_SYSTEM_PROMPT = """你是港人中山置业KOL竞品分析助手，为"港人中山置业通Jacky"提供每日竞品快讯分析。
+
+**现在是2026年5月。关键时间背景：**
+- 深中通道已于2024年6月30日通车，至今近2年，早已不是新闻。如果竞品仍在炒作"深中通道即将开通"，标注为「过时炒作」
+- 港车北上、澳车北上政策已实施多年，非新政策
+- 中山当前楼市处于调整期，港人置业更关注现楼、二手笋盘、收楼体验
+- 注意识别并标注Bing搜索可能返回的过时内容（旧新闻、旧视频）
 
 目标观众：计划在中山买楼的香港人。Jacky的内容支柱：
 - 带客看房纪实（50%）— 带香港客户实地睇楼、成交故事、客户反馈
@@ -12,7 +19,7 @@ DAILY_SYSTEM_PROMPT = """你是港人中山置业KOL竞品分析助手，为"港
 
 对以下今日抓取的竞品内容进行分析：
 
-1. 【发布动态】逐条摘要，每条≤30字
+1. 【发布动态】逐条摘要，每条≤30字。若内容明显过时，标注⚠️
 2. 【今日热词】提取TOP10高频关键词（排除通用词：楼盘、中山、买房、大湾区），格式：关键词(出现次数)
 3. 【话题风向】识别今日最热2-3个话题方向，每个≤15字
 4. 【差异化选题】基于竞品话题，结合Jacky三大内容支柱，输出2-3个今日可拍的选题建议：
@@ -24,9 +31,16 @@ DAILY_SYSTEM_PROMPT = """你是港人中山置业KOL竞品分析助手，为"港
 - 用粤语/香港用词风格（買樓、上車、筍盤、呎價、按揭、首期、供款）
 - 每条建议100-150字，精炼有力
 - 如果今天没有竞品数据，如实说明
+- **不要将深中通道通车当作新闻**
 - Markdown格式输出"""
 
 WEEKLY_SYSTEM_PROMPT = """你是港人中山置业KOL竞品分析专家，为"港人中山置业通Jacky"提供每周深度竞品分析报告。
+
+**现在是2026年5月。关键时间背景：**
+- 深中通道已于2024年6月30日通车，至今近2年。如竞品仍以此为"新闻"炒作，标注为过时
+- 港车北上、澳车北上已实施多年
+- 中山楼市2025-2026年处于调整期，港人买家关注点已从「炒楼增值」转向「自住+退休+医疗配套」
+- 注意识别Bing搜索可能返回的过时内容
 
 Jacky的内容支柱：
 - 带客看房纪实（50%）— 带香港客户实地睇楼、成交故事、客户反馈
@@ -54,6 +68,7 @@ Jacky的内容支柱：
 重要规则：
 - 粤语/香港用词风格（買樓、上車、筍盤、呎價、按揭、首期、供款）
 - 数据驱动，拒绝空泛建议
+- **不要将深中通道通车/即将开通当作2026年的新闻**
 - Markdown格式输出，2000-3000字"""
 
 
@@ -127,15 +142,17 @@ def _load_history() -> dict:
 
 
 def analyze_daily(items: list) -> str:
-    user_message = "今日竞品内容：\n\n" + _build_items_text(items)
+    today = datetime.now().strftime("%Y年%m月%d日")
+    user_message = f"今天是{today}。以下是今日抓取的竞品内容：\n\n" + _build_items_text(items)
     return _call_deepseek(DAILY_SYSTEM_PROMPT, user_message, max_tokens=2000)
 
 
 def analyze_weekly(items: list, week_label: str) -> str:
     history = _load_history()
     prev_weeks = history.get("weeks", {})
+    today = datetime.now().strftime("%Y年%m月%d日")
 
-    user_message = f"本周（{week_label}）竞品内容汇总：\n\n"
+    user_message = f"今天是{today}。本周（{week_label}）竞品内容汇总：\n\n"
     user_message += _build_items_text(items)
     user_message += "\n\n历史数据参考：\n"
     user_message += json.dumps(prev_weeks, ensure_ascii=False, indent=2)[:2000]

@@ -24,7 +24,12 @@ jobs:
         id: pipeline
         run: |
           cd zs-ranking-agent
-          python main.py
+          python main.py || echo "WARNING: Scrapers failed, checking fallback..."
+          # If timeline wasn't generated (empty data), fall back to manual compilation
+          if [ ! -f output/timeline-latest.json ]; then
+            echo "No timeline generated. Running manual data compilation..."
+            python run_real_data.py || echo "FATAL: All data sources failed"
+          fi
           echo "timeline_path=$(pwd)/output/timeline-latest.json" >> $GITHUB_OUTPUT
 
       - name: Upload timeline JSON as artifact

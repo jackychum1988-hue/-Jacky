@@ -6,8 +6,8 @@ from datetime import datetime
 OUTPUT_DIR = "output"
 TIMELINE_FILE = "timeline-latest.json"
 
-WIDTH = 1920
-HEIGHT = 1080
+WIDTH = 1080
+HEIGHT = 1920
 FPS = 30
 TOTAL_FRAMES = 2040  # 68s @ 30fps
 
@@ -36,8 +36,9 @@ def build_timeline(aggregated: dict) -> dict:
         "animation": "spring",
         "position": "center",
         "props": {
-            "title": "本周中山楼盘排行榜",
-            "subtitle": f"成交量 TOP10 · 热度 TOP10 · 涨跌 TOP10  |  {datetime.now().strftime('%Y.%m.%d')}",
+            "label": "中山楼盘数据周报",
+            "headline": "本周排行榜",
+            "subline": f"成交量 TOP10 · 热度 TOP10 · 涨跌 TOP10  |  {datetime.now().strftime('%Y.%m.%d')}",
             "color": "#C8A052",
         },
     })
@@ -144,7 +145,8 @@ def build_timeline(aggregated: dict) -> dict:
         "animation": "fade",
         "position": "center",
         "props": {
-            "text": "关注Jacky · 每周更新",
+            "channelName": "港人中山置业通Jacky",
+            "subscribeText": "关注我 · 每周更新中山楼盘数据",
             "color": "#C8A052",
         },
     })
@@ -175,21 +177,43 @@ def save_timeline(timeline: dict) -> str:
 
 
 if __name__ == "__main__":
-    # Test with mock data
+    # Test with rich mock data — 10 items per ranking
     mock = {
         "volume_ranking": [
             {"name": "保利琅悦", "value": 328, "changePct": 12.5},
             {"name": "華發觀山水", "value": 291, "changePct": -3.2},
             {"name": "錦繡海灣城", "value": 256, "changePct": 8.1},
+            {"name": "雅居樂·萬象郡", "value": 228, "changePct": 5.7},
+            {"name": "中山108天寓", "value": 201, "changePct": -1.8},
+            {"name": "招商臻灣府", "value": 187, "changePct": 15.3},
+            {"name": "港航匯", "value": 165, "changePct": 22.0},
+            {"name": "御峰香林", "value": 142, "changePct": -7.5},
+            {"name": "幸福匯", "value": 128, "changePct": 3.1},
+            {"name": "遠洋天著", "value": 115, "changePct": -0.9},
         ],
         "popularity_ranking": [
             {"name": "保利琅悦", "value": 15200, "changePct": 5.3},
             {"name": "華發觀山水", "value": 12100, "changePct": -1.2},
+            {"name": "錦繡海灣城", "value": 10800, "changePct": 8.7},
+            {"name": "雅居樂灣際壹號", "value": 9500, "changePct": 3.5},
+            {"name": "港航匯", "value": 8700, "changePct": 15.7},
+            {"name": "招商臻灣府", "value": 8200, "changePct": 12.1},
+            {"name": "中山108天寓", "value": 7600, "changePct": -2.8},
+            {"name": "朗詩金鐘湖壹號", "value": 6800, "changePct": 6.4},
+            {"name": "保利天匯·熙岸", "value": 6100, "changePct": -4.1},
+            {"name": "華發學府壹號", "value": 5500, "changePct": 1.9},
         ],
         "change_ranking": [
-            {"name": "港航匯", "priceBefore": 218000, "priceAfter": 235000, "changePct": 7.8},
+            {"name": "港航匯", "priceBefore": 21800, "priceAfter": 23500, "changePct": 7.8},
+            {"name": "招商臻灣府", "priceBefore": 18500, "priceAfter": 19700, "changePct": 6.5},
+            {"name": "錦繡海灣城", "priceBefore": 12800, "priceAfter": 12000, "changePct": -6.2},
             {"name": "保利琅悦", "priceBefore": 13800, "priceAfter": 14700, "changePct": 6.5},
-            {"name": "華發觀山水", "priceBefore": 9500, "priceAfter": 9200, "changePct": -3.2},
+            {"name": "雅居樂·萬象郡", "priceBefore": 10500, "priceAfter": 11200, "changePct": 6.7},
+            {"name": "御峰香林", "priceBefore": 16200, "priceAfter": 15000, "changePct": -7.4},
+            {"name": "中山粵海城", "priceBefore": 14200, "priceAfter": 15050, "changePct": 6.0},
+            {"name": "幸福匯", "priceBefore": 9500, "priceAfter": 9100, "changePct": -4.2},
+            {"name": "遠洋天著", "priceBefore": 11800, "priceAfter": 12200, "changePct": 3.4},
+            {"name": "朗詩金鐘湖壹號", "priceBefore": 15500, "priceAfter": 14900, "changePct": -3.9},
         ],
         "trend_data": {
             "weeks": ["W15", "W16", "W17", "W18", "W19", "W20", "W21", "W22"],

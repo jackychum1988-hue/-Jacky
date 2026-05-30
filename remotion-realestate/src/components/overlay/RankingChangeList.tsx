@@ -101,15 +101,14 @@ export const RankingChangeList: React.FC<RankingChangeListProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 16,
-                padding: '10px 24px',
-                backgroundColor: 'rgba(26,24,21,0.75)',
+                padding: '12px 24px',
+                backgroundColor: 'rgba(14,12,10,0.78)',
                 borderRadius: 12,
-                border: `1px solid rgba(${rgb},0.15)`,
                 opacity: rowSpring,
                 transform: `translateX(${rowX}px)`,
               }}
             >
-              {/* Arrow direction */}
+              {/* Arrow direction — SVG */}
               <div
                 style={{
                   width: 36,
@@ -117,13 +116,15 @@ export const RankingChangeList: React.FC<RankingChangeListProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 28,
-                  fontWeight: 800,
-                  color: arrowColor,
-                  fontFamily: '"SF Mono", monospace',
                 }}
               >
-                {isUp ? '↑' : '↓'}
+                <svg width="24" height="24" viewBox="0 0 24 24">
+                  {isUp ? (
+                    <polygon points="12,4 6,16 18,16" fill={arrowColor} />
+                  ) : (
+                    <polygon points="12,20 6,8 18,8" fill={arrowColor} />
+                  )}
+                </svg>
               </div>
 
               {/* Project name */}

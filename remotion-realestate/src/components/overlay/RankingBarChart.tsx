@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useCurrentFrame, useVideoConfig, spring, interpolate } from 'remotion';
 import {
   useOverlayAnimation,
   positionToStyle,
-  hexToRgb,
+  hexToRgba,
   OverlayElementBase,
+  F,
 } from './animation';
 
 interface RankingItem {
@@ -20,12 +21,16 @@ interface RankingBarChartProps extends OverlayElementBase {
   color?: string;
 }
 
-const BAR_HEIGHT = 52;
-const BAR_GAP = 14;
+const BAR_HEIGHT = 48;
+const BAR_GAP = 10;
 const ROW_STAGGER = 15;
-const MAX_BAR_WIDTH = 600;
-const NAME_WIDTH = 280;
-const BADGE_SIZE = 48;
+const MAX_BAR_WIDTH = 580;
+const NAME_WIDTH = 240;
+const BADGE_SIZE = 44;
+const CHART_PADDING = 24;
+
+// Simple unique ID counter to avoid SVG gradient ID conflicts
+let uidCounter = 0;
 
 export const RankingBarChart: React.FC<RankingBarChartProps> = ({
   title,
@@ -42,11 +47,15 @@ export const RankingBarChart: React.FC<RankingBarChartProps> = ({
   const { fps } = useVideoConfig();
   const anim = useOverlayAnimation(frame, fps, { enterAt, exitAt, animation });
 
+  // Unique IDs for this instance to avoid gradient conflicts
+  const uid = useRef(++uidCounter).current;
+
   if (!anim.isVisible || items.length === 0) return null;
 
   const posStyle = positionToStyle(position, offset);
   const maxValue = Math.max(...items.map((i) => i.value), 1);
-  const totalHeight = items.length * (BAR_HEIGHT + BAR_GAP);
+  const svgW = NAME_WIDTH + MAX_BAR_WIDTH + 160;
+  const svgH = items.length * (BAR_HEIGHT + BAR_GAP) + CHART_PADDING * 2;
 
   return (
     <div
@@ -67,16 +76,19 @@ export const RankingBarChart: React.FC<RankingBarChartProps> = ({
           transform: anim.transform,
           display: 'flex',
           flexDirection: 'column',
-          gap: 8,
+          padding: '28px 36px',
+          backgroundColor: 'rgba(14,12,10,0.82)',
+          borderRadius: 16,
+          border: `1.5px solid ${hexToRgba(color, 0.20)}`,
         }}
       >
         <h2
           style={{
-            fontSize: 36,
+            fontSize: 38,
             fontWeight: 700,
             color,
-            fontFamily: 'Georgia, "Noto Serif SC", serif',
-            margin: '0 0 12px 0',
+            fontFamily: F.display,
+            margin: '0 0 18px 8px',
             letterSpacing: '0.02em',
           }}
         >
@@ -84,18 +96,18 @@ export const RankingBarChart: React.FC<RankingBarChartProps> = ({
         </h2>
 
         <svg
-          width={NAME_WIDTH + MAX_BAR_WIDTH + 140}
-          height={totalHeight + 20}
-          viewBox={`0 0 ${NAME_WIDTH + MAX_BAR_WIDTH + 140} ${totalHeight + 20}`}
+          width={svgW}
+          height={svgH}
+          viewBox={`0 0 ${svgW} ${svgH}`}
         >
           <defs>
-            <linearGradient id="bar-gold" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor={color} stopOpacity={0.6} />
+            <linearGradient id={`bar-gold-${uid}`} x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor={color} stopOpacity={0.5} />
               <stop offset="100%" stopColor={color} stopOpacity={1} />
             </linearGradient>
-            <linearGradient id="bar-bronze" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#8B7355" stopOpacity={0.5} />
-              <stop offset="100%" stopColor="#8B7355" stopOpacity={0.85} />
+            <linearGradient id={`bar-bronze-${uid}`} x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#6B7B8D" stopOpacity={0.4} />
+              <stop offset="100%" stopColor="#8B9DAD" stopOpacity={0.75} />
             </linearGradient>
           </defs>
 
@@ -131,13 +143,27 @@ export const RankingBarChart: React.FC<RankingBarChartProps> = ({
               interpolate(barProgress, [0, 1], [0, item.value]),
             );
 
-            const y = i * (BAR_HEIGHT + BAR_GAP) + 10;
+            const y = CHART_PADDING + i * (BAR_HEIGHT + BAR_GAP);
             const isTop3 = i < 3;
-            const badgeFill = isTop3 ? 'url(#bar-gold)' : '#3A3530';
-            const barFill = isTop3 ? 'url(#bar-gold)' : 'url(#bar-bronze)';
+            const badgeFill = isTop3
+              ? `url(#bar-gold-${uid})`
+              : 'rgba(90,84,70,0.60)';
+            const barFill = isTop3
+              ? `url(#bar-gold-${uid})`
+              : `url(#bar-bronze-${uid})`;
 
             return (
               <g key={item.name} opacity={rowOpacity}>
+                {/* Row background strip (subtle alternating) */}
+                <rect
+                  x={0}
+                  y={y}
+                  width={svgW}
+                  height={BAR_HEIGHT}
+                  rx={10}
+                  fill={i % 2 === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.01)'}
+                />
+
                 {/* Rank badge */}
                 <rect
                   x={0}
@@ -152,75 +178,81 @@ export const RankingBarChart: React.FC<RankingBarChartProps> = ({
                   y={y + BAR_HEIGHT / 2 + 1}
                   textAnchor="middle"
                   dominantBaseline="central"
-                  fill={isTop3 ? '#1A1815' : '#C8A052'}
-                  fontSize={22}
+                  fill={isTop3 ? '#1A1815' : '#F5F0E8'}
+                  fontSize={20}
                   fontWeight={800}
-                  fontFamily={'"SF Mono", "JetBrains Mono", monospace'}
+                  fontFamily={F.mono}
                 >
                   {i + 1}
                 </text>
 
                 {/* Project name */}
                 <text
-                  x={BADGE_SIZE + 20}
+                  x={BADGE_SIZE + 16}
                   y={y + BAR_HEIGHT / 2 + 1}
                   dominantBaseline="central"
                   fill="#F5F0E8"
-                  fontSize={24}
+                  fontSize={23}
                   fontWeight={600}
-                  fontFamily={'"PingFang SC", "Microsoft YaHei", sans-serif'}
+                  fontFamily={F.text}
                 >
                   {item.name}
                 </text>
 
                 {/* Bar */}
                 <rect
-                  x={BADGE_SIZE + 20 + NAME_WIDTH}
-                  y={y + (BAR_HEIGHT - 24) / 2}
+                  x={BADGE_SIZE + 16 + NAME_WIDTH}
+                  y={y + (BAR_HEIGHT - 26) / 2}
                   width={barWidth}
-                  height={24}
-                  rx={6}
+                  height={26}
+                  rx={7}
                   fill={barFill}
                   opacity={0.9}
                 />
 
                 {/* Value */}
                 <text
-                  x={BADGE_SIZE + 20 + NAME_WIDTH + barWidth + 12}
+                  x={BADGE_SIZE + 16 + NAME_WIDTH + barWidth + 12}
                   y={y + BAR_HEIGHT / 2 + 1}
                   dominantBaseline="central"
                   fill={isTop3 ? color : '#C8BFA8'}
-                  fontSize={26}
+                  fontSize={24}
                   fontWeight={800}
-                  fontFamily={'"SF Mono", "JetBrains Mono", monospace'}
+                  fontFamily={F.mono}
                   opacity={barProgress}
                 >
                   {valueDisplay}
-                  <tspan
-                    fontSize={16}
-                    fontWeight={500}
-                    fill="#8B7B68"
-                  >
+                  <tspan fontSize={15} fontWeight={500} fill="#8B7B68">
                     {' '}{unit}
                   </tspan>
                 </text>
 
-                {/* Change indicator */}
+                {/* Change indicator arrow + percentage */}
                 {item.changePct !== undefined &&
                   item.changePct !== 0 &&
                   barProgress > 0.8 && (
-                    <text
-                      x={BADGE_SIZE + 20 + NAME_WIDTH + barWidth + 90}
-                      y={y + BAR_HEIGHT / 2 + 1}
-                      dominantBaseline="central"
-                      fill={item.changePct > 0 ? '#C8A052' : '#6B7B8D'}
-                      fontSize={20}
-                      fontWeight={600}
-                      fontFamily={'"SF Mono", "JetBrains Mono", monospace'}
-                    >
-                      {item.changePct > 0 ? '↑' : '↓'}
-                      {Math.abs(item.changePct)}%
-                    </text>
+                    <g>
+                      {/* SVG arrow */}
+                      <polygon
+                        points={
+                          item.changePct > 0
+                            ? `${svgW - 90},${y + BAR_HEIGHT / 2 - 8} ${svgW - 90},${y + BAR_HEIGHT / 2 + 8} ${svgW - 78},${y + BAR_HEIGHT / 2}`
+                            : `${svgW - 90},${y + BAR_HEIGHT / 2 + 8} ${svgW - 90},${y + BAR_HEIGHT / 2 - 8} ${svgW - 78},${y + BAR_HEIGHT / 2}`
+                        }
+                        fill={item.changePct > 0 ? color : '#6B7B8D'}
+                      />
+                      <text
+                        x={svgW - 72}
+                        y={y + BAR_HEIGHT / 2 + 1}
+                        dominantBaseline="central"
+                        fill={item.changePct > 0 ? color : '#6B7B8D'}
+                        fontSize={19}
+                        fontWeight={700}
+                        fontFamily={F.mono}
+                      >
+                        {Math.abs(item.changePct)}%
+                      </text>
+                    </g>
                   )}
               </g>
             );

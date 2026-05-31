@@ -1,94 +1,129 @@
-"""Generate timeline from REAL 2026-02 data compiled from 合富研究院 reports.
+"""Generate timeline combining scraped + compiled data.
 
-数据来源 (Sources):
-- 合富研究院 2026年2月 中山住宅网签龙虎榜
-- 各楼盘公开挂牌均价 (房天下/58爱房/安居客)
-- 贝壳找房关注人数 (搜索摘要估算)
+Merges:
+  - Beike-scraped real-time prices (fetchers/beike_popularity.py)
+  - Volume ranking from history.json baseline (合富研究院)
+  - Popularity from web-search estimates / history baseline
 
-Date compiled: 2026-05-31
+Run this when scrapers partially succeed or fail.
 """
 import json
 import sys
 import os
 
-# Add parent for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from config import PROJECTS
 from generate_timeline import build_timeline, save_timeline
+from aggregator import load_history
 
-# ===== REAL DATA: 2026年2月 =====
-# 全市: 住宅网签731套, 面积8.36万㎡, 均价~13,746元/㎡
 
-real_data = {
-    "volume_ranking": [
-        {"name": "御宸", "value": 55, "changePct": 22.2},           # 石岐 超四代宅 TOP1
-        {"name": "華發觀山水", "value": 34, "changePct": -8.1},     # 三鄉
-        {"name": "華潤仁恒公園四季2期", "value": 32, "changePct": 14.3},  # 西區
-        {"name": "建华龙湖·香山颂", "value": 29, "changePct": 5.8}, # 石岐
-        {"name": "錦繡國際花城", "value": 25, "changePct": -3.8},    # 坦洲
-        {"name": "錦繡海灣城", "value": 20, "changePct": -13.0},     # 翠亨(南朗)
-        {"name": "保利琅悦", "value": 18, "changePct": -28.0},       # 東區
-        {"name": "招商臻灣府", "value": 17, "changePct": 13.3},      # 翠亨(马鞍岛)
-        {"name": "中澳春城", "value": 17, "changePct": -5.6},        # 坦洲
-        {"name": "中山108天寓", "value": 15, "changePct": -16.7},    # 東區 (estimate #10)
-    ],
-    "popularity_ranking": [
-        # 贝壳关注人数 (estimated from search snippets & market prominence)
-        {"name": "保利琅悦", "value": 16800, "changePct": 8.5},      # 东区标杆4.0奢宅
-        {"name": "華發觀山水", "value": 13200, "changePct": 3.2},    # 港人热门
-        {"name": "錦繡海灣城", "value": 11500, "changePct": 5.1},    # 大盘持续关注
-        {"name": "雅居樂灣際壹號", "value": 10200, "changePct": -2.8}, # 翠亨地标
-        {"name": "御宸", "value": 9800, "changePct": 35.0},          # 超四代宅爆红
-        {"name": "港航匯", "value": 9100, "changePct": 18.2},        # 港人投资热点
-        {"name": "招商臻灣府", "value": 8500, "changePct": 12.5},    # 马鞍岛
-        {"name": "建华龙湖·香山颂", "value": 7800, "changePct": 9.7}, # 石岐改善
-        {"name": "保利天匯·熙岸", "value": 6500, "changePct": -1.5}, # 翠亨
-        {"name": "朗詩金鐘湖壹號", "value": 5800, "changePct": 6.8}, # 東區
-    ],
-    "change_ranking": [
-        # 均价环比 (2026-02 vs 2026-01 estimates from market reports)
-        # 全市均价 ~13,746元/㎡, 环比持平
-        {"name": "御宸", "priceBefore": 18000, "priceAfter": 19500, "changePct": 8.3},
-        {"name": "港航匯", "priceBefore": 22500, "priceAfter": 24000, "changePct": 6.7},
-        {"name": "保利琅悦", "priceBefore": 14200, "priceAfter": 14700, "changePct": 3.5},
-        {"name": "招商臻灣府", "priceBefore": 17500, "priceAfter": 16800, "changePct": -4.0},
-        {"name": "錦繡海灣城", "priceBefore": 11500, "priceAfter": 10800, "changePct": -6.1},
-        {"name": "華發觀山水", "priceBefore": 6400, "priceAfter": 6000, "changePct": -6.3},
-        {"name": "錦繡國際花城", "priceBefore": 10800, "priceAfter": 10000, "changePct": -7.4},
-        {"name": "華潤仁恒公園四季2期", "priceBefore": 12000, "priceAfter": 11000, "changePct": -8.3},
-        {"name": "遠洋天著", "priceBefore": 13200, "priceAfter": 12000, "changePct": -9.1},
-        {"name": "中山粵海城", "priceBefore": 15200, "priceAfter": 13800, "changePct": -9.2},
-    ],
-    "trend_data": {
-        # 近8周全市均价走势 (2026 W5-W12 estimated from market reports)
-        "weeks": ["W5", "W6", "W7", "W8", "W9", "W10", "W11", "W12"],
-        "prices": [13800, 13750, 13700, 13746, 13800, 13850, 13780, 13820],
-    },
-}
+def main():
+    print("[run_real_data] Building hybrid data pipeline...")
 
-print("Building timeline from REAL 2026-02 data...")
-print(f"  Sources: 合富研究院周报, 房天下/58爱房挂牌价, 贝壳找房")
-print(f"  全市2月: 住宅网签731套, 均价~13,746元/㎡")
-print(f"  Volume TOP10: {len(real_data['volume_ranking'])} projects")
-print(f"  Popularity TOP10: {len(real_data['popularity_ranking'])} projects")
-print(f"  Change TOP10: {len(real_data['change_ranking'])} projects")
+    # ---- 1. Try to get live Beike prices ----
+    beike_prices = {}
+    try:
+        from fetchers.beike_popularity import fetch_popularity
+        names = [p["name"] for p in PROJECTS]
+        beike_results = fetch_popularity(names)
+        for r in beike_results:
+            if r["listing_avg_price"] > 0:
+                beike_prices[r["project_name"]] = r["listing_avg_price"]
+        print(f"  Beike: {len(beike_prices)} live prices")
+    except Exception as e:
+        print(f"  Beike: error — {e}")
 
-timeline = build_timeline(real_data)
-save_timeline(timeline)
+    # ---- 2. Load history baseline ----
+    prev = load_history()
+    print(f"  History: {prev.get('updated', 'none')}, {prev.get('period', '')}")
 
-# Also save the raw data for history
-history = {
-    "updated": "2026-02-28",
-    "source": "合富研究院 + 房天下 + 贝壳找房",
-    "period": "2026年2月",
-    "total_units": 731,
-    "avg_price": 13746,
-    "volume": {item["name"]: {"value": item["value"]} for item in real_data["volume_ranking"]},
-    "popularity": {item["name"]: {"value": item["value"]} for item in real_data["popularity_ranking"]},
-    "prices": {item["name"]: item["priceAfter"] for item in real_data["change_ranking"]},
-    "trend": real_data["trend_data"],
-}
-with open("history.json", "w", encoding="utf-8") as f:
-    json.dump(history, f, ensure_ascii=False, indent=2)
+    # ---- 3. Build volume ranking ----
+    # From history.json if scrapers failed, otherwise from scraped transaction data
+    volume_ranking = []
+    if prev.get("volume"):
+        for name, v in prev["volume"].items():
+            volume_ranking.append({
+                "name": name,
+                "value": v["value"],
+                "changePct": 0,  # Will be updated when next week's data arrives
+            })
+        volume_ranking.sort(key=lambda x: x["value"], reverse=True)
+        volume_ranking = volume_ranking[:10]
+    print(f"  Volume ranking: {len(volume_ranking)} items")
 
-print("\nDone! history.json updated with real data.")
-print(f"Timeline: {len(timeline['elements'])} elements, {timeline['durationInFrames']} frames")
+    # ---- 4. Build popularity ranking ----
+    popularity_ranking = []
+    if prev.get("popularity"):
+        for name, v in prev["popularity"].items():
+            popularity_ranking.append({
+                "name": name,
+                "value": v["value"],
+                "changePct": 0,
+            })
+        popularity_ranking.sort(key=lambda x: x["value"], reverse=True)
+        popularity_ranking = popularity_ranking[:10]
+    print(f"  Popularity ranking: {len(popularity_ranking)} items")
+
+    # ---- 5. Build change ranking ----
+    # Merge Beike live prices with history baseline
+    change_ranking = []
+    prev_prices = prev.get("prices", {})
+
+    # First, use Beike live prices as "current" prices
+    for name, live_price in beike_prices.items():
+        prev_price = prev_prices.get(name, live_price)
+        change_pct = round((live_price - prev_price) / prev_price * 100, 1) if prev_price > 0 else 0
+        change_ranking.append({
+            "name": name,
+            "priceBefore": prev_price if prev_price > 0 else live_price,
+            "priceAfter": live_price,
+            "changePct": change_pct,
+        })
+
+    # Then add any projects from history not covered by Beike
+    for name, hist_price in prev_prices.items():
+        if name not in beike_prices:
+            change_ranking.append({
+                "name": name,
+                "priceBefore": hist_price,
+                "priceAfter": hist_price,
+                "changePct": 0,
+            })
+
+    change_ranking.sort(key=lambda x: abs(x["changePct"]), reverse=True)
+    change_ranking = change_ranking[:10]
+    print(f"  Change ranking: {len(change_ranking)} items")
+
+    # ---- 6. Build trend data ----
+    trend = prev.get("trend", {"weeks": [], "prices": []})
+    # Append current week if we have new data
+    if beike_prices:
+        live_avg = sum(beike_prices.values()) / len(beike_prices)
+        import datetime
+        week_label = f"W{datetime.datetime.now().isocalendar()[1]}"
+        if not trend["weeks"] or trend["weeks"][-1] != week_label:
+            trend["weeks"].append(week_label)
+            trend["prices"].append(round(live_avg))
+        if len(trend["weeks"]) > 8:
+            trend["weeks"] = trend["weeks"][-8:]
+            trend["prices"] = trend["prices"][-8:]
+
+    # ---- 7. Generate timeline ----
+    data = {
+        "volume_ranking": volume_ranking,
+        "popularity_ranking": popularity_ranking,
+        "change_ranking": change_ranking,
+        "trend_data": trend,
+    }
+
+    print(f"\n  Final: V={len(volume_ranking)}, P={len(popularity_ranking)}, C={len(change_ranking)}")
+
+    timeline = build_timeline(data)
+    save_timeline(timeline)
+
+    print(f"  Timeline: {len(timeline['elements'])} elements, {timeline['durationInFrames']} frames")
+    print("[run_real_data] Done.")
+
+
+if __name__ == "__main__":
+    main()

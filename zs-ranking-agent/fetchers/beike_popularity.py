@@ -1,118 +1,86 @@
-"""贝壳找房 — 楼盘关注人数 & 挂牌均价爬虫.
+"""贝壳找房 — 楼盘价格 & 热度爬虫.
 
-策略:
-1. 直接搜索贝壳楼盘页面提取关注数和均价
-2. Bing 搜索缓存页面作为降级方案
-3. 都失败则返回空，由 aggregator 处理
+解析 zs.ke.com/loupan 列表页 DOM:
+- resblock-name → 项目名称
+- resblock-desc-wrapper → 含均价 "XXXXX元/㎡(均价)"
+- 分页抓取直到匹配所有目标项目
 """
 import re
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
-from urllib.parse import quote
 
 
 def fetch_popularity(project_names: list[str]) -> list[dict]:
-    """Fetch follower count and listing price from Beike for given projects.
-
-    Returns:
-        [{project_name: str, followers: int, listing_avg_price: float, source: str}]
-    """
-    results: list[dict] = []
+    """Fetch prices from Beike listing pages, match to canonical names."""
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Accept": "text/html,application/xhtml+xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "zh-CN,zh;q=0.9",
         "Referer": "https://zs.ke.com/",
     }
 
-    for name in project_names[:15]:  # Limit to 15 to avoid being blocked
-        data = _try_direct_beike(name, headers)
-        if data:
-            results.append(data)
+    from config import match_project
+
+    all_items: dict[str, dict] = {}  # canonical_name → {followers, price}
+    target_set = set(project_names)
+
+    for page in range(1, 20):  # Max 20 pages (~200 projects)
+        try:
+            url = f"https://zs.ke.com/loupan/pg{page}/"
+            resp = requests.get(url, headers=headers, timeout=15)
+            if resp.status_code != 200:
+                print(f"[beike] pg{page}: HTTP {resp.status_code}")
+                break
+
+            soup = BeautifulSoup(resp.text, "html.parser")
+            name_elems = soup.find_all(class_="resblock-name")
+
+            if not name_elems:
+                print(f"[beike] pg{page}: no listings found, stopping")
+                break
+
+            for elem in name_elems:
+                # Clean project name (remove "在售住宅"/"在售"/"售罄" etc.)
+                raw_name = elem.get_text(strip=True)
+                clean_name = re.sub(r'(在售住宅|在售|售罄|待售|已售完)', '', raw_name).strip()
+
+                # Fuzzy match to canonical name
+                canonical = match_project(clean_name)
+                if not canonical:
+                    continue
+
+                # Find price: resblock-name is a child of resblock-desc-wrapper
+                # which contains the price text directly
+                price = 0.0
+                desc_parent = elem.parent  # resblock-desc-wrapper
+                if desc_parent:
+                    pm = re.search(r'(\d[\d,]+)\s*元/㎡\s*[\(（]均价[\)）]', desc_parent.get_text())
+                    if pm:
+                        price = float(pm.group(1).replace(",", ""))
+
+                if canonical not in all_items:
+                    all_items[canonical] = {
+                        "project_name": canonical,
+                        "followers": 0,
+                        "listing_avg_price": price,
+                        "source": "beike",
+                        "fetched_at": datetime.now().isoformat(),
+                    }
+                elif price > all_items[canonical]["listing_avg_price"]:
+                    all_items[canonical]["listing_avg_price"] = price
+
+            found = len(all_items)
+            print(f"[beike] pg{page}: {len(name_elems)} listings, matched {found}/{len(target_set)} targets")
+
+            # Stop early if all targets found
+            if found >= len(target_set):
+                break
+
+        except Exception as e:
+            print(f"[beike] pg{page} error: {e}")
             continue
 
-        # Fallback: Bing cached search
-        data = _try_bing_beike(name)
-        if data:
-            results.append(data)
-
-    print(f"[beike] Got {len(results)}/{len(project_names)} projects with data")
+    results = list(all_items.values())
+    print(f"[beike] Total: {len(results)}/{len(target_set)} projects with price data")
     return results
-
-
-def _try_direct_beike(name: str, headers: dict) -> dict | None:
-    """Try direct Beike search for a project."""
-    try:
-        search_url = f"https://zs.ke.com/loupan/pg1/?key={quote(name)}"
-        resp = requests.get(search_url, headers=headers, timeout=15)
-        if resp.status_code != 200:
-            print(f"[beike] HTTP {resp.status_code} for {name}")
-            return None
-
-        soup = BeautifulSoup(resp.text, "html.parser")
-        text = soup.get_text()
-
-        followers = 0
-        avg_price = 0.0
-
-        # Extract followers (关注人数) from text patterns
-        follow_match = re.search(r'(\d[\d,]*)\s*人(?:关注|已关注)', text)
-        if follow_match:
-            followers = int(follow_match.group(1).replace(",", ""))
-
-        # Extract average price (均价)
-        price_match = re.search(r'(\d[\d,]*)\s*元/㎡', text)
-        if price_match:
-            avg_price = float(price_match.group(1).replace(",", ""))
-
-        if followers > 0 or avg_price > 0:
-            return {
-                "project_name": name,
-                "followers": followers,
-                "listing_avg_price": avg_price,
-                "source": "beike",
-                "fetched_at": datetime.now().isoformat(),
-            }
-    except Exception as e:
-        print(f"[beike] Error for {name}: {e}")
-
-    return None
-
-
-def _try_bing_beike(name: str) -> dict | None:
-    """Bing search fallback for Beike data."""
-    try:
-        search_url = f"https://www.bing.com/search?q=site:zs.ke.com+{quote(name)}+%E6%A5%BC%E7%9B%98"
-        resp = requests.get(search_url, headers={
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-        }, timeout=10)
-        if resp.status_code != 200:
-            return None
-
-        soup = BeautifulSoup(resp.text, "html.parser")
-        text = soup.get_text()
-
-        followers = 0
-        # Look for patterns in search snippets
-        follow_match = re.search(r'(\d[\d,]*)\s*人(?:关注|已关注)', text)
-        if follow_match:
-            followers = int(follow_match.group(1).replace(",", ""))
-
-        avg_price = 0.0
-        price_match = re.search(r'(\d[\d,]*)\s*元/㎡', text)
-        if price_match:
-            avg_price = float(price_match.group(1).replace(",", ""))
-
-        if followers > 0 or avg_price > 0:
-            return {
-                "project_name": name,
-                "followers": followers,
-                "listing_avg_price": avg_price,
-                "source": "beike_bing",
-                "fetched_at": datetime.now().isoformat(),
-            }
-    except Exception as e:
-        print(f"[beike-bing] Error for {name}: {e}")
-
-    return None

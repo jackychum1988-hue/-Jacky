@@ -77,9 +77,9 @@ export const RankingBarChart: React.FC<RankingBarChartProps> = ({
           display: 'flex',
           flexDirection: 'column',
           padding: '28px 36px',
-          backgroundColor: 'rgba(14,12,10,0.82)',
+          backgroundColor: 'rgba(10,8,6,0.38)',
           borderRadius: 16,
-          border: `1.5px solid ${hexToRgba(color, 0.20)}`,
+          border: `1px solid ${hexToRgba(color, 0.15)}`,
         }}
       >
         <h2

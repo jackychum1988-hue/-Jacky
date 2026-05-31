@@ -91,9 +91,9 @@ export const TrendLineChart: React.FC<TrendLineChartProps> = ({
           opacity: anim.opacity,
           transform: anim.transform,
           padding: '24px 28px',
-          backgroundColor: 'rgba(14,12,10,0.82)',
+          backgroundColor: 'rgba(10,8,6,0.38)',
           borderRadius: 16,
-          border: `1.5px solid rgba(${rgb},0.20)`,
+          border: `1px solid rgba(${rgb},0.15)`,
         }}
       >
         {title && (

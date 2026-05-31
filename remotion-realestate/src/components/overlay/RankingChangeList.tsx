@@ -102,7 +102,7 @@ export const RankingChangeList: React.FC<RankingChangeListProps> = ({
                 alignItems: 'center',
                 gap: 16,
                 padding: '12px 24px',
-                backgroundColor: 'rgba(14,12,10,0.78)',
+                backgroundColor: 'rgba(10,8,6,0.35)',
                 borderRadius: 12,
                 opacity: rowSpring,
                 transform: `translateX(${rowX}px)`,

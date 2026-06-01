@@ -252,16 +252,21 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="PipOverlay"
         component={PipOverlay}
-        durationInFrames={30 * 15}
+        durationInFrames={2040}
         fps={30}
-        width={1920}
-        height={1080}
+        width={1080}
+        height={1920}
         schema={PipOverlaySchema}
+        calculateMetadata={({ props }) => ({
+          durationInFrames: props.durationInFrames ?? 2040,
+          width: props.width ?? 1080,
+          height: props.height ?? 1920,
+        })}
         defaultProps={{
-          width: 1920,
-          height: 1080,
+          width: 1080,
+          height: 1920,
           fps: 30,
-          durationInFrames: 150,
+          durationInFrames: 2040,
           elements: [
             {
               type: 'KeywordTag',

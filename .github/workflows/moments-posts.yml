@@ -1,0 +1,79 @@
+name: Daily Moments Posts
+
+on:
+  schedule:
+    # UTC 00:00 = 北京时间 08:00 (morning)
+    - cron: "0 0 * * *"
+    # UTC 04:30 = 北京时间 12:30 (noon)
+    - cron: "30 4 * * *"
+    # UTC 12:30 = 北京时间 20:30 (evening)
+    - cron: "30 12 * * *"
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: "Time slot override (leave empty for auto-detect)"
+        required: false
+        type: choice
+        options:
+          - auto
+          - morning
+          - noon
+          - evening
+
+permissions:
+  contents: write
+
+jobs:
+  generate-post:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: moments-agent
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Determine time slot
+        id: slot
+        run: |
+          if [ -n "${{ github.event.inputs.slot }}" ] && [ "${{ github.event.inputs.slot }}" != "auto" ]; then
+            SLOT="${{ github.event.inputs.slot }}"
+          else
+            HOUR_UTC=$(date -u +%H)
+            case "$HOUR_UTC" in
+              00) SLOT="morning" ;;
+              04) SLOT="noon" ;;
+              *)  SLOT="evening" ;;
+            esac
+          fi
+          echo "slot=$SLOT" >> $GITHUB_OUTPUT
+          echo "Detected slot: $SLOT (UTC hour: $HOUR_UTC)"
+
+      - name: Run moments agent
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          DEEPSEEK_BASE_URL: ${{ secrets.DEEPSEEK_BASE_URL }}
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+          SLOT: ${{ steps.slot.outputs.slot }}
+        run: python main.py
+
+      - name: Persist history back to repo
+        if: always()
+        run: |
+          git config user.name "Moments Agent"
+          git config user.email "agent@moments.local"
+          git add moments-agent/history.json
+          if git diff --cached --quiet; then
+            echo "No history change to commit"
+          else
+            git commit -m "auto(moments): update history.json after ${{ steps.slot.outputs.slot }} run"
+            git push
+          fi

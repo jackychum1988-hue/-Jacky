@@ -1,0 +1,41 @@
+{
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "durationInFrames": 450,
+  "elements": [
+    {
+      "type": "KeywordTag",
+      "text": "ROI 300%",
+      "enterAt": 30,
+      "exitAt": 120,
+      "animation": "spring",
+      "position": "top-right",
+      "offset": { "x": -80, "y": 40 },
+      "props": { "color": "#5599FF", "size": "lg" }
+    },
+    {
+      "type": "DataPanel",
+      "title": "季度增长",
+      "value": "+45%",
+      "subtitle": "同比 2025 Q1",
+      "enterAt": 150,
+      "exitAt": 300,
+      "animation": "slideLeft",
+      "position": "center-right",
+      "offset": { "x": -60, "y": 0 },
+      "props": { "color": "#26C281" }
+    },
+    {
+      "type": "QuoteBar",
+      "text": "数据不会说谎，用户用脚投票",
+      "author": "Jacky",
+      "enterAt": 320,
+      "exitAt": 0,
+      "animation": "fade",
+      "position": "bottom-left",
+      "offset": { "x": 40, "y": -40 },
+      "props": { "color": "#C8A052" }
+    }
+  ]
+}

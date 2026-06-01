@@ -24,7 +24,7 @@ npx remotion render src/index.ts <CompositionID> out/video.mp4
 
 # 渲染周排行榜叠加视频 (ProRes 4444 alpha)
 # 完整标准文档: ../zs-ranking-agent/STANDARDS.md
-npx ts-node scripts/render_ranking.ts ../zs-ranking-agent/output/timeline-latest.json out/zhongshan-ranking.mov
+npx tsx scripts/render_ranking.ts ../zs-ranking-agent/output/timeline-latest.json out/zhongshan-ranking.mov
 
 # 升级 Remotion
 npx remotion upgrade

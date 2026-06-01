@@ -1,6 +1,6 @@
 // render_ranking.ts — CLI for rendering weekly ranking overlay video
-// Usage: npx ts-node scripts/render_ranking.ts <timeline.json> [output.mov]
-// Example: npx ts-node scripts/render_ranking.ts ../zs-ranking-agent/output/timeline-latest.json out/zhongshan-ranking.mov
+// Usage: npx tsx scripts/render_ranking.ts <timeline.json> [output.mov]
+// Example: npx tsx scripts/render_ranking.ts ../zs-ranking-agent/output/timeline-latest.json out/zhongshan-ranking.mov
 
 import { bundle } from '@remotion/bundler';
 import { renderMedia, selectComposition } from '@remotion/renderer';

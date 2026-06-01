@@ -50,7 +50,7 @@ jobs:
       - name: Render ranking overlay video
         run: |
           cd remotion-realestate
-          npx ts-node scripts/render_ranking.ts \
+          npx tsx scripts/render_ranking.ts \
             ../zs-ranking-agent/output/timeline-latest.json \
             "out/zhongshan-ranking-$(date +%Y-%m-%d).mov"
 

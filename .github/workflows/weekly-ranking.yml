@@ -48,12 +48,7 @@ jobs:
         run: cd remotion-realestate && npm ci
 
       - name: Render ranking overlay video
-        run: |
-          cd remotion-realestate
-          npx remotion render src/index.ts PipOverlay \
-            "out/zhongshan-ranking-$(date +%Y-%m-%d).mov" \
-            --props="$(cat ../zs-ranking-agent/output/timeline-latest.json)" \
-            --codec=prores --prores-profile=4444 --pixel-format=yuva444p10le
+        run: bash remotion-realestate/scripts/ci-render.sh
 
       - name: Upload video as artifact
         uses: actions/upload-artifact@v4

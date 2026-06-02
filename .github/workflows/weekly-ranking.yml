@@ -47,16 +47,8 @@ jobs:
       - name: Install Remotion dependencies
         run: cd remotion-realestate && npm ci
 
-      - name: Render ranking overlay video (MP4 test first)
-        run: |
-          cd remotion-realestate
-          echo "=== Test: basic Remotion render ==="
-          npx remotion render src/index.ts PipOverlay out/test.mp4 --props='{"width":1080,"height":1920,"fps":30,"durationInFrames":90,"elements":[{"type":"HookCard","enterAt":0,"exitAt":90,"animation":"fade","position":"center","props":{"label":"TEST","headline":"Hello","color":"#C8A052"}}]}' 2>&1
-          echo "=== Basic render exit: $? ==="
-          ls -la out/test.mp4 2>&1 || echo "No test.mp4"
-          echo "=== Now full render ==="
-          npx tsx scripts/ci-render.ts 2>&1
-          echo "=== Full render exit: $? ==="
+      - name: Render ranking overlay video
+        run: cd remotion-realestate && npx tsx scripts/ci-render.ts
 
       - name: Upload video as artifact
         uses: actions/upload-artifact@v4

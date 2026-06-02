@@ -1,0 +1,23 @@
+/* Remotion 房产视频 - 全局样式 */
+
+/* 基础重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 字体声明（系统自带即可，SF Pro/Georgia/PingFang 均已在 token 中 fallback） */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei",
+    "Helvetica Neue", sans-serif;
+  background: #1A1815;
+  color: #F5F0E8;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 禁止 tailwind 动画（Remotion 必须用 useCurrentFrame 驱动） */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

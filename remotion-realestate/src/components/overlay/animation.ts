@@ -7,7 +7,8 @@ import { interpolate, Easing } from 'remotion';
 export type Position9 =
   | 'top-left' | 'top-center' | 'top-right'
   | 'center-left' | 'center' | 'center-right'
-  | 'bottom-left' | 'bottom-center' | 'bottom-right';
+  | 'bottom-left' | 'bottom-center' | 'bottom-right'
+  | 'safe-top';
 
 export type AnimationType =
   | 'fade' | 'slideUp' | 'slideDown' | 'slideLeft' | 'slideRight'
@@ -52,6 +53,7 @@ const POSITION_STYLE_MAP: Record<
   'bottom-left':  { justifyContent: 'flex-end',   alignItems: 'flex-start', padding: '0 0 60px 60px' },
   'bottom-center':{ justifyContent: 'flex-end',   alignItems: 'center',     padding: '0 0 60px 0' },
   'bottom-right': { justifyContent: 'flex-end',   alignItems: 'flex-end',   padding: '0 60px 60px 0' },
+  'safe-top':     { justifyContent: 'flex-start', alignItems: 'flex-start', padding: '12% 8% 0 8%' },
 };
 
 export interface PositionStyle {

@@ -50,9 +50,11 @@ jobs:
       - name: Render ranking overlay video
         run: |
           cd remotion-realestate
-          npx ts-node scripts/render_ranking.ts \
-            ../zs-ranking-agent/output/timeline-latest.json \
-            "out/zhongshan-ranking-$(date +%Y-%m-%d).mov"
+          echo "=== Remotion version ==="
+          npx remotion versions 2>&1
+          echo "=== Full render ==="
+          npx tsx scripts/ci-render.ts 2>&1
+          echo "=== Exit: $? ==="
 
       - name: Upload video as artifact
         uses: actions/upload-artifact@v4

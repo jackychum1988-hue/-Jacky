@@ -227,3 +227,52 @@ export const hexToRgb = (hex: string): string => {
   const b = parseInt(hex.slice(5, 7), 16);
   return `${r},${g},${b}`;
 };
+
+export const hexToRgba = (hex: string, alpha: number): string => {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+};
+
+// Subtle text depth — no colored glow, works on transparent backgrounds
+export const textGlow = (color: string, intensity: number): string => {
+  return [
+    `0 0 1px rgba(255,255,255,${0.10 * intensity})`,
+    `0 0 2px rgba(0,0,0,${0.45 * intensity})`,
+    `0 2px 6px rgba(0,0,0,${0.22 * intensity})`,
+  ].join(', ');
+};
+
+// Subtle breathing scale (~5s cycle, ±0.8%)
+export const breathingScale = (frame: number): number => {
+  return 1 + Math.sin(frame * 0.035) * 0.008;
+};
+
+// zhuzige 6-color palette
+export const V = [
+  '#FF4136', // 0: red
+  '#F5A623', // 1: amber
+  '#1A56DB', // 2: deep-blue
+  '#10B981', // 3: emerald
+  '#8B5CF6', // 4: violet
+  '#06B6D4', // 5: cyan
+];
+
+// Text colors for transparent overlay
+export const C = {
+  text: '#FFFFFF',
+  textSecondary: '#F5F0E8',
+  textTertiary: '#C8BFA8',
+};
+
+// English font-size ratio relative to Chinese
+export const EN_RATIO = 0.5;
+export const enFontSize = (cnSize: number) => Math.round(cnSize * EN_RATIO);
+
+// Font stacks
+export const F = {
+  display: '-apple-system, BlinkMacSystemFont, "Inter", "Noto Sans SC", sans-serif',
+  text: '-apple-system, BlinkMacSystemFont, "Inter", "PingFang SC", "Microsoft YaHei", sans-serif',
+  mono: '"SF Mono", "JetBrains Mono", "Fira Code", monospace',
+};

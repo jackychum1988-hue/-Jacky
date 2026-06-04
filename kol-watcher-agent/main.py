@@ -2,12 +2,14 @@
 import sys
 import json
 import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import argparse
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from config import (
     HISTORY_FILE, OUTPUT_DIR, Platform,
+    DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, DEEPSEEK_MODEL, PUSHPLUS_TOKEN,
 )
 from fetchers import fetch_youtube, fetch_xiaohongshu, fetch_facebook, fetch_shipinhao
 from dedup import dedup_items, save_seen
@@ -148,6 +150,20 @@ def run_daily():
 
     print(f"[main] analyzing {len(items)} items...")
     analysis = analyze_daily(items)
+
+    # Generate spoken scripts from topic suggestions
+    print("[main] generating spoken scripts...")
+    try:
+        from shared.script_writer import generate_and_push
+        generate_and_push(
+            analysis_text=analysis or "",
+            deepseek_api_key=DEEPSEEK_API_KEY,
+            pushplus_token=PUSHPLUS_TOKEN,
+            deepseek_base_url=DEEPSEEK_BASE_URL,
+            deepseek_model=DEEPSEEK_MODEL,
+        )
+    except Exception as e:
+        print(f"[main] script generation failed (non-fatal): {e}")
 
     stats = platform_stats(results)
     report = render_daily(analysis, len(items), stats)

@@ -22,6 +22,12 @@ from reporter import build_report
 from pusher import push_to_wechat
 from dedup import dedup_results, save_seen_urls
 
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from config import DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, DEEPSEEK_MODEL, PUSHPLUS_TOKEN
+
 
 def run_fetcher(name: str, fn) -> tuple[str, list[dict]]:
     try:
@@ -89,6 +95,20 @@ def main():
         print(f"[main] AI analysis: {len(ai_analysis)} chars")
     else:
         print("[main] AI analysis skipped (no API key or failed)")
+
+    # Generate spoken scripts from topic suggestions
+    print("[main] generating spoken scripts...")
+    try:
+        from shared.script_writer import generate_and_push
+        generate_and_push(
+            analysis_text=ai_analysis or "",
+            deepseek_api_key=DEEPSEEK_API_KEY,
+            pushplus_token=PUSHPLUS_TOKEN,
+            deepseek_base_url=DEEPSEEK_BASE_URL,
+            deepseek_model=DEEPSEEK_MODEL,
+        )
+    except Exception as e:
+        print(f"[main] script generation failed (non-fatal): {e}")
 
     report = build_report(
         anjuke_items=results.get("anjuke", []),

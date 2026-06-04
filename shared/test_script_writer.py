@@ -95,3 +95,16 @@ def test_format_scripts_for_push():
     assert "三乡" in result
     assert "按揭" in result
     assert "---" in result  # separator between scripts
+
+
+def test_extract_none_input():
+    """Return empty list when analysis_text is None."""
+    result = _extract_topic_suggestions(None)
+    assert result == []
+
+
+def test_format_scripts_for_push_empty():
+    """Format empty scripts list returns just the header."""
+    result = format_scripts_for_push([], date_str="06/04")
+    assert "🎙 **Jacky今日口播** | 06/04" in result
+    assert "**【选题" not in result  # no topic entries

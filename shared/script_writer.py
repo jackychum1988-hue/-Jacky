@@ -198,8 +198,10 @@ def generate_scripts(
         text = data["choices"][0]["message"]["content"]
 
         # Parse JSON from response (handle markdown code block wrapping)
-        if text.startswith("```"):
-            text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+        import re as _re
+        m = _re.search(r'```(?:json)?\s*\n?(.*?)```', text, _re.DOTALL)
+        if m:
+            text = m.group(1).strip()
         result = json.loads(text)
         return result.get("scripts", [])
 
@@ -287,9 +289,10 @@ def generate_and_push(
     )
 
     if not scripts:
-        # Fallback: push raw suggestions so user at least sees the topics
-        print("[script_writer] script generation returned empty, pushing raw suggestions as fallback")
-        fallback = f"🎙 **Jacky今日口播** | {datetime.now().strftime('%m/%d')}\n\n⚠️ AI脚本生成暂不可用，以下是今日话题建议原文：\n\n{analysis_text}"
+        # Fallback: push a short notice (not the full analysis text)
+        print("[script_writer] script generation returned empty, pushing short fallback notice")
+        suggestions_text = "\n".join(f"- {s[:80]}..." for s in suggestions[:3])
+        fallback = f"🎙 **Jacky今日口播** | {datetime.now().strftime('%m/%d')}\n\n⚠️ AI脚本生成暂不可用。今日话题建议已附在数据报告中，以下是建议摘要：\n\n{suggestions_text}"
         push_scripts(fallback, pushplus_token)
         return False
 

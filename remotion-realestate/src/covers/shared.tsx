@@ -17,10 +17,10 @@ export const SERIES_LABELS: Record<SeriesType, string> = {
 // ====== 系列辨识色映射 — 复用 COLORS token ======
 
 export const SERIES_COLORS: Record<SeriesType, string> = {
-  sundip: COLORS.warning,
-  data: COLORS.info,
-  opinion: COLORS.success,
-  warning: COLORS.error,
+  sundip: '#FF6B35',
+  data: '#00D4FF',
+  opinion: '#39FF14',
+  warning: '#FF3366',
 };
 
 // ====== 辅助函数 ======

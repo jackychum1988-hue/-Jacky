@@ -1,14 +1,13 @@
 // remotion-realestate/src/covers/OpinionCover.tsx
-// Jacky观点 — 透明底 + 砸脸大字 / 叠加视频不挡人物
+// Jacky观点 — 顶部标题 + 底部钩子 / 中间透明 / 霓虹绿
 
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
-import { COLORS, FONTS, SIZES } from '../design-system/tokens';
+import { FONTS } from '../design-system/tokens';
 import { SeriesBadge, BrandBar, SERIES_COLORS } from './shared';
 import type { OpinionCoverProps } from './types';
 
-const SHADOW = '0 3px 20px rgba(0,0,0,0.95)';
-const SHADOW_LIGHT = '0 2px 14px rgba(0,0,0,0.8)';
+const SHADOW = '0 4px 24px rgba(0,0,0,0.95)';
 
 export const OpinionCover: React.FC<OpinionCoverProps> = ({
   series,
@@ -23,133 +22,78 @@ export const OpinionCover: React.FC<OpinionCoverProps> = ({
       style={{
         backgroundColor: 'transparent',
         fontFamily: FONTS.text,
-        overflow: 'hidden',
       }}
     >
-      {/* 右上角大光环 */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '4%',
-          right: '3%',
-          width: 480,
-          height: 480,
-          borderRadius: '50%',
-          background: `radial-gradient(circle, ${color}35 0%, transparent 60%)`,
-          pointerEvents: 'none',
-        }}
-      />
+      {/* ====== 顶部区域 ====== */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 1 }}>
+        {/* 顶部色条 */}
+        <div style={{ height: 4, background: color, marginBottom: 0 }} />
 
-      {/* 左边缘色条 */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '8%',
-          left: 0,
-          width: 8,
-          height: '30%',
-          background: color,
-          pointerEvents: 'none',
-        }}
-      />
+        <div style={{ padding: '32px 64px 0' }}>
+          {/* 系列标签 + 装饰线 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+            <div style={{ width: 6, height: 28, background: color, borderRadius: 3 }} />
+            <SeriesBadge series={series} episodeNumber={episodeNumber} />
+          </div>
 
-      {/* 底部渐变色带 */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 4,
-          background: `linear-gradient(90deg, ${color}, ${COLORS.primary})`,
-          pointerEvents: 'none',
-        }}
-      />
-
-      <SeriesBadge series={series} episodeNumber={episodeNumber} />
-
-      {/* 主内容 — 左对齐大字 */}
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          padding: `0 ${SIZES.spacing.xxxl}px 0 80px`,
-          position: 'relative',
-          zIndex: 1,
-        }}
-      >
-        {/* 顶部小标签 */}
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 10,
-            marginBottom: SIZES.spacing.xl,
-          }}
-        >
-          <div style={{ width: 32, height: 3, background: color }} />
-          <span style={{ color, fontSize: 24, fontWeight: 700, letterSpacing: '0.1em', textShadow: SHADOW_LIGHT }}>
-            港人置业必看
-          </span>
-        </div>
-
-        {/* 主标题 — 砸脸大字 */}
-        <h1
-          style={{
-            fontFamily: FONTS.display,
-            fontSize: 88,
-            color: COLORS.text,
-            lineHeight: 1.1,
-            fontWeight: 700,
-            margin: 0,
-            letterSpacing: '-0.01em',
-            maxWidth: '92%',
-            textShadow: SHADOW,
-          }}
-        >
-          {title.split('\n').map((line, i) => (
-            <React.Fragment key={i}>
-              <span style={{ display: 'block' }}>
-                {line}
-              </span>
-            </React.Fragment>
-          ))}
-        </h1>
-
-        {/* 分隔区 */}
-        <div style={{ height: SIZES.spacing.xl }} />
-
-        {/* 钩子文案 */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: SIZES.spacing.md }}>
-          <div
+          {/* 砸脸标题 — 左对齐 */}
+          <h1
             style={{
-              width: 5,
-              height: 60,
-              background: COLORS.primary,
-              borderRadius: 2,
-              flexShrink: 0,
-              marginTop: 4,
-            }}
-          />
-          <p
-            style={{
-              fontSize: 36,
-              color: COLORS.text,
-              fontWeight: 600,
-              lineHeight: 1.35,
+              fontFamily: FONTS.display,
+              fontSize: 90,
+              color: '#FFFFFF',
+              lineHeight: 1.08,
+              fontWeight: 800,
               margin: 0,
-              maxWidth: '82%',
               textShadow: SHADOW,
+              letterSpacing: '-0.02em',
             }}
           >
-            {hook}
-          </p>
+            {title.split('\n').map((line, i) => (
+              <React.Fragment key={i}>
+                {i > 0 && <br />}
+                {line}
+              </React.Fragment>
+            ))}
+          </h1>
         </div>
       </div>
 
-      <BrandBar />
+      {/* ====== 底部区域 ====== */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1 }}>
+        <div style={{ padding: '0 64px 0' }}>
+          {/* 钩子文字 — 右对齐 */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
+            <div style={{ maxWidth: '70%' }}>
+              <div
+                style={{
+                  width: '100%',
+                  height: 3,
+                  background: `linear-gradient(90deg, transparent, ${color})`,
+                  marginBottom: 16,
+                }}
+              />
+              <p
+                style={{
+                  fontSize: 38,
+                  color: '#FFFFFF',
+                  fontWeight: 700,
+                  lineHeight: 1.3,
+                  margin: 0,
+                  textAlign: 'right',
+                  textShadow: SHADOW,
+                }}
+              >
+                {hook}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* 底部分隔色条 */}
+        <div style={{ height: 3, background: `linear-gradient(90deg, ${color}, transparent)` }} />
+        <BrandBar />
+      </div>
     </AbsoluteFill>
   );
 };

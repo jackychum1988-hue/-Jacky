@@ -15,6 +15,7 @@ import json
 import os
 import re
 from datetime import datetime
+from functools import lru_cache
 
 # ---------------------------------------------------------------------------
 # Card sequence per content tier
@@ -34,9 +35,10 @@ TIER_CARD_SEQUENCE = {
 }
 
 # ---------------------------------------------------------------------------
-# Frame duration per card type (at 30fps)
+# Per-card-type configuration tables
 # ---------------------------------------------------------------------------
 
+# Frame duration per card type (at 30fps)
 CARD_DURATION_MAP = {
     "HookCard": 180,             # 6s
     "CTACard": 210,              # 7s
@@ -48,14 +50,11 @@ CARD_DURATION_MAP = {
     "TimelineCard": 360,         # 12s
 }
 
-# ---------------------------------------------------------------------------
-# Card positions (must be valid Position9 values)
-#   Position9 = top-left | top-center | top-right
-#             | center-left | center | center-right
-#             | bottom-left | bottom-center | bottom-right
-#             | safe-top
-# ---------------------------------------------------------------------------
-
+# Card positions — must be valid Position9 values:
+#   top-left | top-center | top-right
+# | center-left | center | center-right
+# | bottom-left | bottom-center | bottom-right
+# | safe-top
 CARD_POSITIONS = {
     "HookCard": "safe-top",
     "CTACard": "bottom-center",
@@ -67,10 +66,7 @@ CARD_POSITIONS = {
     "TimelineCard": "center",
 }
 
-# ---------------------------------------------------------------------------
-# Card accent colours (matches zhuzige V palette + gold accent)
-# ---------------------------------------------------------------------------
-
+# Card accent colours (matches zhuzige V palette)
 CARD_COLORS = [
     "#1A56DB",   # deep-blue
     "#F5A623",   # amber
@@ -80,43 +76,71 @@ CARD_COLORS = [
     "#06B6D4",   # cyan
 ]
 
+# Card entry animation — must be valid AnimationType values:
+#   fade | slideUp | slideDown | slideLeft | slideRight | scale | spring | typewriter
+CARD_ANIMATION = {
+    "HookCard": "spring",
+    "CTACard": "slideUp",
+    "DataPanel": "slideLeft",
+    "PriceRevealCard": "spring",
+    "DataComparisonCard": "slideLeft",
+    "ChecklistCard": "slideUp",
+    "WarningCard": "fade",
+    "TimelineCard": "slideUp",
+}
+
+# ---------------------------------------------------------------------------
+# Pre-compiled regex patterns (module-level to avoid re-compilation per call)
+# ---------------------------------------------------------------------------
+
+_RE_CN_ORDINAL = re.compile(r'(?:第[一二三四五六七八九十]+[，,、]?\s*)')
+_RE_CN_BULLET  = re.compile(r'(?:[一二三四五六七八九十]+[、．.,])\s*')
+_RE_NUMERIC    = re.compile(r'\d+[\.\)、]\s*')
+_RE_CHINESE_NUMBER = re.compile(r'(\d[\d,.]*(?:万|亿|千|蚊|元|%|平)?)')
+
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _split_numbered_body(body: str) -> list[str]:
+def _truncate(text: str, max_len: int) -> str:
+    """Truncate text to max_len chars, appending an ellipsis if cut."""
+    if len(text) <= max_len:
+        return text
+    return text[:max_len] + "…"
+
+
+@lru_cache(maxsize=8)
+def _split_numbered_body(body: str) -> tuple:
     """Split a Chinese body string into items/steps by numbered markers.
 
     Matches patterns like:
         第一，... 第二，... 第三，...
         1. ... 2. ... 3. ...
         一、... 二、... 三、...
-    Returns a list of item strings, stripping the marker prefix.
+
+    Returns a tuple of item strings (hashable, for lru_cache).
     """
     if not body:
-        return [body] if body else []
+        return ()
 
     # Try Chinese ordinal markers: 第一，/ 第二，/ etc.
-    cn_ordinal = re.split(r'(?:第[一二三四五六七八九十]+[，,、]?\s*)', body)
-    cn_ordinal = [s.strip() for s in cn_ordinal if s.strip()]
+    cn_ordinal = [s.strip() for s in _RE_CN_ORDINAL.split(body) if s.strip()]
     if len(cn_ordinal) >= 2:
-        return cn_ordinal
+        return tuple(cn_ordinal)
 
     # Try Chinese bullet: 一、/ 二、/ etc.
-    cn_bullet = re.split(r'(?:[一二三四五六七八九十]+[、．.,])\s*', body)
-    cn_bullet = [s.strip() for s in cn_bullet if s.strip()]
+    cn_bullet = [s.strip() for s in _RE_CN_BULLET.split(body) if s.strip()]
     if len(cn_bullet) >= 2:
-        return cn_bullet
+        return tuple(cn_bullet)
 
     # Try numeric: 1. / 2. / etc.
-    num = re.split(r'\d+[\.\)、]\s*', body)
-    num = [s.strip() for s in num if s.strip()]
+    num = [s.strip() for s in _RE_NUMERIC.split(body) if s.strip()]
     if len(num) >= 2:
-        return num
+        return tuple(num)
 
     # Fallback: return the whole body as a single item
-    return [body.strip()]
+    return (body.strip(),)
 
 
 def _extract_number(body: str) -> str:
@@ -127,8 +151,7 @@ def _extract_number(body: str) -> str:
     """
     if not body:
         return "--"
-    # Match patterns like "1.2万", "200万", "47万", "涨咗2000蚊"
-    m = re.search(r'(\d[\d,.]*(?:万|亿|千|蚊|元|%|平)?)', body)
+    m = _RE_CHINESE_NUMBER.search(body)
     if m:
         return m.group(1)
     return "--"
@@ -144,7 +167,7 @@ def _build_element(
     exit_at: int,
     script: dict,
     color: str,
-    index: int,
+    card_index: int,
 ) -> dict:
     """Build a single PipOverlay element dict from card type and script data.
 
@@ -157,7 +180,7 @@ def _build_element(
         exit_at: Frame at which the element starts exiting.
         script: Script dict with title/hook/body/cta/full_script.
         color: Accent colour hex string.
-        index: Zero-based index in the card sequence (for colour cycling).
+        card_index: Zero-based index in the card sequence.
 
     Returns:
         Element dict compatible with PipOverlaySchema.elementSchema.
@@ -166,10 +189,8 @@ def _build_element(
     hook = script.get("hook", "")
     body = script.get("body", "")
     cta = script.get("cta", "")
-    full_script = script.get("full_script", "")
 
     props: dict = {"color": color}
-    animation = "spring"  # default
 
     # --- HookCard ---
     # Interface: { label, headline, enText?, icon?, color?, subline? }
@@ -179,12 +200,8 @@ def _build_element(
             "headline": hook or title,
             "icon": "alert",
         })
-        # Only add subline if body is short enough to read alongside headline
-        if body and len(body) <= 60:
-            props["subline"] = body
-        elif body:
-            props["subline"] = body[:60]
-        animation = "spring"
+        if body:
+            props["subline"] = _truncate(body, 60)
 
     # --- CTACard ---
     # Interface: { icon?, headline, enHeadline?, contact, enLabel?, color?, tags? }
@@ -194,7 +211,6 @@ def _build_element(
             "contact": "PM",
             "tags": ["#港人中山置业", "#避坑清单", "#中山买楼"],
         })
-        animation = "slideUp"
 
     # --- DataPanel ---
     # Interface: { title, value, subtitle?, color? }
@@ -204,23 +220,19 @@ def _build_element(
             "value": _extract_number(body),
         })
         if body:
-            subtitle = body[:40]
-            if len(body) > 40:
-                subtitle += "…"
-            props["subtitle"] = subtitle
-        animation = "slideLeft"
+            props["subtitle"] = _truncate(body, 40)
 
     # --- PriceRevealCard ---
     # Interface: { tag, subtitle, priceLabel, priceValue, priceUnit, enTag?, enSubtitle?, color? }
     elif card_type == "PriceRevealCard":
+        num_value = _extract_number(body)
         props.update({
             "tag": "笋盘速报",
             "subtitle": hook or title,
             "priceLabel": "总价",
-            "priceValue": _extract_number(body) if _extract_number(body) != "--" else "200万",
+            "priceValue": num_value if num_value != "--" else "200万",
             "priceUnit": "起",
         })
-        animation = "spring"
 
     # --- DataComparisonCard ---
     # Interface: { label?, icon?, leftLabel, leftValue, leftUnit?, rightLabel, rightValue,
@@ -236,41 +248,33 @@ def _build_element(
             "delta": "详情PM",
             "icon": "chart",
         })
-        animation = "slideLeft"
 
     # --- ChecklistCard ---
     # Interface: { label?, title?, enTitle?, items: [{label, enLabel?}], color? }
     elif card_type == "ChecklistCard":
         items_raw = _split_numbered_body(body)
-        # Take at most 5 items, each truncated to 40 chars
-        items = []
-        for raw in items_raw[:5]:
-            item_label = raw[:40]
-            if len(raw) > 40:
-                item_label += "…"
-            items.append({"label": item_label})
+        items = [{"label": _truncate(raw, 40)} for raw in items_raw[:5]]
         if not items:
-            items = [{"label": body[:40] if body else "待补充"}]
+            items = [{"label": _truncate(body, 40) if body else "待补充"}]
         props.update({
             "title": title or "核心要点",
             "items": items,
         })
-        animation = "slideUp"
 
     # --- WarningCard ---
     # Interface: { label?, n, title, desc, enTitle?, enDesc?, icon?, color?, bullets? }
     elif card_type == "WarningCard":
-        bullets = _split_numbered_body(body)
-        # Limit bullets and truncate each
-        bullets = [b[:60] for b in bullets[:3]]
+        # Compute display number: position of WarningCard in deep sequence + 1
+        deep_seq = TIER_CARD_SEQUENCE["deep"]
+        n_value = deep_seq.index("WarningCard") + 1 if "WarningCard" in deep_seq else 1
+        bullets = [_truncate(b, 60) for b in _split_numbered_body(body)[:3]]
         props.update({
-            "n": index + 1,
+            "n": n_value,
             "title": "避坑提醒",
-            "desc": body[:100] if body else "购买前请仔细核实相关信息",
+            "desc": _truncate(body, 100) if body else "购买前请仔细核实相关信息",
             "icon": "alert",
             "bullets": bullets,
         })
-        animation = "fade"
 
     # --- TimelineCard ---
     # Interface: { title?, enTitle?, steps: [{label, enLabel?, desc?, enDesc?}], color? }
@@ -278,24 +282,22 @@ def _build_element(
         steps_raw = _split_numbered_body(body)
         steps = []
         for i, raw in enumerate(steps_raw[:6]):
-            step_label = f"步骤{i + 1}"
-            step_desc = raw[:60]
-            if len(raw) > 60:
-                step_desc += "…"
-            steps.append({"label": step_label, "desc": step_desc})
+            steps.append({
+                "label": f"步骤{i + 1}",
+                "desc": _truncate(raw, 60),
+            })
         if not steps:
-            steps = [{"label": "步骤1", "desc": body[:60] if body else "待补充"}]
+            steps = [{"label": "步骤1", "desc": _truncate(body, 60) if body else "待补充"}]
         props.update({
             "title": title or "流程步骤",
             "steps": steps,
         })
-        animation = "slideUp"
 
     return {
         "type": card_type,
         "enterAt": enter_at,
         "exitAt": exit_at,
-        "animation": animation,
+        "animation": CARD_ANIMATION.get(card_type, "spring"),
         "position": CARD_POSITIONS.get(card_type, "center"),
         "offset": {"x": 0, "y": 0},
         "props": props,
@@ -372,7 +374,7 @@ def save_timeline(timeline: dict, output_path: str) -> str:
 def script_to_timeline_json(
     script: dict,
     tier: str = "deep",
-    output_dir: str = "config/timelines",
+    output_dir: str = "remotion-realestate/config/timelines",
 ) -> str:
     """Full convenience pipeline: script -> timeline build -> save JSON.
 
@@ -380,6 +382,7 @@ def script_to_timeline_json(
         script: Script dict from script_writer.py.
         tier: Content tier.
         output_dir: Directory to save the timeline JSON file.
+                    Defaults to remotion-realestate/config/timelines/.
 
     Returns:
         Absolute path to the saved timeline JSON file.

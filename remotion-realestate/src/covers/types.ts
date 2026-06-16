@@ -61,19 +61,3 @@ export type CoverProps =
   | DataCoverProps
   | OpinionCoverProps
   | WarningCoverProps;
-
-/** 系列名称映射 */
-export const SERIES_LABELS: Record<SeriesType, string> = {
-  sundip: '🔥 笋盘速报',
-  data: '📊 数据拆解',
-  opinion: '💡 Jacky观点',
-  warning: '⚠️ 避坑指南',
-};
-
-/** 系列辨识色映射 — 复用 COLORS token */
-export const SERIES_COLORS: Record<SeriesType, string> = {
-  sundip: '#D4875E',   // COLORS.warning (赤陶)
-  data: '#6B9EB3',     // COLORS.info (海洋蓝)
-  opinion: '#7B9B6A',  // COLORS.success (鼠尾草绿)
-  warning: '#C4554D',  // COLORS.error (砖红)
-};

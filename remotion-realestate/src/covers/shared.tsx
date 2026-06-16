@@ -2,8 +2,37 @@
 // 四系列共享子组件 — SeriesBadge, BrandBar, GoldLine, CoverGradient
 
 import React from 'react';
-import { COLORS, FONTS } from '../design-system/tokens';
-import { SeriesType, SERIES_LABELS, SERIES_COLORS } from './types';
+import { COLORS, FONTS, SIZES } from '../design-system/tokens';
+import { SeriesType } from './types';
+
+// ====== 系列名称映射（纯中文，无 emoji） ======
+
+export const SERIES_LABELS: Record<SeriesType, string> = {
+  sundip: '笋盘速报',
+  data: '数据拆解',
+  opinion: 'Jacky观点',
+  warning: '避坑指南',
+};
+
+// ====== 系列辨识色映射 — 复用 COLORS token ======
+
+export const SERIES_COLORS: Record<SeriesType, string> = {
+  sundip: COLORS.warning,
+  data: COLORS.info,
+  opinion: COLORS.success,
+  warning: COLORS.error,
+};
+
+// ====== 辅助函数 ======
+
+/** 根据背景色相对亮度选取高对比文字色 */
+function getSeriesTextColor(bgColor: string): string {
+  const r = parseInt(bgColor.slice(1, 3), 16);
+  const g = parseInt(bgColor.slice(3, 5), 16);
+  const b = parseInt(bgColor.slice(5, 7), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? COLORS.background : COLORS.text;
+}
 
 // ====== SeriesBadge — 左上角系列标签 ======
 
@@ -18,16 +47,16 @@ export const SeriesBadge: React.FC<{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '24px 32px 0 32px',
+        padding: `${SIZES.spacing.md}px ${SIZES.spacing.lg}px 0 ${SIZES.spacing.lg}px`,
       }}
     >
       <div
         style={{
           backgroundColor: color,
-          color: series === 'warning' ? COLORS.text : COLORS.background,
-          padding: '6px 16px',
-          borderRadius: 20,
-          fontSize: 18,
+          color: getSeriesTextColor(color),
+          padding: `${SIZES.spacing.xs}px ${SIZES.spacing.sm}px`,
+          borderRadius: SIZES.radius.xl,
+          fontSize: SIZES.body,
           fontFamily: FONTS.text,
           fontWeight: 700,
         }}
@@ -36,8 +65,8 @@ export const SeriesBadge: React.FC<{
       </div>
       <div
         style={{
-          color: color,
-          fontSize: 16,
+          color,
+          fontSize: SIZES.caption,
           fontFamily: FONTS.text,
         }}
       >
@@ -55,7 +84,7 @@ export const GoldLine: React.FC<{ width?: number }> = ({ width = 60 }) => (
       width,
       height: 2,
       background: `linear-gradient(90deg, transparent, ${COLORS.primary}, transparent)`,
-      margin: '16px auto',
+      margin: `${SIZES.spacing.sm}px auto`,
     }}
   />
 );
@@ -66,14 +95,14 @@ export const BrandBar: React.FC = () => (
   <div
     style={{
       borderTop: `1px solid ${COLORS.backgroundElevated}`,
-      paddingTop: 12,
-      paddingBottom: 24,
+      paddingTop: SIZES.spacing.sm,
+      paddingBottom: SIZES.spacing.md,
       textAlign: 'center' as const,
     }}
   >
     <span
       style={{
-        fontSize: 14,
+        fontSize: SIZES.small,
         fontFamily: FONTS.text,
         color: COLORS.textTertiary,
       }}

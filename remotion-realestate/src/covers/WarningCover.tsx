@@ -37,7 +37,7 @@ export const WarningCover: React.FC<WarningCoverProps> = ({
         <h1
           style={{
             fontFamily: FONTS.display,
-            fontSize: 52,
+            fontSize: SIZES.h2,
             color: COLORS.text,
             lineHeight: 1.3,
             fontWeight: 700,
@@ -56,7 +56,7 @@ export const WarningCover: React.FC<WarningCoverProps> = ({
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          gap: 14,
+          gap: SIZES.spacing.sm,
           padding: `0 ${SIZES.spacing.xxxl}px`,
         }}
       >
@@ -74,7 +74,7 @@ export const WarningCover: React.FC<WarningCoverProps> = ({
           >
             <span
               style={{
-                fontSize: 32,
+                fontSize: 32, // 32px for ✕ icon — no exact SIZES match (between h4=28 and h3=40)
                 color: color,
                 fontFamily: FONTS.display,
                 fontWeight: 700,

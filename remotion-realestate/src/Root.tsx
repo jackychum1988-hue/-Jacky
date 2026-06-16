@@ -1,7 +1,7 @@
 // Root.tsx - Remotion Composition 注册入口
 
 import React from 'react';
-import { Composition, AbsoluteFill, useCurrentFrame } from 'remotion';
+import { Composition, Still, AbsoluteFill, useCurrentFrame } from 'remotion';
 import './index.css';
 import { RealEstateDemo } from './scenes/demo/RealEstateDemo';
 import { GangHangHuiIntro, GangHangHuiSchema } from './scenes/demo/GangHangHuiIntro';
@@ -18,7 +18,16 @@ import { ManCaveOverlay, ManCaveOverlaySchema } from './scenes/ads/ManCaveOverla
 import { ComparisonCards, SectionTitle, ProcessFlow, HeroProductTitle } from './components/new';
 import { IconCloudScene } from './scenes/IconCloudScene';
 import { PipOverlay, PipOverlaySchema } from './scenes/PipOverlay';
+import { FullBgOverlay, FullBgOverlaySchema } from './scenes/FullBgOverlay';
+import { DataSourceCard } from './scenes/DataSourceCard';
+import { CityPriceDataSource } from './scenes/CityPriceDataSource';
 import { COLORS } from './design-system/tokens';
+import propertyCostRanking from '../config/property-cost-ranking.json';
+import dualContractTimeline from '../config/dual-contract-timeline.json';
+import parkSeasonsInfo from '../config/park-seasons-info.json';
+import parkSeasonsResettlement from '../config/park-seasons-resettlement.json';
+import zhongshanComparison from '../config/zhongshan-comparison.json';
+import { SundipCover, DataCover, OpinionCover, WarningCover } from './covers';
 
 // ====== 主 Root 组件 ======
 
@@ -30,132 +39,12 @@ export const RemotionRoot: React.FC = () => {
       {/* 楼盘对比演示 */}
       {/* 买房流程演示 */}
       {/* 港航匯 — 产品标题动效（两行文字自上而下酷炫入场） */}
-
       {/* Jacky口播精剪 — 片头+片尾动画（柱子哥风格） */}
       {/* 港航匯 — Remotion Ad Video Skill: 价格直击路线 15s */}
-      <Composition
-        id="GangHangHuiAd"
-        component={GangHangHuiAd}
-        durationInFrames={30 * 15}
-        fps={30}
-        width={1080}
-        height={1920}
-        schema={GangHangHuiAdSchema}
-        defaultProps={{
-          brandName: '港航匯',
-          priceLabel: '總價',
-          priceValue: 21.8,
-          priceUnit: '萬起',
-          priceSuffix: '*精裝現樓 即買即入住',
-          hookEyebrow: '中山城芯 · 精裝現樓',
-          hookBody: '港人上車首選',
-          features: [
-            {
-              icon: 'mapPin',
-              title: '中山城芯',
-              description: '深中通道直達 · 港車北上1小時生活圈',
-            },
-            { icon: 'building', title: '精裝現樓', description: '所見即所得 · 即買即收樓即入住' },
-            { icon: 'currency', title: '港人優惠', description: '低總價上車盤 · 專享VIP禮遇' },
-          ],
-          benefitHeadline: '即買即住',
-          benefitBody: '深中通道直達 · 1小時生活圈 · 港車北上',
-          ctaHeadline: '預約睇樓',
-          ctaSubtitle: 'VIP專車接送',
-          ctaContact: '+852 6672 2526',
-        }}
-      />
       {/* 港航匯 — Modern Short Video Skill: 极简暗黑 8段式 TransitionSeries */}
-      <Composition
-        id="GangHangHuiModern"
-        component={GangHangHuiModern}
-        durationInFrames={DURATION_IN_FRAMES}
-        fps={30}
-        width={1080}
-        height={1920}
-        schema={GangHangHuiModernSchema}
-        defaultProps={{
-          brandName: '港航匯',
-          tagline: '中山城芯 · 精裝現樓 · 港人上車首選',
-          priceValue: 21.8,
-          priceUnit: '萬起',
-          features: [
-            { title: '中山城芯', description: '深中通道直達 · 港車北上1小時生活圈' },
-            { title: '精裝現樓', description: '所見即所得 · 即買即收樓即入住' },
-            { title: '港人優惠', description: '低總價上車盤 · 專享VIP禮遇' },
-          ],
-          outro: '港人上車首選',
-          ctaHeadline: '預約睇樓',
-          ctaSubtitle: 'VIP專車接送',
-          ctaContact: '+852 6672 2526',
-        }}
-      />
       {/* 港航匯 — 全合成口播視頻 / 電影暗調背景 + 玻璃卡片 / 45秒 */}
-      <Composition
-        id="GangHangHuiOverlay"
-        component={GangHangHuiOverlay}
-        durationInFrames={30 * 45}
-        fps={30}
-        width={1080}
-        height={1920}
-        schema={GangHangHuiOverlaySchema}
-        defaultProps={{
-          hookHeadline: '抖唔到氣？',
-          hookSubtext: '四五百呎住四五個人 · 老婆日日鵝 · 仔女日日嘈',
-          revealHeadline: '總價 21.8 萬',
-          revealSubtext: '中山城芯 · 精裝現樓 · 男人嘅避風港',
-          warning1Title: '得個殼同基本裝修',
-          warning1Desc: '冇奢華會所 · 冇大泳池 · 發夢早啲',
-          warning2Title: '33㎡ 只夠兩公婆',
-          warning2Desc: '想帶埋成家嚟週末？多個人都逼到爆',
-          warning3Title: '冇花園',
-          warning3Desc: '養狗種花免問 · 純住宅空間',
-          transitionHeadline: '男人嘅「救命草」？',
-          transitionSubtext: '點解我咁講？',
-          benefit1Title: '總價 21.8 萬 · 私己錢買得起',
-          benefit1Desc: '民水民电 · 明火煮食 · 真正屬於自己嘅空間',
-          benefit2Title: '男人嘅浪漫',
-          benefit2Desc: '週末熄電話 · 打機睇波嘆啤酒 · 冇人阻你',
-          benefit3Title: '進可攻 · 退可守',
-          benefit3Desc: '唔過嚟就托管出租 · 租客幫你養樓 · 老婆見到有錢收笑到見牙唔見眼',
-          climaxHeadline: '最奢侈嘅係…',
-          climaxSubtext:
-            '唔係名錶跑車 · 而係一個可以完全放空自己嘅空間\n叉足電再返香港搏殺 · 感情好咗 · 事業自然順',
-          ctaHeadline: '想睇樓？即刻聯絡 Jacky！',
-          ctaContact: '+852 6672 2526',
-          // 背景圖片：留空使用程序化暗調漸變，放入 public/ 圖片即可替換
-          bgImages: {},
-        }}
-      />
       {/* 法律陷阱口播透明疊加素材 / 75秒 / 三張大卡片逐一展示 */}
-      <Composition
-        id="LegalTrapsOverlay"
-        component={LegalTrapsOverlay}
-        durationInFrames={30 * 75}
-        fps={30}
-        width={1080}
-        height={1920}
-        schema={LegalTrapsOverlaySchema}
-        defaultProps={{
-          hookLine1: '喺香港買樓，你有冇諗過…',
-          hookLine2: '唔係有錢就買到心水樓，',
-          hookLine3: '仲有好多法律陷阱等緊你。',
-          hookLine4: '買樓前一定要知嘅三大法律陷阱！',
-          revealHeadline: '唔好以為有錢就大晒',
-          revealSubtext: '香港買樓有三大法律陷阱，隨時令你後悔一世。今日同你拆解！',
-          trap1Title: '陷阱一：違例建築',
-          trap1Desc: '見到個靚露台好開心？可能係僭建！銀行唔批按揭，保險唔包賠，賣樓仲要被壓價。簽約前一定要check圖則！',
-          trap2Title: '陷阱二：維修令',
-          trap2Desc: '大廈收到強制維修令？維修費隨時幾十萬甚至過百萬！買樓前一定要查大廈記錄，唔好貪平買咗個炸彈返嚟。',
-          trap3Title: '陷阱三：業權瑕疵',
-          trap3Desc: '業主唔係得一個？有人未簽名就賣？土地查冊一定要做，否則買咗都可能唔係你㗎！',
-          recapHeadline: '三大陷阱！買樓前一定要Check清楚',
-          recapSubtext: '僭建、維修令、業權瑕疵。記住：土地查冊、查圖則、查大廈記錄，三樣缺一不可！',
-          ctaHeadline: '想買樓唔想中伏？搵Jacky幫你！',
-          ctaContact: '+852 6672 2526',
-          ctaTags: '#香港買樓 #買樓陷阱 #土地查冊 #僭建 #維修令 #業權',
-        }}
-      />
+
       {/* 稅費陷阱口播透明疊加素材 / 75秒 / 複用 LegalTrapsOverlay 框架 */}
       <Composition
         id="TaxTrapsOverlay"
@@ -173,13 +62,17 @@ export const RemotionRoot: React.FC = () => {
           revealHeadline: '稅費可以貴過首期？',
           revealSubtext: '唔好以為計掂首期就搞掂。稅費陷阱分分鐘令你失預算，今日同你拆解！',
           trap1Title: '陷阱一：契稅 — 3%唔係講笑',
-          trap1Desc: '內地買樓契稅係總價3%，唔同香港分段計！200萬樓就要6萬契稅，現金一筆過冇得分期。簽約前一定要計清楚呢筆數！',
+          trap1Desc:
+            '內地買樓契稅係總價3%，唔同香港分段計！200萬樓就要6萬契稅，現金一筆過冇得分期。簽約前一定要計清楚呢筆數！',
           trap2Title: '陷阱二：增值稅 — 發展商轉嫁俾你',
-          trap2Desc: '新樓有增值稅，發展商通常話「包稅」，但隨時用其他名目收返你！管理費、裝修費、雜費一個月可以幾千蚊。問清楚「總代價」先好簽！',
+          trap2Desc:
+            '新樓有增值稅，發展商通常話「包稅」，但隨時用其他名目收返你！管理費、裝修費、雜費一個月可以幾千蚊。問清楚「總代價」先好簽！',
           trap3Title: '陷阱三：轉手稅 — 五年內賣樓扣你20%',
-          trap3Desc: '內地五年內賣樓要交個人所得稅，賺100萬要交20萬！唔似香港咁簡單。打算短炒嘅港人一定要知，否則賺埋都唔夠交稅！',
+          trap3Desc:
+            '內地五年內賣樓要交個人所得稅，賺100萬要交20萬！唔似香港咁簡單。打算短炒嘅港人一定要知，否則賺埋都唔夠交稅！',
           recapHeadline: '三大稅費陷阱！買樓前一定要計清楚',
-          recapSubtext: '契稅3%、增值稅陷阱、轉手稅20%。記住：睇總代價、問清楚包咩稅、計埋五年內轉手成本，三樣缺一不可！',
+          recapSubtext:
+            '契稅3%、增值稅陷阱、轉手稅20%。記住：睇總代價、問清楚包咩稅、計埋五年內轉手成本，三樣缺一不可！',
           ctaHeadline: '唔想計漏稅？搵Jacky幫你計！',
           ctaContact: '+852 6672 2526',
           ctaTags: '#香港買樓 #中山買樓 #稅費陷阱 #契稅 #增值稅 #港人置業',
@@ -252,32 +145,161 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="PipOverlay"
         component={PipOverlay}
-        durationInFrames={2040}
+        durationInFrames={150}
         fps={30}
         width={1080}
         height={1920}
         schema={PipOverlaySchema}
         calculateMetadata={({ props }) => ({
-          durationInFrames: props.durationInFrames ?? 2040,
+          durationInFrames: props.durationInFrames ?? 6000,
           width: props.width ?? 1080,
           height: props.height ?? 1920,
         })}
+        defaultProps={propertyCostRanking}
+      />
+      {/* 双合同陷阱口播叠加视频 */}
+      <Composition
+        id="DualContractOverlay"
+        component={PipOverlay}
+        durationInFrames={2760}
+        fps={30}
+        width={1080}
+        height={1920}
+        schema={PipOverlaySchema}
+        calculateMetadata={({ props }) => ({
+          durationInFrames: props.durationInFrames ?? 6000,
+          width: props.width ?? 1080,
+          height: props.height ?? 1920,
+        })}
+        defaultProps={dualContractTimeline}
+      />
+      {/* 华润仁恒公园四季 — 数据展示卡片 */}
+      <Composition
+        id="ParkSeasonsInfo"
+        component={PipOverlay}
+        durationInFrames={150}
+        fps={30}
+        width={1080}
+        height={1920}
+        schema={PipOverlaySchema}
+        calculateMetadata={({ props }) => ({
+          durationInFrames: props.durationInFrames ?? 6000,
+          width: props.width ?? 1080,
+          height: props.height ?? 1920,
+        })}
+        defaultProps={parkSeasonsInfo}
+      />
+      {/* 华润仁恒公园四季 — 回迁房深度拆解 (v11标准) */}
+      <Composition
+        id="ParkSeasonsResettlement"
+        component={PipOverlay}
+        durationInFrames={2810}
+        fps={30}
+        width={1080}
+        height={1920}
+        schema={PipOverlaySchema}
+        calculateMetadata={({ props }) => ({
+          durationInFrames: props.durationInFrames ?? 6000,
+          width: props.width ?? 1080,
+          height: props.height ?? 1920,
+        })}
+        defaultProps={parkSeasonsResettlement}
+      />
+      {/* 中山vs珠海vs惠州 — 三城对比口播视频 / 165秒 / 10卡 */}
+      <Composition
+        id="ZhongshanComparison"
+        component={FullBgOverlay}
+        durationInFrames={4950}
+        fps={30}
+        width={1080}
+        height={1920}
+        schema={FullBgOverlaySchema}
+        calculateMetadata={({ props }) => ({
+          durationInFrames: props.durationInFrames ?? 4950,
+          width: props.width ?? 1080,
+          height: props.height ?? 1920,
+        })}
+        defaultProps={zhongshanComparison}
+      />
+      {/* 数据来源参考卡片 — 静态 PNG */}
+      <Composition
+        id="DataSourceCard"
+        component={DataSourceCard}
+        durationInFrames={30}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      {/* 大湾区房价数据来源 — 5秒动态卡片 / 6项数据依次入场 */}
+      <Composition
+        id="CityPriceDataSource"
+        component={CityPriceDataSource}
+        durationInFrames={150}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+
+      {/* ====== 封面 <Still> 组件 ====== */}
+
+      <Still
+        id="CoverSundip"
+        component={SundipCover as unknown as React.FC<Record<string, unknown>>}
+        width={1242}
+        height={1656}
         defaultProps={{
-          width: 1080,
-          height: 1920,
-          fps: 30,
-          durationInFrames: 2040,
-          elements: [
-            {
-              type: 'KeywordTag',
-              text: 'Sample Tag',
-              enterAt: 15,
-              exitAt: 90,
-              animation: 'spring',
-              position: 'top-right',
-              props: { color: '#5599FF', size: 'lg' },
-            },
-          ],
+          series: 'sundip' as const,
+          episodeNumber: 1,
+          highlightNumber: '21.8',
+          highlightUnit: '万',
+          highlightLabel: '首付上车中山',
+          propertyName: '港航汇·三房',
+          tags: ['近港珠澳大桥', '精装修交付', '送全屋家电'],
+        }}
+      />
+
+      <Still
+        id="CoverData"
+        component={DataCover as unknown as React.FC<Record<string, unknown>>}
+        width={1242}
+        height={1656}
+        defaultProps={{
+          series: 'data' as const,
+          episodeNumber: 1,
+          title: '香港 vs 中山\n买楼成本大对比',
+          leftLabel: '香港',
+          leftValue: '$800万',
+          leftSub: '200呎·纳米楼',
+          rightLabel: '中山',
+          rightValue: '$80万',
+          rightSub: '900呎·三房',
+          insight: '港人每月悭供款 $12,000',
+        }}
+      />
+
+      <Still
+        id="CoverOpinion"
+        component={OpinionCover as unknown as React.FC<Record<string, unknown>>}
+        width={1242}
+        height={1656}
+        defaultProps={{
+          series: 'opinion' as const,
+          episodeNumber: 1,
+          title: '港人买中山楼\n最易中嘅3个伏',
+          hook: '第一个你可能已经踩咗...',
+        }}
+      />
+
+      <Still
+        id="CoverWarning"
+        component={WarningCover as unknown as React.FC<Record<string, unknown>>}
+        width={1242}
+        height={1656}
+        defaultProps={{
+          series: 'warning' as const,
+          episodeNumber: 1,
+          title: '买卖合同\n3大陷阱',
+          items: ['公摊面积模糊', '交付标准缩水', '违约责任不对等'],
         }}
       />
     </>

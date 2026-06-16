@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
-import { COLORS, FONTS } from '../design-system/tokens';
+import { COLORS, FONTS, SIZES } from '../design-system/tokens';
 import { SeriesBadge, GoldLine, BrandBar, CoverGradient, SERIES_COLORS } from './shared';
 import type { OpinionCoverProps } from './types';
 
@@ -51,7 +51,7 @@ export const OpinionCover: React.FC<OpinionCoverProps> = ({
           {/* 头像占位 — 实际使用时替换为 Jacky 照片 */}
           <span
             style={{
-              fontSize: 28,
+              fontSize: SIZES.h4,
               color: color,
               fontFamily: FONTS.display,
               fontWeight: 700,
@@ -70,7 +70,7 @@ export const OpinionCover: React.FC<OpinionCoverProps> = ({
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          padding: '0 64px',
+          padding: `0 ${SIZES.spacing.xxl}px`,
         }}
       >
         <h1

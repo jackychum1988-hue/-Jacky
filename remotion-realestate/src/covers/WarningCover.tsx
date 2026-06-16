@@ -1,5 +1,5 @@
 // remotion-realestate/src/covers/WarningCover.tsx
-// 避坑指南 — 透明底 + 编号列表 / 叠加视频不挡人物
+// 避坑指南 — 透明底 + 砸脸编号列表 / 叠加视频不挡人物
 
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
@@ -7,8 +7,8 @@ import { COLORS, FONTS, SIZES } from '../design-system/tokens';
 import { SeriesBadge, BrandBar, SERIES_COLORS } from './shared';
 import type { WarningCoverProps } from './types';
 
-const SHADOW = '0 2px 16px rgba(0,0,0,0.9)';
-const SHADOW_LIGHT = '0 2px 10px rgba(0,0,0,0.75)';
+const SHADOW = '0 3px 20px rgba(0,0,0,0.95)';
+const SHADOW_LIGHT = '0 2px 14px rgba(0,0,0,0.8)';
 
 export const WarningCover: React.FC<WarningCoverProps> = ({
   series,
@@ -32,10 +32,10 @@ export const WarningCover: React.FC<WarningCoverProps> = ({
           position: 'absolute',
           top: '4%',
           right: '3%',
-          width: 340,
-          height: 340,
+          width: 420,
+          height: 420,
           borderRadius: '50%',
-          border: `1px solid ${color}35`,
+          border: `2px solid ${color}35`,
           pointerEvents: 'none',
         }}
       />
@@ -44,10 +44,10 @@ export const WarningCover: React.FC<WarningCoverProps> = ({
           position: 'absolute',
           top: '10%',
           right: '8%',
-          width: 240,
-          height: 240,
+          width: 300,
+          height: 300,
           borderRadius: '50%',
-          background: `radial-gradient(circle, ${color}25 0%, transparent 60%)`,
+          background: `radial-gradient(circle, ${color}30 0%, transparent 60%)`,
           pointerEvents: 'none',
         }}
       />
@@ -61,7 +61,7 @@ export const WarningCover: React.FC<WarningCoverProps> = ({
           width: 0,
           height: 0,
           borderStyle: 'solid',
-          borderWidth: '100px 100px 0 0',
+          borderWidth: '140px 140px 0 0',
           borderColor: `${color}20 transparent transparent transparent`,
           pointerEvents: 'none',
         }}
@@ -73,7 +73,7 @@ export const WarningCover: React.FC<WarningCoverProps> = ({
           position: 'absolute',
           top: '8%',
           left: 0,
-          width: 6,
+          width: 8,
           height: '25%',
           background: color,
           pointerEvents: 'none',
@@ -87,7 +87,7 @@ export const WarningCover: React.FC<WarningCoverProps> = ({
           bottom: 0,
           left: 0,
           right: 0,
-          height: 3,
+          height: 4,
           background: `linear-gradient(90deg, ${color}, ${COLORS.primary})`,
           pointerEvents: 'none',
         }}
@@ -111,12 +111,12 @@ export const WarningCover: React.FC<WarningCoverProps> = ({
           style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: 8,
-            marginBottom: SIZES.spacing.lg,
+            gap: 10,
+            marginBottom: SIZES.spacing.xl,
           }}
         >
-          <div style={{ width: 24, height: 2, background: color }} />
-          <span style={{ color, fontSize: SIZES.caption, fontWeight: 700, letterSpacing: '0.1em', textShadow: SHADOW_LIGHT }}>
+          <div style={{ width: 32, height: 3, background: color }} />
+          <span style={{ color, fontSize: 24, fontWeight: 700, letterSpacing: '0.1em', textShadow: SHADOW_LIGHT }}>
             避坑必读
           </span>
         </div>
@@ -125,9 +125,9 @@ export const WarningCover: React.FC<WarningCoverProps> = ({
         <h1
           style={{
             fontFamily: FONTS.display,
-            fontSize: 68,
+            fontSize: 84,
             color: COLORS.text,
-            lineHeight: 1.15,
+            lineHeight: 1.12,
             fontWeight: 700,
             margin: 0,
             textShadow: SHADOW,
@@ -146,7 +146,7 @@ export const WarningCover: React.FC<WarningCoverProps> = ({
           style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: SIZES.spacing.sm,
+            gap: SIZES.spacing.md,
             marginTop: SIZES.spacing.xl,
           }}
         >
@@ -156,28 +156,28 @@ export const WarningCover: React.FC<WarningCoverProps> = ({
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: SIZES.spacing.md,
+                gap: SIZES.spacing.lg,
                 padding: `${SIZES.spacing.sm}px 0`,
               }}
             >
               {/* 圆形编号 */}
               <div
                 style={{
-                  width: 36,
-                  height: 36,
+                  width: 48,
+                  height: 48,
                   borderRadius: '50%',
-                  border: `2px solid ${color}`,
+                  border: `3px solid ${color}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
                 }}
               >
-                <span style={{ color, fontSize: SIZES.caption, fontWeight: 700 }}>
+                <span style={{ color, fontSize: 24, fontWeight: 700 }}>
                   {i + 1}
                 </span>
               </div>
-              <span style={{ fontSize: 26, color: COLORS.text, fontWeight: 600, textShadow: SHADOW }}>
+              <span style={{ fontSize: 34, color: COLORS.text, fontWeight: 600, textShadow: SHADOW }}>
                 {item}
               </span>
             </div>

@@ -7,8 +7,8 @@ import { COLORS, FONTS, SIZES } from '../design-system/tokens';
 import { SeriesBadge, BrandBar, SERIES_COLORS } from './shared';
 import type { SundipCoverProps } from './types';
 
-const SHADOW = '0 2px 16px rgba(0,0,0,0.9)';
-const SHADOW_LIGHT = '0 2px 10px rgba(0,0,0,0.75)';
+const SHADOW = '0 3px 20px rgba(0,0,0,0.95)';
+const SHADOW_LIGHT = '0 2px 14px rgba(0,0,0,0.8)';
 
 export const SundipCover: React.FC<SundipCoverProps> = ({
   series,
@@ -35,8 +35,8 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
           position: 'absolute',
           top: '6%',
           right: '5%',
-          width: 300,
-          height: 300,
+          width: 400,
+          height: 400,
           borderRadius: '50%',
           background: `radial-gradient(circle, ${color}40 0%, transparent 60%)`,
           pointerEvents: 'none',
@@ -49,7 +49,7 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
           position: 'absolute',
           top: '8%',
           left: 0,
-          width: 6,
+          width: 8,
           height: '30%',
           background: color,
           pointerEvents: 'none',
@@ -63,7 +63,7 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
           bottom: 0,
           left: 0,
           right: 0,
-          height: 3,
+          height: 4,
           background: `linear-gradient(90deg, ${color}, ${COLORS.primary})`,
           pointerEvents: 'none',
         }}
@@ -88,22 +88,22 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
           style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: 8,
-            marginBottom: SIZES.spacing.lg,
+            gap: 10,
+            marginBottom: SIZES.spacing.xl,
           }}
         >
-          <div style={{ width: 24, height: 2, background: color }} />
-          <span style={{ color, fontSize: SIZES.caption, fontWeight: 700, letterSpacing: '0.1em', textShadow: SHADOW_LIGHT }}>
+          <div style={{ width: 32, height: 3, background: color }} />
+          <span style={{ color, fontSize: 24, fontWeight: 700, letterSpacing: '0.1em', textShadow: SHADOW_LIGHT }}>
             笋盘推荐
           </span>
         </div>
 
         {/* 超大数字 */}
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
           <span
             style={{
               fontFamily: FONTS.display,
-              fontSize: 140,
+              fontSize: 180,
               color: COLORS.text,
               fontWeight: 700,
               lineHeight: 1,
@@ -115,7 +115,7 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
           <span
             style={{
               fontFamily: FONTS.display,
-              fontSize: 56,
+              fontSize: 72,
               color: color,
               fontWeight: 700,
               textShadow: SHADOW_LIGHT,
@@ -126,7 +126,7 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
         </div>
 
         {/* 价格描述 */}
-        <div style={{ fontSize: 28, color, marginTop: SIZES.spacing.xs, fontWeight: 600, textShadow: SHADOW_LIGHT }}>
+        <div style={{ fontSize: 36, color, marginTop: SIZES.spacing.sm, fontWeight: 600, textShadow: SHADOW_LIGHT }}>
           {highlightLabel}
         </div>
 
@@ -134,7 +134,7 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
         <div
           style={{
             fontFamily: FONTS.display,
-            fontSize: 44,
+            fontSize: 56,
             color: COLORS.text,
             fontWeight: 700,
             marginTop: SIZES.spacing.md,
@@ -149,8 +149,8 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
           <div
             style={{
               display: 'flex',
-              gap: SIZES.spacing.sm,
-              marginTop: SIZES.spacing.lg,
+              gap: SIZES.spacing.md,
+              marginTop: SIZES.spacing.xl,
               flexWrap: 'wrap',
             }}
           >
@@ -158,14 +158,14 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
               <span
                 key={i}
                 style={{
-                  padding: `${SIZES.spacing.xs}px ${SIZES.spacing.md}px`,
-                  border: `1px solid ${COLORS.primary}60`,
+                  padding: `${SIZES.spacing.sm}px ${SIZES.spacing.lg}px`,
+                  border: `2px solid ${COLORS.primary}60`,
                   borderRadius: SIZES.radius.xl,
                   color: COLORS.primary,
-                  fontSize: SIZES.caption,
+                  fontSize: 22,
                   fontFamily: FONTS.text,
+                  fontWeight: 600,
                   textShadow: SHADOW_LIGHT,
-                  backdropFilter: 'blur(4px)',
                 }}
               >
                 {tag}

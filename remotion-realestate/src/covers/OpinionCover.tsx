@@ -7,8 +7,8 @@ import { COLORS, FONTS, SIZES } from '../design-system/tokens';
 import { SeriesBadge, BrandBar, SERIES_COLORS } from './shared';
 import type { OpinionCoverProps } from './types';
 
-const SHADOW = '0 2px 16px rgba(0,0,0,0.9)';
-const SHADOW_LIGHT = '0 2px 10px rgba(0,0,0,0.75)';
+const SHADOW = '0 3px 20px rgba(0,0,0,0.95)';
+const SHADOW_LIGHT = '0 2px 14px rgba(0,0,0,0.8)';
 
 export const OpinionCover: React.FC<OpinionCoverProps> = ({
   series,
@@ -32,8 +32,8 @@ export const OpinionCover: React.FC<OpinionCoverProps> = ({
           position: 'absolute',
           top: '4%',
           right: '3%',
-          width: 400,
-          height: 400,
+          width: 480,
+          height: 480,
           borderRadius: '50%',
           background: `radial-gradient(circle, ${color}35 0%, transparent 60%)`,
           pointerEvents: 'none',
@@ -46,7 +46,7 @@ export const OpinionCover: React.FC<OpinionCoverProps> = ({
           position: 'absolute',
           top: '8%',
           left: 0,
-          width: 6,
+          width: 8,
           height: '30%',
           background: color,
           pointerEvents: 'none',
@@ -60,7 +60,7 @@ export const OpinionCover: React.FC<OpinionCoverProps> = ({
           bottom: 0,
           left: 0,
           right: 0,
-          height: 3,
+          height: 4,
           background: `linear-gradient(90deg, ${color}, ${COLORS.primary})`,
           pointerEvents: 'none',
         }}
@@ -85,12 +85,12 @@ export const OpinionCover: React.FC<OpinionCoverProps> = ({
           style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: 8,
+            gap: 10,
             marginBottom: SIZES.spacing.xl,
           }}
         >
-          <div style={{ width: 24, height: 2, background: color }} />
-          <span style={{ color, fontSize: SIZES.caption, fontWeight: 700, letterSpacing: '0.1em', textShadow: SHADOW_LIGHT }}>
+          <div style={{ width: 32, height: 3, background: color }} />
+          <span style={{ color, fontSize: 24, fontWeight: 700, letterSpacing: '0.1em', textShadow: SHADOW_LIGHT }}>
             港人置业必看
           </span>
         </div>
@@ -99,13 +99,13 @@ export const OpinionCover: React.FC<OpinionCoverProps> = ({
         <h1
           style={{
             fontFamily: FONTS.display,
-            fontSize: 72,
+            fontSize: 88,
             color: COLORS.text,
-            lineHeight: 1.15,
+            lineHeight: 1.1,
             fontWeight: 700,
             margin: 0,
             letterSpacing: '-0.01em',
-            maxWidth: '90%',
+            maxWidth: '92%',
             textShadow: SHADOW,
           }}
         >
@@ -125,8 +125,8 @@ export const OpinionCover: React.FC<OpinionCoverProps> = ({
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: SIZES.spacing.md }}>
           <div
             style={{
-              width: 4,
-              height: 48,
+              width: 5,
+              height: 60,
               background: COLORS.primary,
               borderRadius: 2,
               flexShrink: 0,
@@ -135,12 +135,12 @@ export const OpinionCover: React.FC<OpinionCoverProps> = ({
           />
           <p
             style={{
-              fontSize: 28,
+              fontSize: 36,
               color: COLORS.text,
               fontWeight: 600,
-              lineHeight: 1.4,
+              lineHeight: 1.35,
               margin: 0,
-              maxWidth: '80%',
+              maxWidth: '82%',
               textShadow: SHADOW,
             }}
           >

@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
-import { COLORS, FONTS } from '../design-system/tokens';
+import { COLORS, FONTS, SIZES } from '../design-system/tokens';
 import { SeriesBadge, GoldLine, BrandBar, CoverGradient, SERIES_COLORS } from './shared';
 import type { SundipCoverProps } from './types';
 
@@ -36,7 +36,7 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          padding: '0 48px',
+          padding: `0 ${SIZES.spacing.xl}px`,
         }}
       >
         {/* 大数字 */}
@@ -44,7 +44,7 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
           <span
             style={{
               fontFamily: FONTS.display,
-              fontSize: 120,
+              fontSize: SIZES.hero,
               color: COLORS.text,
               fontWeight: 700,
             }}
@@ -68,7 +68,7 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
           style={{
             fontSize: 24,
             color: SERIES_COLORS[series],
-            marginTop: 8,
+            marginTop: SIZES.spacing.xs,
           }}
         >
           {highlightLabel}
@@ -91,6 +91,7 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
       </div>
 
       {/* ❸ 卖点标签 */}
+      {tags.length > 0 && (
       <div
         style={{
           display: 'flex',
@@ -107,7 +108,7 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
               backgroundColor: COLORS.backgroundElevated,
               color: COLORS.textSecondary,
               padding: '6px 18px',
-              borderRadius: 8,
+              borderRadius: SIZES.radius.sm,
               fontSize: 18,
               fontFamily: FONTS.text,
             }}
@@ -116,6 +117,7 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
           </span>
         ))}
       </div>
+      )}
 
       {/* ❹ 品牌条 */}
       <BrandBar />

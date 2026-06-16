@@ -1,0 +1,34 @@
+{
+  "outputDir": "../image-cards/batch-output",
+  "covers": [
+    {
+      "stillId": "CoverSundip",
+      "output": "sundip/cover-ganghanghui-01.png",
+      "props": {
+        "series": "sundip",
+        "episodeNumber": 12,
+        "highlightNumber": "21.8",
+        "highlightUnit": "万",
+        "highlightLabel": "首付上车中山",
+        "propertyName": "港航汇·三房",
+        "tags": ["近港珠澳大桥", "精装修交付", "送全屋家电"]
+      }
+    },
+    {
+      "stillId": "CoverData",
+      "output": "data/cover-hk-vs-zs-01.png",
+      "props": {
+        "series": "data",
+        "episodeNumber": 8,
+        "title": "香港 vs 中山\n买楼成本大对比",
+        "leftLabel": "香港",
+        "leftValue": "$800万",
+        "leftSub": "200呎·纳米楼",
+        "rightLabel": "中山",
+        "rightValue": "$80万",
+        "rightSub": "900呎·三房",
+        "insight": "港人每月悭供款 $12,000"
+      }
+    }
+  ]
+}

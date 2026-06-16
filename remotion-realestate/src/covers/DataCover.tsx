@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
-import { COLORS, FONTS } from '../design-system/tokens';
+import { COLORS, FONTS, SIZES } from '../design-system/tokens';
 import { SeriesBadge, GoldLine, BrandBar, CoverGradient, SERIES_COLORS } from './shared';
 import type { DataCoverProps } from './types';
 
@@ -16,13 +16,13 @@ const ComparisonCard: React.FC<{
   <div
     style={{
       backgroundColor: COLORS.backgroundElevated,
-      borderRadius: 16,
+      borderRadius: SIZES.radius.lg,
       padding: '24px 20px',
       textAlign: 'center',
       minWidth: 200,
     }}
   >
-    <div style={{ fontSize: 18, color: accentColor, marginBottom: 8 }}>{label}</div>
+    <div style={{ fontSize: 18, color: accentColor, marginBottom: SIZES.spacing.xs }}>{label}</div>
     <div
       style={{
         fontFamily: FONTS.display,
@@ -34,7 +34,7 @@ const ComparisonCard: React.FC<{
       {value}
     </div>
     {sub && (
-      <div style={{ fontSize: 16, color: COLORS.textTertiary, marginTop: 4 }}>{sub}</div>
+      <div style={{ fontSize: SIZES.caption, color: COLORS.textTertiary, marginTop: 4 }}>{sub}</div>
     )}
   </div>
 );
@@ -66,7 +66,7 @@ export const DataCover: React.FC<DataCoverProps> = ({
       <SeriesBadge series={series} episodeNumber={episodeNumber} />
 
       {/* ❷ 钩子标题 */}
-      <div style={{ padding: '32px 48px 0', textAlign: 'center' }}>
+      <div style={{ padding: `${SIZES.spacing.lg}px ${SIZES.spacing.xl}px 0`, textAlign: 'center' }}>
         <h1
           style={{
             fontFamily: FONTS.display,
@@ -89,20 +89,20 @@ export const DataCover: React.FC<DataCoverProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: 24,
-          padding: '0 48px',
+          gap: SIZES.spacing.md,
+          padding: `0 ${SIZES.spacing.xl}px`,
         }}
       >
         <ComparisonCard
           label={leftLabel}
           value={leftValue}
           sub={leftSub}
-          accentColor="#C4554D"
+          accentColor={COLORS.error}
         />
         <div
           style={{
             fontFamily: FONTS.display,
-            fontSize: 28,
+            fontSize: SIZES.h4,
             color: color,
             fontWeight: 700,
           }}
@@ -120,15 +120,15 @@ export const DataCover: React.FC<DataCoverProps> = ({
       {/* ❹ 核心洞察 */}
       <div
         style={{
-          margin: '0 48px 16px',
-          padding: '16px 24px',
+          margin: `0 ${SIZES.spacing.xl}px ${SIZES.spacing.sm}px`,
+          padding: `${SIZES.spacing.sm}px ${SIZES.spacing.md}px`,
           backgroundColor: COLORS.backgroundElevated,
-          borderRadius: 12,
+          borderRadius: SIZES.radius.md,
           textAlign: 'center',
         }}
       >
         <span style={{ fontSize: 18, color: COLORS.textSecondary }}>
-          💡 {insight}
+          {insight}
         </span>
       </div>
 

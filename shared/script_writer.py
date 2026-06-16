@@ -377,6 +377,7 @@ def generate_and_push(
     pushplus_token,
     deepseek_base_url="https://api.deepseek.com",
     deepseek_model="deepseek-chat",
+    tier="deep",
 ):
     """Extract suggestions from analysis, generate scripts, and push to WeChat.
 
@@ -388,6 +389,8 @@ def generate_and_push(
         pushplus_token: PushPlus token for WeChat push.
         deepseek_base_url: API base URL (default DeepSeek).
         deepseek_model: Model name (default deepseek-chat).
+        tier: Content tier — 'viral' (引流轰炸), 'flash' (笋盘速报),
+              'deep' (深度拆解, default).
 
     Returns:
         True if scripts were generated and pushed successfully.
@@ -402,11 +405,12 @@ def generate_and_push(
         print("[script_writer] no topic suggestions found in analysis, skipping")
         return False
 
-    print(f"[script_writer] extracted {len(suggestions)} topic suggestions")
+    print(f"[script_writer] extracted {len(suggestions)} topic suggestions (tier={tier})")
 
     # Step 2: Generate scripts via DeepSeek
-    scripts = generate_scripts(
+    scripts = generate_scripts_for_tier(
         suggestions,
+        tier,
         deepseek_api_key,
         deepseek_base_url,
         deepseek_model,

@@ -124,7 +124,10 @@ export const CoverGradient: React.FC<{ series: SeriesType }> = ({ series }) => {
         left: 0,
         right: 0,
         bottom: 0,
-        background: `linear-gradient(160deg, ${color}22 0%, ${COLORS.background} 50%)`,
+        background: `
+          radial-gradient(ellipse 60% 40% at 50% 45%, ${color}18 0%, transparent 60%),
+          linear-gradient(160deg, ${color}55 0%, ${COLORS.background} 75%)
+        `,
         pointerEvents: 'none' as const,
       }}
     />

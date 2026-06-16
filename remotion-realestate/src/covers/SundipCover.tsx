@@ -1,10 +1,10 @@
 // remotion-realestate/src/covers/SundipCover.tsx
-// 笋盘速报 — 数字炸弹布局，适用于楼盘讲解封面
+// 笋盘速报 — 砸脸大字 + 超大数字 / 高对比撞色
 
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
 import { COLORS, FONTS, SIZES } from '../design-system/tokens';
-import { SeriesBadge, GoldLine, BrandBar, CoverGradient, SERIES_COLORS } from './shared';
+import { SeriesBadge, BrandBar, SERIES_COLORS } from './shared';
 import type { SundipCoverProps } from './types';
 
 export const SundipCover: React.FC<SundipCoverProps> = ({
@@ -16,37 +16,108 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
   propertyName,
   tags,
 }) => {
+  const color = SERIES_COLORS[series];
+
   return (
     <AbsoluteFill
       style={{
         backgroundColor: COLORS.background,
         fontFamily: FONTS.text,
+        overflow: 'hidden',
       }}
     >
-      <CoverGradient series={series} />
+      {/* 右上角大光环 */}
+      <div
+        style={{
+          position: 'absolute',
+          top: -80,
+          right: -80,
+          width: 480,
+          height: 480,
+          borderRadius: '50%',
+          background: `radial-gradient(circle, ${color}25 0%, transparent 70%)`,
+          pointerEvents: 'none',
+        }}
+      />
 
-      {/* ❶ 系列标签 */}
+      {/* 左下角装饰环 */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 80,
+          left: -60,
+          width: 240,
+          height: 240,
+          borderRadius: '50%',
+          border: `1px solid ${color}25`,
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* 左边缘色条 */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: 8,
+          height: '40%',
+          background: color,
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* 底部渐变色带 */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 4,
+          background: `linear-gradient(90deg, ${color}, ${COLORS.primary})`,
+          pointerEvents: 'none',
+        }}
+      />
+
       <SeriesBadge series={series} episodeNumber={episodeNumber} />
 
-      {/* ❷ 核心数字区 */}
+      {/* 主内容区 */}
       <div
         style={{
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          alignItems: 'center',
-          padding: `0 ${SIZES.spacing.xl}px`,
+          padding: `0 ${SIZES.spacing.xxxl}px 0 80px`,
+          position: 'relative',
+          zIndex: 1,
         }}
       >
-        {/* 大数字 */}
-        <div style={{ textAlign: 'center', lineHeight: 1 }}>
+        {/* 小标签 */}
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            marginBottom: SIZES.spacing.lg,
+          }}
+        >
+          <div style={{ width: 24, height: 2, background: color }} />
+          <span style={{ color, fontSize: SIZES.caption, fontWeight: 700, letterSpacing: '0.1em' }}>
+            笋盘推荐
+          </span>
+        </div>
+
+        {/* 超大数字 */}
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
           <span
             style={{
               fontFamily: FONTS.display,
-              fontSize: SIZES.hero,
+              fontSize: 140,
               color: COLORS.text,
               fontWeight: 700,
+              lineHeight: 1,
             }}
           >
             {highlightNumber}
@@ -54,72 +125,62 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
           <span
             style={{
               fontFamily: FONTS.display,
-              fontSize: 44,
-              color: COLORS.text,
-              marginLeft: 4,
+              fontSize: 56,
+              color: color,
+              fontWeight: 700,
             }}
           >
             {highlightUnit}
           </span>
         </div>
 
-        {/* 短描述 */}
-        <div
-          style={{
-            fontSize: 24,
-            color: SERIES_COLORS[series],
-            marginTop: SIZES.spacing.xs,
-          }}
-        >
+        {/* 价格描述 */}
+        <div style={{ fontSize: 28, color, marginTop: SIZES.spacing.xs, fontWeight: 600 }}>
           {highlightLabel}
         </div>
-
-        <GoldLine />
 
         {/* 楼盘名 */}
         <div
           style={{
             fontFamily: FONTS.display,
-            fontSize: 36,
+            fontSize: 44,
             color: COLORS.text,
-            textAlign: 'center',
             fontWeight: 700,
+            marginTop: SIZES.spacing.md,
           }}
         >
           {propertyName}
         </div>
-      </div>
 
-      {/* ❸ 卖点标签 */}
-      {tags.length > 0 && (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: 10,
-          padding: '0 48px 16px',
-          flexWrap: 'wrap',
-        }}
-      >
-        {tags.map((tag, i) => (
-          <span
-            key={i}
+        {/* 卖点标签 */}
+        {tags.length > 0 && (
+          <div
             style={{
-              backgroundColor: COLORS.backgroundElevated,
-              color: COLORS.textSecondary,
-              padding: '6px 18px',
-              borderRadius: SIZES.radius.sm,
-              fontSize: 18,
-              fontFamily: FONTS.text,
+              display: 'flex',
+              gap: SIZES.spacing.sm,
+              marginTop: SIZES.spacing.lg,
+              flexWrap: 'wrap',
             }}
           >
-            {tag}
-          </span>
-        ))}
+            {tags.map((tag, i) => (
+              <span
+                key={i}
+                style={{
+                  padding: `${SIZES.spacing.xs}px ${SIZES.spacing.md}px`,
+                  border: `1px solid ${COLORS.primary}40`,
+                  borderRadius: SIZES.radius.xl,
+                  color: COLORS.primary,
+                  fontSize: SIZES.caption,
+                  fontFamily: FONTS.text,
+                }}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
-      )}
 
-      {/* ❹ 品牌条 */}
       <BrandBar />
     </AbsoluteFill>
   );

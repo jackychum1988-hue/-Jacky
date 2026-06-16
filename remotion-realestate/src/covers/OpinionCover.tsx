@@ -1,10 +1,10 @@
 // remotion-realestate/src/covers/OpinionCover.tsx
-// Jacky观点 — 人物+金句布局，适用于口播观点封面
+// Jacky观点 — 砸脸大字杂志风 / 高对比撞色 / 左对齐留白排版
 
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
 import { COLORS, FONTS, SIZES } from '../design-system/tokens';
-import { SeriesBadge, GoldLine, BrandBar, CoverGradient, SERIES_COLORS } from './shared';
+import { SeriesBadge, BrandBar, SERIES_COLORS } from './shared';
 import type { OpinionCoverProps } from './types';
 
 export const OpinionCover: React.FC<OpinionCoverProps> = ({
@@ -20,86 +20,132 @@ export const OpinionCover: React.FC<OpinionCoverProps> = ({
       style={{
         backgroundColor: COLORS.background,
         fontFamily: FONTS.text,
+        overflow: 'hidden',
       }}
     >
-      <CoverGradient series={series} />
-
-      {/* ❶ 系列标签 */}
-      <SeriesBadge series={series} episodeNumber={episodeNumber} />
-
-      {/* ❷ 人物头像占位 */}
+      {/* 背景氛围 — 大色块撞色 */}
       <div
         style={{
-          display: 'flex',
-          justifyContent: 'center',
-          paddingTop: 40,
+          position: 'absolute',
+          top: '8%',
+          right: -60,
+          width: 520,
+          height: 520,
+          borderRadius: '50%',
+          background: `radial-gradient(circle, ${color}30 0%, transparent 70%)`,
+          pointerEvents: 'none',
         }}
-      >
-        <div
-          style={{
-            width: 120,
-            height: 120,
-            borderRadius: '50%',
-            backgroundColor: COLORS.backgroundElevated,
-            border: `3px solid ${color}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            overflow: 'hidden',
-          }}
-        >
-          {/* 头像占位 — 实际使用时替换为 Jacky 照片 */}
-          <span
-            style={{
-              fontSize: SIZES.h4,
-              color: color,
-              fontFamily: FONTS.display,
-              fontWeight: 700,
-            }}
-          >
-            Jacky
-          </span>
-        </div>
-      </div>
+      />
 
-      {/* ❸ 观点标题区 */}
+      {/* 左上角色块装饰 */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: 8,
+          height: '35%',
+          background: color,
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* 底部色块条 */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 4,
+          background: `linear-gradient(90deg, ${color}, ${COLORS.primary})`,
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* 系列标签 */}
+      <SeriesBadge series={series} episodeNumber={episodeNumber} />
+
+      {/* 主内容 — 左对齐大字 */}
       <div
         style={{
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          alignItems: 'center',
-          padding: `0 ${SIZES.spacing.xxl}px`,
+          padding: `0 ${SIZES.spacing.xxxl}px 0 80px`,
+          position: 'relative',
+          zIndex: 1,
         }}
       >
+        {/* 顶部小标签 */}
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            marginBottom: SIZES.spacing.xl,
+          }}
+        >
+          <div style={{ width: 24, height: 2, background: color }} />
+          <span style={{ color, fontSize: SIZES.caption, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            港人置业必看
+          </span>
+        </div>
+
+        {/* 主标题 — 砸脸大字 */}
         <h1
           style={{
             fontFamily: FONTS.display,
-            fontSize: 48,
+            fontSize: 72,
             color: COLORS.text,
-            textAlign: 'center',
-            lineHeight: 1.3,
+            lineHeight: 1.15,
             fontWeight: 700,
             margin: 0,
+            letterSpacing: '-0.01em',
+            maxWidth: '90%',
           }}
         >
-          {title}
+          {title.split('\n').map((line, i, arr) => (
+            <React.Fragment key={i}>
+              <span style={{ display: 'block' }}>
+                {line}
+              </span>
+            </React.Fragment>
+          ))}
         </h1>
-        <GoldLine />
-        <p
-          style={{
-            fontSize: 22,
-            color: COLORS.textSecondary,
-            textAlign: 'center',
-            margin: 0,
-          }}
-        >
-          {hook}
-        </p>
+
+        {/* 分隔区 */}
+        <div style={{ height: SIZES.spacing.xl }} />
+
+        {/* 钩子文案 — 高亮色底 */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: SIZES.spacing.md }}>
+          <div
+            style={{
+              width: 4,
+              height: 48,
+              background: COLORS.primary,
+              borderRadius: 2,
+              flexShrink: 0,
+              marginTop: 4,
+            }}
+          />
+          <p
+            style={{
+              fontSize: 28,
+              color: COLORS.text,
+              fontWeight: 600,
+              lineHeight: 1.4,
+              margin: 0,
+              maxWidth: '80%',
+            }}
+          >
+            {hook}
+          </p>
+        </div>
       </div>
 
-      {/* ❹ 品牌条 */}
+      {/* 品牌条 */}
       <BrandBar />
     </AbsoluteFill>
   );

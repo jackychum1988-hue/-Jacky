@@ -1,43 +1,11 @@
 // remotion-realestate/src/covers/DataCover.tsx
-// 数据拆解 — 对比卡片布局，适用于市场分析封面
+// 数据拆解 — 砸脸对比卡 / 高对比撞色排版
 
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
 import { COLORS, FONTS, SIZES } from '../design-system/tokens';
-import { SeriesBadge, GoldLine, BrandBar, CoverGradient, SERIES_COLORS } from './shared';
+import { SeriesBadge, BrandBar, SERIES_COLORS } from './shared';
 import type { DataCoverProps } from './types';
-
-const ComparisonCard: React.FC<{
-  label: string;
-  value: string;
-  sub?: string;
-  accentColor: string;
-}> = ({ label, value, sub, accentColor }) => (
-  <div
-    style={{
-      backgroundColor: COLORS.backgroundElevated,
-      borderRadius: SIZES.radius.lg,
-      padding: '24px 20px',
-      textAlign: 'center',
-      minWidth: 200,
-    }}
-  >
-    <div style={{ fontSize: 18, color: accentColor, marginBottom: SIZES.spacing.xs }}>{label}</div>
-    <div
-      style={{
-        fontFamily: FONTS.display,
-        fontSize: 48,
-        color: COLORS.text,
-        fontWeight: 700,
-      }}
-    >
-      {value}
-    </div>
-    {sub && (
-      <div style={{ fontSize: SIZES.caption, color: COLORS.textTertiary, marginTop: 4 }}>{sub}</div>
-    )}
-  </div>
-);
 
 export const DataCover: React.FC<DataCoverProps> = ({
   series,
@@ -58,81 +26,181 @@ export const DataCover: React.FC<DataCoverProps> = ({
       style={{
         backgroundColor: COLORS.background,
         fontFamily: FONTS.text,
+        overflow: 'hidden',
       }}
     >
-      <CoverGradient series={series} />
+      {/* 右上角色块 */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          width: 300,
+          height: 300,
+          background: `radial-gradient(circle at 100% 0%, ${color}30 0%, transparent 70%)`,
+          pointerEvents: 'none',
+        }}
+      />
 
-      {/* ❶ 系列标签 */}
+      {/* 左边缘色条 */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: 8,
+          height: '35%',
+          background: color,
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* 底部渐变色带 */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 4,
+          background: `linear-gradient(90deg, ${color}, ${COLORS.primary})`,
+          pointerEvents: 'none',
+        }}
+      />
+
       <SeriesBadge series={series} episodeNumber={episodeNumber} />
 
-      {/* ❷ 钩子标题 */}
-      <div style={{ padding: `${SIZES.spacing.lg}px ${SIZES.spacing.xl}px 0`, textAlign: 'center' }}>
-        <h1
-          style={{
-            fontFamily: FONTS.display,
-            fontSize: 44,
-            color: COLORS.text,
-            lineHeight: 1.3,
-            fontWeight: 700,
-            margin: 0,
-          }}
-        >
-          {title}
-        </h1>
-        <GoldLine />
-      </div>
-
-      {/* ❸ 数据对比区 */}
       <div
         style={{
           flex: 1,
           display: 'flex',
-          alignItems: 'center',
+          flexDirection: 'column',
           justifyContent: 'center',
-          gap: SIZES.spacing.md,
-          padding: `0 ${SIZES.spacing.xl}px`,
+          padding: `0 ${SIZES.spacing.xxxl}px 0 80px`,
+          position: 'relative',
+          zIndex: 1,
         }}
       >
-        <ComparisonCard
-          label={leftLabel}
-          value={leftValue}
-          sub={leftSub}
-          accentColor={COLORS.error}
-        />
+        {/* 小标签 */}
         <div
           style={{
-            fontFamily: FONTS.display,
-            fontSize: SIZES.h4,
-            color: color,
-            fontWeight: 700,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            marginBottom: SIZES.spacing.lg,
           }}
         >
-          VS
+          <div style={{ width: 24, height: 2, background: color }} />
+          <span style={{ color, fontSize: SIZES.caption, fontWeight: 700, letterSpacing: '0.1em' }}>
+            数据对比
+          </span>
         </div>
-        <ComparisonCard
-          label={rightLabel}
-          value={rightValue}
-          sub={rightSub}
-          accentColor={color}
-        />
+
+        {/* 标题 */}
+        <h1
+          style={{
+            fontFamily: FONTS.display,
+            fontSize: 64,
+            color: COLORS.text,
+            lineHeight: 1.15,
+            fontWeight: 700,
+            margin: 0,
+          }}
+        >
+          {title.split('\n').map((line, i) => (
+            <React.Fragment key={i}>
+              {i > 0 && <br />}
+              {line}
+            </React.Fragment>
+          ))}
+        </h1>
+
+        {/* VS 对比区 */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: SIZES.spacing.md,
+            marginTop: SIZES.spacing.xl,
+          }}
+        >
+          {/* 左侧卡片 */}
+          <div
+            style={{
+              flex: 1,
+              background: COLORS.backgroundElevated,
+              borderRadius: SIZES.radius.lg,
+              padding: `${SIZES.spacing.md}px ${SIZES.spacing.lg}px`,
+              borderLeft: `4px solid ${COLORS.error}`,
+            }}
+          >
+            <div style={{ fontSize: SIZES.caption, color: COLORS.textTertiary, marginBottom: 4 }}>
+              {leftLabel}
+            </div>
+            <div style={{ fontFamily: FONTS.display, fontSize: 44, color: COLORS.text, fontWeight: 700 }}>
+              {leftValue}
+            </div>
+            {leftSub && (
+              <div style={{ fontSize: SIZES.caption, color: COLORS.textTertiary, marginTop: 2 }}>
+                {leftSub}
+              </div>
+            )}
+          </div>
+
+          {/* VS 标签 */}
+          <div
+            style={{
+              fontFamily: FONTS.display,
+              fontSize: SIZES.h4,
+              color,
+              fontWeight: 700,
+              flexShrink: 0,
+            }}
+          >
+            VS
+          </div>
+
+          {/* 右侧卡片 */}
+          <div
+            style={{
+              flex: 1,
+              background: COLORS.backgroundElevated,
+              borderRadius: SIZES.radius.lg,
+              padding: `${SIZES.spacing.md}px ${SIZES.spacing.lg}px`,
+              borderLeft: `4px solid ${color}`,
+            }}
+          >
+            <div style={{ fontSize: SIZES.caption, color: COLORS.textTertiary, marginBottom: 4 }}>
+              {rightLabel}
+            </div>
+            <div style={{ fontFamily: FONTS.display, fontSize: 44, color: COLORS.text, fontWeight: 700 }}>
+              {rightValue}
+            </div>
+            {rightSub && (
+              <div style={{ fontSize: SIZES.caption, color: COLORS.textTertiary, marginTop: 2 }}>
+                {rightSub}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 底部洞察 */}
+        <div
+          style={{
+            marginTop: SIZES.spacing.lg,
+            padding: `${SIZES.spacing.sm}px 0`,
+            display: 'flex',
+            alignItems: 'center',
+            gap: SIZES.spacing.sm,
+          }}
+        >
+          <div style={{ width: 4, height: 24, background: COLORS.primary, borderRadius: 2, flexShrink: 0 }} />
+          <span style={{ fontSize: SIZES.body, color: COLORS.text, fontWeight: 600 }}>
+            {insight}
+          </span>
+        </div>
       </div>
 
-      {/* ❹ 核心洞察 */}
-      <div
-        style={{
-          margin: `0 ${SIZES.spacing.xl}px ${SIZES.spacing.sm}px`,
-          padding: `${SIZES.spacing.sm}px ${SIZES.spacing.md}px`,
-          backgroundColor: COLORS.backgroundElevated,
-          borderRadius: SIZES.radius.md,
-          textAlign: 'center',
-        }}
-      >
-        <span style={{ fontSize: 18, color: COLORS.textSecondary }}>
-          {insight}
-        </span>
-      </div>
-
-      {/* ❺ 品牌条 */}
       <BrandBar />
     </AbsoluteFill>
   );

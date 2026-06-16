@@ -17,7 +17,7 @@ export const WarningCover: React.FC<WarningCoverProps> = ({ series, episodeNumbe
             <div style={{ width: 10, height: 42, background: color, borderRadius: 5 }} />
             <SeriesBadge series={series} episodeNumber={episodeNumber} />
           </div>
-          <h1 style={{ fontFamily: FONTS.display, fontSize: 124, color: '#FFFFFF', lineHeight: 1.04, fontWeight: 800, margin: 0, textShadow: SHADOW, letterSpacing: '-0.03em' }}>
+          <h1 style={{ fontFamily: FONTS.display, fontSize: 124, color: '#FFFFFF', lineHeight: 1.04, fontWeight: 900, margin: 0, textShadow: SHADOW, letterSpacing: '-0.03em' }}>
             {title.split('\n').map((line, i) => (<React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>))}
           </h1>
         </div>
@@ -31,9 +31,9 @@ export const WarningCover: React.FC<WarningCoverProps> = ({ series, episodeNumbe
                 {items.map((item, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 20, flexDirection: 'row-reverse' }}>
                     <div style={{ width: 56, height: 56, borderRadius: 12, background: color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <span style={{ color: '#FFFFFF', fontSize: 30, fontWeight: 800 }}>{i + 1}</span>
+                      <span style={{ color: '#FFFFFF', fontSize: 30, fontWeight: 900 }}>{i + 1}</span>
                     </div>
-                    <span style={{ fontSize: 48, color: '#FFFFFF', fontWeight: 700, textShadow: SHADOW }}>{item}</span>
+                    <span style={{ fontSize: 48, color: '#FFFFFF', fontWeight: 900, textShadow: SHADOW }}>{item}</span>
                   </div>
                 ))}
               </div>

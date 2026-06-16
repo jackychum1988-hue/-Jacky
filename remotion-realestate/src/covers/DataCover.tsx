@@ -17,7 +17,7 @@ export const DataCover: React.FC<DataCoverProps> = ({ series, episodeNumber, tit
             <div style={{ width: 10, height: 42, background: color, borderRadius: 5 }} />
             <SeriesBadge series={series} episodeNumber={episodeNumber} />
           </div>
-          <h1 style={{ fontFamily: FONTS.display, fontSize: 120, color: '#FFFFFF', lineHeight: 1.04, fontWeight: 800, margin: 0, textShadow: SHADOW, letterSpacing: '-0.03em' }}>
+          <h1 style={{ fontFamily: FONTS.display, fontSize: 120, color: '#FFFFFF', lineHeight: 1.04, fontWeight: 900, margin: 0, textShadow: SHADOW, letterSpacing: '-0.03em' }}>
             {title.split('\n').map((line, i) => (<React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>))}
           </h1>
         </div>
@@ -30,13 +30,13 @@ export const DataCover: React.FC<DataCoverProps> = ({ series, episodeNumber, tit
               <div style={{ display: 'flex', alignItems: 'center', gap: 28, justifyContent: 'flex-end', marginBottom: 22 }}>
                 <div>
                   <div style={{ fontSize: 28, color: '#FFFFFF80', marginBottom: 6, textShadow: SHADOW }}>{leftLabel}</div>
-                  <div style={{ fontFamily: FONTS.display, fontSize: 76, color: '#FF4444', fontWeight: 700, textShadow: SHADOW }}>{leftValue}</div>
+                  <div style={{ fontFamily: FONTS.display, fontSize: 76, color: '#FF4444', fontWeight: 900, textShadow: SHADOW }}>{leftValue}</div>
                   {leftSub && <div style={{ fontSize: 26, color: '#FFFFFF60', textShadow: SHADOW }}>{leftSub}</div>}
                 </div>
-                <div style={{ fontFamily: FONTS.display, fontSize: 52, color, fontWeight: 800, textShadow: SHADOW }}>VS</div>
+                <div style={{ fontFamily: FONTS.display, fontSize: 52, color, fontWeight: 900, textShadow: SHADOW }}>VS</div>
                 <div>
                   <div style={{ fontSize: 28, color: '#FFFFFF80', marginBottom: 6, textShadow: SHADOW }}>{rightLabel}</div>
-                  <div style={{ fontFamily: FONTS.display, fontSize: 76, color, fontWeight: 700, textShadow: SHADOW }}>{rightValue}</div>
+                  <div style={{ fontFamily: FONTS.display, fontSize: 76, color, fontWeight: 900, textShadow: SHADOW }}>{rightValue}</div>
                   {rightSub && <div style={{ fontSize: 26, color: '#FFFFFF60', textShadow: SHADOW }}>{rightSub}</div>}
                 </div>
               </div>

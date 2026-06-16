@@ -58,7 +58,7 @@ export const SeriesBadge: React.FC<{
           borderRadius: SIZES.radius.xl,
           fontSize: SIZES.body,
           fontFamily: FONTS.text,
-          fontWeight: 700,
+          fontWeight: 900,
         }}
       >
         {SERIES_LABELS[series]}

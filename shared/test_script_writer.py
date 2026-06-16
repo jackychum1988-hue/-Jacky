@@ -108,3 +108,47 @@ def test_format_scripts_for_push_empty():
     result = format_scripts_for_push([], date_str="06/04")
     assert "🎙 **Jacky今日口播** | 06/04" in result
     assert "**【选题" not in result  # no topic entries
+
+
+# === Tiered Prompt Tests ===
+
+from shared.script_writer import build_tier_prompt, TIER_PROMPTS
+
+
+def test_build_tier_prompt_viral():
+    """引流轰炸 tier: 15-25s, strong hook, instant CTA."""
+    prompt = build_tier_prompt("viral")
+    assert "15-25秒" in prompt
+    assert "钩子" in prompt
+    assert "CTA" in prompt
+    assert "严禁" in prompt
+
+
+def test_build_tier_prompt_flash():
+    """笋盘速报 tier: 30-45s, data-focused."""
+    prompt = build_tier_prompt("flash")
+    assert "30-45秒" in prompt
+    assert ("数据" in prompt or "数字" in prompt)
+    assert "价格" in prompt
+
+
+def test_build_tier_prompt_deep():
+    """深度拆解 tier: 60-90s, comprehensive — default tier."""
+    prompt = build_tier_prompt("deep")
+    assert "60-90秒" in prompt
+
+
+def test_build_tier_prompt_unknown_falls_back_to_deep():
+    """Unknown tier falls back to deep."""
+    prompt = build_tier_prompt("unknown")
+    assert "60-90秒" in prompt
+
+
+def test_tier_prompts_are_distinct():
+    """All three tiers produce different prompts."""
+    viral = build_tier_prompt("viral")
+    flash = build_tier_prompt("flash")
+    deep = build_tier_prompt("deep")
+    assert viral != flash
+    assert flash != deep
+    assert viral != deep

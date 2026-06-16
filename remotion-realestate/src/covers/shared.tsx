@@ -94,7 +94,7 @@ export const GoldLine: React.FC<{ width?: number }> = ({ width = 60 }) => (
 export const BrandBar: React.FC = () => (
   <div
     style={{
-      borderTop: `1px solid ${COLORS.backgroundElevated}`,
+      borderTop: `1px solid rgba(255,255,255,0.1)`,
       paddingTop: SIZES.spacing.sm,
       paddingBottom: SIZES.spacing.md,
       textAlign: 'center' as const,
@@ -105,6 +105,7 @@ export const BrandBar: React.FC = () => (
         fontSize: SIZES.small,
         fontFamily: FONTS.text,
         color: COLORS.textTertiary,
+        textShadow: '0 1px 8px rgba(0,0,0,0.7)',
       }}
     >
       港人中山置業通 · Jacky

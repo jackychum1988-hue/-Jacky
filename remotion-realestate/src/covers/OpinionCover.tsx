@@ -1,11 +1,14 @@
 // remotion-realestate/src/covers/OpinionCover.tsx
-// Jacky观点 — 砸脸大字杂志风 / 高对比撞色 / 左对齐留白排版
+// Jacky观点 — 透明底 + 砸脸大字 / 叠加视频不挡人物
 
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
 import { COLORS, FONTS, SIZES } from '../design-system/tokens';
 import { SeriesBadge, BrandBar, SERIES_COLORS } from './shared';
 import type { OpinionCoverProps } from './types';
+
+const SHADOW = '0 2px 16px rgba(0,0,0,0.9)';
+const SHADOW_LIGHT = '0 2px 10px rgba(0,0,0,0.75)';
 
 export const OpinionCover: React.FC<OpinionCoverProps> = ({
   series,
@@ -18,52 +21,51 @@ export const OpinionCover: React.FC<OpinionCoverProps> = ({
   return (
     <AbsoluteFill
       style={{
-        backgroundColor: COLORS.background,
+        backgroundColor: 'transparent',
         fontFamily: FONTS.text,
         overflow: 'hidden',
       }}
     >
-      {/* 背景氛围 — 大色块撞色 */}
+      {/* 右上角大光环 */}
       <div
         style={{
           position: 'absolute',
-          top: '8%',
-          right: -60,
-          width: 520,
-          height: 520,
+          top: '4%',
+          right: '3%',
+          width: 400,
+          height: 400,
           borderRadius: '50%',
-          background: `radial-gradient(circle, ${color}30 0%, transparent 70%)`,
+          background: `radial-gradient(circle, ${color}35 0%, transparent 60%)`,
           pointerEvents: 'none',
         }}
       />
 
-      {/* 左上角色块装饰 */}
+      {/* 左边缘色条 */}
       <div
         style={{
           position: 'absolute',
-          top: 0,
+          top: '8%',
           left: 0,
-          width: 8,
-          height: '35%',
+          width: 6,
+          height: '30%',
           background: color,
           pointerEvents: 'none',
         }}
       />
 
-      {/* 底部色块条 */}
+      {/* 底部渐变色带 */}
       <div
         style={{
           position: 'absolute',
           bottom: 0,
           left: 0,
           right: 0,
-          height: 4,
+          height: 3,
           background: `linear-gradient(90deg, ${color}, ${COLORS.primary})`,
           pointerEvents: 'none',
         }}
       />
 
-      {/* 系列标签 */}
       <SeriesBadge series={series} episodeNumber={episodeNumber} />
 
       {/* 主内容 — 左对齐大字 */}
@@ -88,7 +90,7 @@ export const OpinionCover: React.FC<OpinionCoverProps> = ({
           }}
         >
           <div style={{ width: 24, height: 2, background: color }} />
-          <span style={{ color, fontSize: SIZES.caption, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          <span style={{ color, fontSize: SIZES.caption, fontWeight: 700, letterSpacing: '0.1em', textShadow: SHADOW_LIGHT }}>
             港人置业必看
           </span>
         </div>
@@ -104,9 +106,10 @@ export const OpinionCover: React.FC<OpinionCoverProps> = ({
             margin: 0,
             letterSpacing: '-0.01em',
             maxWidth: '90%',
+            textShadow: SHADOW,
           }}
         >
-          {title.split('\n').map((line, i, arr) => (
+          {title.split('\n').map((line, i) => (
             <React.Fragment key={i}>
               <span style={{ display: 'block' }}>
                 {line}
@@ -118,7 +121,7 @@ export const OpinionCover: React.FC<OpinionCoverProps> = ({
         {/* 分隔区 */}
         <div style={{ height: SIZES.spacing.xl }} />
 
-        {/* 钩子文案 — 高亮色底 */}
+        {/* 钩子文案 */}
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: SIZES.spacing.md }}>
           <div
             style={{
@@ -138,6 +141,7 @@ export const OpinionCover: React.FC<OpinionCoverProps> = ({
               lineHeight: 1.4,
               margin: 0,
               maxWidth: '80%',
+              textShadow: SHADOW,
             }}
           >
             {hook}
@@ -145,7 +149,6 @@ export const OpinionCover: React.FC<OpinionCoverProps> = ({
         </div>
       </div>
 
-      {/* 品牌条 */}
       <BrandBar />
     </AbsoluteFill>
   );

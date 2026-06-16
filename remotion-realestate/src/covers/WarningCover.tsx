@@ -1,11 +1,14 @@
 // remotion-realestate/src/covers/WarningCover.tsx
-// 避坑指南 — 砸脸警告列表 / 高对比撞色 / 左对齐留白
+// 避坑指南 — 透明底 + 编号列表 / 叠加视频不挡人物
 
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
 import { COLORS, FONTS, SIZES } from '../design-system/tokens';
 import { SeriesBadge, BrandBar, SERIES_COLORS } from './shared';
 import type { WarningCoverProps } from './types';
+
+const SHADOW = '0 2px 16px rgba(0,0,0,0.9)';
+const SHADOW_LIGHT = '0 2px 10px rgba(0,0,0,0.75)';
 
 export const WarningCover: React.FC<WarningCoverProps> = ({
   series,
@@ -18,33 +21,33 @@ export const WarningCover: React.FC<WarningCoverProps> = ({
   return (
     <AbsoluteFill
       style={{
-        backgroundColor: COLORS.background,
+        backgroundColor: 'transparent',
         fontFamily: FONTS.text,
         overflow: 'hidden',
       }}
     >
-      {/* 右上角几何装饰 */}
+      {/* 右上角光环 */}
       <div
         style={{
           position: 'absolute',
-          top: '8%',
-          right: -60,
-          width: 420,
-          height: 420,
+          top: '4%',
+          right: '3%',
+          width: 340,
+          height: 340,
           borderRadius: '50%',
-          border: `1px solid ${color}30`,
+          border: `1px solid ${color}35`,
           pointerEvents: 'none',
         }}
       />
       <div
         style={{
           position: 'absolute',
-          top: '14%',
-          right: 10,
-          width: 300,
-          height: 300,
+          top: '10%',
+          right: '8%',
+          width: 240,
+          height: 240,
           borderRadius: '50%',
-          background: `radial-gradient(circle, ${color}20 0%, transparent 60%)`,
+          background: `radial-gradient(circle, ${color}25 0%, transparent 60%)`,
           pointerEvents: 'none',
         }}
       />
@@ -58,8 +61,8 @@ export const WarningCover: React.FC<WarningCoverProps> = ({
           width: 0,
           height: 0,
           borderStyle: 'solid',
-          borderWidth: '120px 120px 0 0',
-          borderColor: `${color}15 transparent transparent transparent`,
+          borderWidth: '100px 100px 0 0',
+          borderColor: `${color}20 transparent transparent transparent`,
           pointerEvents: 'none',
         }}
       />
@@ -68,10 +71,10 @@ export const WarningCover: React.FC<WarningCoverProps> = ({
       <div
         style={{
           position: 'absolute',
-          top: 0,
+          top: '8%',
           left: 0,
-          width: 8,
-          height: '35%',
+          width: 6,
+          height: '25%',
           background: color,
           pointerEvents: 'none',
         }}
@@ -84,7 +87,7 @@ export const WarningCover: React.FC<WarningCoverProps> = ({
           bottom: 0,
           left: 0,
           right: 0,
-          height: 4,
+          height: 3,
           background: `linear-gradient(90deg, ${color}, ${COLORS.primary})`,
           pointerEvents: 'none',
         }}
@@ -113,12 +116,12 @@ export const WarningCover: React.FC<WarningCoverProps> = ({
           }}
         >
           <div style={{ width: 24, height: 2, background: color }} />
-          <span style={{ color, fontSize: SIZES.caption, fontWeight: 700, letterSpacing: '0.1em' }}>
+          <span style={{ color, fontSize: SIZES.caption, fontWeight: 700, letterSpacing: '0.1em', textShadow: SHADOW_LIGHT }}>
             避坑必读
           </span>
         </div>
 
-        {/* 警告标题 — 砸脸大字 */}
+        {/* 警告标题 */}
         <h1
           style={{
             fontFamily: FONTS.display,
@@ -127,6 +130,7 @@ export const WarningCover: React.FC<WarningCoverProps> = ({
             lineHeight: 1.15,
             fontWeight: 700,
             margin: 0,
+            textShadow: SHADOW,
           }}
         >
           {title.split('\n').map((line, i) => (
@@ -173,7 +177,7 @@ export const WarningCover: React.FC<WarningCoverProps> = ({
                   {i + 1}
                 </span>
               </div>
-              <span style={{ fontSize: 26, color: COLORS.text, fontWeight: 600 }}>
+              <span style={{ fontSize: 26, color: COLORS.text, fontWeight: 600, textShadow: SHADOW }}>
                 {item}
               </span>
             </div>

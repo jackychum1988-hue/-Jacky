@@ -1,11 +1,15 @@
 // remotion-realestate/src/covers/DataCover.tsx
-// 数据拆解 — 砸脸对比卡 / 高对比撞色排版
+// 数据拆解 — 透明底 + 对比卡 / 叠加视频不挡人物
 
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
 import { COLORS, FONTS, SIZES } from '../design-system/tokens';
 import { SeriesBadge, BrandBar, SERIES_COLORS } from './shared';
 import type { DataCoverProps } from './types';
+
+const SHADOW = '0 2px 16px rgba(0,0,0,0.9)';
+const SHADOW_LIGHT = '0 2px 10px rgba(0,0,0,0.75)';
+const CARD_BG = 'rgba(26, 24, 21, 0.65)';
 
 export const DataCover: React.FC<DataCoverProps> = ({
   series,
@@ -24,7 +28,7 @@ export const DataCover: React.FC<DataCoverProps> = ({
   return (
     <AbsoluteFill
       style={{
-        backgroundColor: COLORS.background,
+        backgroundColor: 'transparent',
         fontFamily: FONTS.text,
         overflow: 'hidden',
       }}
@@ -35,9 +39,9 @@ export const DataCover: React.FC<DataCoverProps> = ({
           position: 'absolute',
           top: 0,
           right: 0,
-          width: 300,
-          height: 300,
-          background: `radial-gradient(circle at 100% 0%, ${color}30 0%, transparent 70%)`,
+          width: 260,
+          height: 260,
+          background: `radial-gradient(circle at 100% 0%, ${color}35 0%, transparent 70%)`,
           pointerEvents: 'none',
         }}
       />
@@ -46,10 +50,10 @@ export const DataCover: React.FC<DataCoverProps> = ({
       <div
         style={{
           position: 'absolute',
-          top: 0,
+          top: '8%',
           left: 0,
-          width: 8,
-          height: '35%',
+          width: 6,
+          height: '25%',
           background: color,
           pointerEvents: 'none',
         }}
@@ -62,7 +66,7 @@ export const DataCover: React.FC<DataCoverProps> = ({
           bottom: 0,
           left: 0,
           right: 0,
-          height: 4,
+          height: 3,
           background: `linear-gradient(90deg, ${color}, ${COLORS.primary})`,
           pointerEvents: 'none',
         }}
@@ -91,7 +95,7 @@ export const DataCover: React.FC<DataCoverProps> = ({
           }}
         >
           <div style={{ width: 24, height: 2, background: color }} />
-          <span style={{ color, fontSize: SIZES.caption, fontWeight: 700, letterSpacing: '0.1em' }}>
+          <span style={{ color, fontSize: SIZES.caption, fontWeight: 700, letterSpacing: '0.1em', textShadow: SHADOW_LIGHT }}>
             数据对比
           </span>
         </div>
@@ -105,6 +109,7 @@ export const DataCover: React.FC<DataCoverProps> = ({
             lineHeight: 1.15,
             fontWeight: 700,
             margin: 0,
+            textShadow: SHADOW,
           }}
         >
           {title.split('\n').map((line, i) => (
@@ -128,20 +133,21 @@ export const DataCover: React.FC<DataCoverProps> = ({
           <div
             style={{
               flex: 1,
-              background: COLORS.backgroundElevated,
+              background: CARD_BG,
               borderRadius: SIZES.radius.lg,
               padding: `${SIZES.spacing.md}px ${SIZES.spacing.lg}px`,
               borderLeft: `4px solid ${COLORS.error}`,
+              backdropFilter: 'blur(8px)',
             }}
           >
-            <div style={{ fontSize: SIZES.caption, color: COLORS.textTertiary, marginBottom: 4 }}>
+            <div style={{ fontSize: SIZES.caption, color: COLORS.textTertiary, marginBottom: 4, textShadow: SHADOW_LIGHT }}>
               {leftLabel}
             </div>
-            <div style={{ fontFamily: FONTS.display, fontSize: 44, color: COLORS.text, fontWeight: 700 }}>
+            <div style={{ fontFamily: FONTS.display, fontSize: 44, color: COLORS.text, fontWeight: 700, textShadow: SHADOW }}>
               {leftValue}
             </div>
             {leftSub && (
-              <div style={{ fontSize: SIZES.caption, color: COLORS.textTertiary, marginTop: 2 }}>
+              <div style={{ fontSize: SIZES.caption, color: COLORS.textTertiary, marginTop: 2, textShadow: SHADOW_LIGHT }}>
                 {leftSub}
               </div>
             )}
@@ -155,6 +161,7 @@ export const DataCover: React.FC<DataCoverProps> = ({
               color,
               fontWeight: 700,
               flexShrink: 0,
+              textShadow: SHADOW,
             }}
           >
             VS
@@ -164,20 +171,21 @@ export const DataCover: React.FC<DataCoverProps> = ({
           <div
             style={{
               flex: 1,
-              background: COLORS.backgroundElevated,
+              background: CARD_BG,
               borderRadius: SIZES.radius.lg,
               padding: `${SIZES.spacing.md}px ${SIZES.spacing.lg}px`,
               borderLeft: `4px solid ${color}`,
+              backdropFilter: 'blur(8px)',
             }}
           >
-            <div style={{ fontSize: SIZES.caption, color: COLORS.textTertiary, marginBottom: 4 }}>
+            <div style={{ fontSize: SIZES.caption, color: COLORS.textTertiary, marginBottom: 4, textShadow: SHADOW_LIGHT }}>
               {rightLabel}
             </div>
-            <div style={{ fontFamily: FONTS.display, fontSize: 44, color: COLORS.text, fontWeight: 700 }}>
+            <div style={{ fontFamily: FONTS.display, fontSize: 44, color: COLORS.text, fontWeight: 700, textShadow: SHADOW }}>
               {rightValue}
             </div>
             {rightSub && (
-              <div style={{ fontSize: SIZES.caption, color: COLORS.textTertiary, marginTop: 2 }}>
+              <div style={{ fontSize: SIZES.caption, color: COLORS.textTertiary, marginTop: 2, textShadow: SHADOW_LIGHT }}>
                 {rightSub}
               </div>
             )}
@@ -195,7 +203,7 @@ export const DataCover: React.FC<DataCoverProps> = ({
           }}
         >
           <div style={{ width: 4, height: 24, background: COLORS.primary, borderRadius: 2, flexShrink: 0 }} />
-          <span style={{ fontSize: SIZES.body, color: COLORS.text, fontWeight: 600 }}>
+          <span style={{ fontSize: SIZES.body, color: COLORS.text, fontWeight: 600, textShadow: SHADOW }}>
             {insight}
           </span>
         </div>

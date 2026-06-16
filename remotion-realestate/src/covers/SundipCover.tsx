@@ -1,11 +1,14 @@
 // remotion-realestate/src/covers/SundipCover.tsx
-// 笋盘速报 — 砸脸大字 + 超大数字 / 高对比撞色
+// 笋盘速报 — 透明底 + 砸脸大字 / 叠加视频不挡人物
 
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
 import { COLORS, FONTS, SIZES } from '../design-system/tokens';
 import { SeriesBadge, BrandBar, SERIES_COLORS } from './shared';
 import type { SundipCoverProps } from './types';
+
+const SHADOW = '0 2px 16px rgba(0,0,0,0.9)';
+const SHADOW_LIGHT = '0 2px 10px rgba(0,0,0,0.75)';
 
 export const SundipCover: React.FC<SundipCoverProps> = ({
   series,
@@ -21,35 +24,21 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
   return (
     <AbsoluteFill
       style={{
-        backgroundColor: COLORS.background,
+        backgroundColor: 'transparent',
         fontFamily: FONTS.text,
         overflow: 'hidden',
       }}
     >
-      {/* 右上角大光环 */}
+      {/* 右上角色块装饰 */}
       <div
         style={{
           position: 'absolute',
-          top: -80,
-          right: -80,
-          width: 480,
-          height: 480,
+          top: '6%',
+          right: '5%',
+          width: 300,
+          height: 300,
           borderRadius: '50%',
-          background: `radial-gradient(circle, ${color}25 0%, transparent 70%)`,
-          pointerEvents: 'none',
-        }}
-      />
-
-      {/* 左下角装饰环 */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 80,
-          left: -60,
-          width: 240,
-          height: 240,
-          borderRadius: '50%',
-          border: `1px solid ${color}25`,
+          background: `radial-gradient(circle, ${color}40 0%, transparent 60%)`,
           pointerEvents: 'none',
         }}
       />
@@ -58,10 +47,10 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
       <div
         style={{
           position: 'absolute',
-          top: 0,
+          top: '8%',
           left: 0,
-          width: 8,
-          height: '40%',
+          width: 6,
+          height: '30%',
           background: color,
           pointerEvents: 'none',
         }}
@@ -74,7 +63,7 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
           bottom: 0,
           left: 0,
           right: 0,
-          height: 4,
+          height: 3,
           background: `linear-gradient(90deg, ${color}, ${COLORS.primary})`,
           pointerEvents: 'none',
         }}
@@ -104,7 +93,7 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
           }}
         >
           <div style={{ width: 24, height: 2, background: color }} />
-          <span style={{ color, fontSize: SIZES.caption, fontWeight: 700, letterSpacing: '0.1em' }}>
+          <span style={{ color, fontSize: SIZES.caption, fontWeight: 700, letterSpacing: '0.1em', textShadow: SHADOW_LIGHT }}>
             笋盘推荐
           </span>
         </div>
@@ -118,6 +107,7 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
               color: COLORS.text,
               fontWeight: 700,
               lineHeight: 1,
+              textShadow: SHADOW,
             }}
           >
             {highlightNumber}
@@ -128,6 +118,7 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
               fontSize: 56,
               color: color,
               fontWeight: 700,
+              textShadow: SHADOW_LIGHT,
             }}
           >
             {highlightUnit}
@@ -135,7 +126,7 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
         </div>
 
         {/* 价格描述 */}
-        <div style={{ fontSize: 28, color, marginTop: SIZES.spacing.xs, fontWeight: 600 }}>
+        <div style={{ fontSize: 28, color, marginTop: SIZES.spacing.xs, fontWeight: 600, textShadow: SHADOW_LIGHT }}>
           {highlightLabel}
         </div>
 
@@ -147,6 +138,7 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
             color: COLORS.text,
             fontWeight: 700,
             marginTop: SIZES.spacing.md,
+            textShadow: SHADOW,
           }}
         >
           {propertyName}
@@ -167,11 +159,13 @@ export const SundipCover: React.FC<SundipCoverProps> = ({
                 key={i}
                 style={{
                   padding: `${SIZES.spacing.xs}px ${SIZES.spacing.md}px`,
-                  border: `1px solid ${COLORS.primary}40`,
+                  border: `1px solid ${COLORS.primary}60`,
                   borderRadius: SIZES.radius.xl,
                   color: COLORS.primary,
                   fontSize: SIZES.caption,
                   fontFamily: FONTS.text,
+                  textShadow: SHADOW_LIGHT,
+                  backdropFilter: 'blur(4px)',
                 }}
               >
                 {tag}

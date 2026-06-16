@@ -7,6 +7,9 @@ from shared.timeline_builder import (
     build_timeline,
     TIER_CARD_SEQUENCE,
     CARD_DURATION_MAP,
+    _truncate,
+    _split_numbered_body,
+    _extract_number,
 )
 
 # Valid Position9 values from animation.ts
@@ -237,3 +240,91 @@ def test_checklistcard_props_match_component_interface():
     assert "items" in props, "ChecklistCard missing 'items'"
     assert isinstance(props["items"], list), f"ChecklistCard 'items' must be list, got {type(props['items'])}"
     assert len(props["items"]) >= 1, "ChecklistCard 'items' must have at least 1 item"
+
+
+def test_datapanel_props_match_component_interface():
+    """DataPanel props must match the TypeScript DataPanelProps interface."""
+    script = _make_script(
+        title="test data panel",
+        body="总价200万，首付40万即可入场",
+    )
+    timeline = build_timeline(script, tier="flash")
+    dp_elements = [e for e in timeline["elements"] if e["type"] == "DataPanel"]
+    assert len(dp_elements) == 1, f"Expected exactly 1 DataPanel in flash tier"
+    props = dp_elements[0]["props"]
+    assert "title" in props, "DataPanel missing 'title'"
+    assert "value" in props, "DataPanel missing 'value'"
+
+
+def test_pricerevealcard_props_match_component_interface():
+    """PriceRevealCard props must match the TypeScript PriceRevealCardProps interface."""
+    script = _make_script(
+        title="深中通道笋盘",
+        hook="通车后涨咗2000蚊一平",
+        body="总价1.2-1.3万每平方，首付30万起",
+    )
+    timeline = build_timeline(script, tier="flash")
+    pr_elements = [e for e in timeline["elements"] if e["type"] == "PriceRevealCard"]
+    assert len(pr_elements) == 1, f"Expected exactly 1 PriceRevealCard in flash tier"
+    props = pr_elements[0]["props"]
+    assert "tag" in props, "PriceRevealCard missing 'tag'"
+    assert "subtitle" in props, "PriceRevealCard missing 'subtitle'"
+    assert "priceLabel" in props, "PriceRevealCard missing 'priceLabel'"
+    assert "priceValue" in props, "PriceRevealCard missing 'priceValue'"
+    assert "priceUnit" in props, "PriceRevealCard missing 'priceUnit'"
+
+
+# ---------------------------------------------------------------------------
+# Helper function unit tests
+# ---------------------------------------------------------------------------
+
+def test_truncate_empty_string():
+    """_truncate on empty string returns empty string."""
+    assert _truncate("", 10) == ""
+
+
+def test_truncate_at_max_len():
+    """_truncate at max_len returns text unchanged (no ellipsis)."""
+    assert _truncate("abc", 3) == "abc"
+
+
+def test_split_numbered_body_empty():
+    """_split_numbered_body on empty string returns empty tuple."""
+    assert _split_numbered_body("") == ()
+
+
+def test_split_numbered_body_plain_text():
+    """_split_numbered_body on plain text without markers returns single-item tuple."""
+    result = _split_numbered_body("plain text without markers")
+    assert result == ("plain text without markers",)
+
+
+def test_extract_number_no_numbers():
+    """_extract_number on text with no numbers returns sentinel."""
+    assert _extract_number("no numbers here") == "--"
+
+
+def test_extract_number_price_range():
+    """_extract_number on price range like '1.2-1.3万' returns full range."""
+    assert _extract_number("1.2-1.3万") == "1.2-1.3万"
+
+
+# ---------------------------------------------------------------------------
+# Unknown tier fallback test
+# ---------------------------------------------------------------------------
+
+def test_build_timeline_unknown_tier_falls_back_to_deep():
+    """Unknown tier should silently fall back to 'deep' sequence."""
+    script = _make_script(
+        title="test",
+        hook="test hook",
+        body="第一，step one。第二，step two。第三，step three。",
+    )
+    timeline = build_timeline(script, tier="nonexistent")
+    types = [e["type"] for e in timeline["elements"]]
+    assert "DataComparisonCard" in types, \
+        "Unknown tier should fall back to deep sequence (has DataComparisonCard)"
+    assert "ChecklistCard" in types
+    assert "WarningCard" in types
+    assert "TimelineCard" in types
+    assert "CTACard" in types

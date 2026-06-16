@@ -90,13 +90,41 @@ CARD_ANIMATION = {
 }
 
 # ---------------------------------------------------------------------------
+# Default / fallback display strings
+# ---------------------------------------------------------------------------
+
+DEFAULTS = {
+    "hook_label": "中山置业",
+    "cta_headline": "有兴趣即刻PM我",
+    "cta_contact": "PM",
+    "cta_tags": ["#港人中山置业", "#避坑清单", "#中山买楼"],
+    "datapanel_title": "数据面板",
+    "price_tag": "笋盘速报",
+    "price_label": "总价",
+    "price_unit": "起",
+    "price_fallback": "200万",
+    "comparison_label": "深度拆解",
+    "comparison_left_label": "项目A",
+    "comparison_right_label": "项目B",
+    "comparison_value": "待定",
+    "comparison_delta": "详情PM",
+    "checklist_title": "核心要点",
+    "checklist_fallback": "待补充",
+    "warning_title": "避坑提醒",
+    "warning_desc": "购买前请仔细核实相关信息",
+    "timeline_title": "流程步骤",
+    "timeline_step_label": "步骤1",
+    "no_number_sentinel": "--",
+}
+
+# ---------------------------------------------------------------------------
 # Pre-compiled regex patterns (module-level to avoid re-compilation per call)
 # ---------------------------------------------------------------------------
 
 _RE_CN_ORDINAL = re.compile(r'(?:第[一二三四五六七八九十]+[，,、]?\s*)')
 _RE_CN_BULLET  = re.compile(r'(?:[一二三四五六七八九十]+[、．.,])\s*')
 _RE_NUMERIC    = re.compile(r'\d+[\.\)、]\s*')
-_RE_CHINESE_NUMBER = re.compile(r'(\d[\d,.]*(?:万|亿|千|蚊|元|%|平)?)')
+_RE_CHINESE_NUMBER = re.compile(r'(\d[\d,.-]*(?:万|亿|千|蚊|元|%|平)?)')
 
 
 # ---------------------------------------------------------------------------
@@ -146,15 +174,15 @@ def _split_numbered_body(body: str) -> tuple:
 def _extract_number(body: str) -> str:
     """Attempt to extract a numeric value from a body string.
 
-    Used by DataPanel to populate the 'value' field.
+    Used by DataPanel and PriceRevealCard to populate numeric fields.
     Returns a placeholder if no number found.
     """
     if not body:
-        return "--"
+        return DEFAULTS["no_number_sentinel"]
     m = _RE_CHINESE_NUMBER.search(body)
     if m:
         return m.group(1)
-    return "--"
+    return DEFAULTS["no_number_sentinel"]
 
 
 # ---------------------------------------------------------------------------
@@ -167,7 +195,6 @@ def _build_element(
     exit_at: int,
     script: dict,
     color: str,
-    card_index: int,
 ) -> dict:
     """Build a single PipOverlay element dict from card type and script data.
 
@@ -180,7 +207,6 @@ def _build_element(
         exit_at: Frame at which the element starts exiting.
         script: Script dict with title/hook/body/cta/full_script.
         color: Accent colour hex string.
-        card_index: Zero-based index in the card sequence.
 
     Returns:
         Element dict compatible with PipOverlaySchema.elementSchema.
@@ -196,7 +222,7 @@ def _build_element(
     # Interface: { label, headline, enText?, icon?, color?, subline? }
     if card_type == "HookCard":
         props.update({
-            "label": title[:8] if title else "中山置业",
+            "label": title[:8] if title else DEFAULTS["hook_label"],
             "headline": hook or title,
             "icon": "alert",
         })
@@ -207,16 +233,16 @@ def _build_element(
     # Interface: { icon?, headline, enHeadline?, contact, enLabel?, color?, tags? }
     elif card_type == "CTACard":
         props.update({
-            "headline": cta or "有兴趣即刻PM我",
-            "contact": "PM",
-            "tags": ["#港人中山置业", "#避坑清单", "#中山买楼"],
+            "headline": cta or DEFAULTS["cta_headline"],
+            "contact": DEFAULTS["cta_contact"],
+            "tags": DEFAULTS["cta_tags"],
         })
 
     # --- DataPanel ---
     # Interface: { title, value, subtitle?, color? }
     elif card_type == "DataPanel":
         props.update({
-            "title": title or "数据面板",
+            "title": title or DEFAULTS["datapanel_title"],
             "value": _extract_number(body),
         })
         if body:
@@ -227,11 +253,11 @@ def _build_element(
     elif card_type == "PriceRevealCard":
         num_value = _extract_number(body)
         props.update({
-            "tag": "笋盘速报",
+            "tag": DEFAULTS["price_tag"],
             "subtitle": hook or title,
-            "priceLabel": "总价",
-            "priceValue": num_value if num_value != "--" else "200万",
-            "priceUnit": "起",
+            "priceLabel": DEFAULTS["price_label"],
+            "priceValue": num_value if num_value != DEFAULTS["no_number_sentinel"] else DEFAULTS["price_fallback"],
+            "priceUnit": DEFAULTS["price_unit"],
         })
 
     # --- DataComparisonCard ---
@@ -240,12 +266,12 @@ def _build_element(
     #              enCenterLabel?, enRightLabel?, delta?, enDelta?, color? }
     elif card_type == "DataComparisonCard":
         props.update({
-            "label": "深度拆解",
-            "leftLabel": "项目A",
-            "leftValue": "待定",
-            "rightLabel": "项目B",
-            "rightValue": "待定",
-            "delta": "详情PM",
+            "label": DEFAULTS["comparison_label"],
+            "leftLabel": DEFAULTS["comparison_left_label"],
+            "leftValue": DEFAULTS["comparison_value"],
+            "rightLabel": DEFAULTS["comparison_right_label"],
+            "rightValue": DEFAULTS["comparison_value"],
+            "delta": DEFAULTS["comparison_delta"],
             "icon": "chart",
         })
 
@@ -255,9 +281,9 @@ def _build_element(
         items_raw = _split_numbered_body(body)
         items = [{"label": _truncate(raw, 40)} for raw in items_raw[:5]]
         if not items:
-            items = [{"label": _truncate(body, 40) if body else "待补充"}]
+            items = [{"label": _truncate(body, 40) if body else DEFAULTS["checklist_fallback"]}]
         props.update({
-            "title": title or "核心要点",
+            "title": title or DEFAULTS["checklist_title"],
             "items": items,
         })
 
@@ -270,8 +296,8 @@ def _build_element(
         bullets = [_truncate(b, 60) for b in _split_numbered_body(body)[:3]]
         props.update({
             "n": n_value,
-            "title": "避坑提醒",
-            "desc": _truncate(body, 100) if body else "购买前请仔细核实相关信息",
+            "title": DEFAULTS["warning_title"],
+            "desc": _truncate(body, 100) if body else DEFAULTS["warning_desc"],
             "icon": "alert",
             "bullets": bullets,
         })
@@ -287,7 +313,7 @@ def _build_element(
                 "desc": _truncate(raw, 60),
             })
         if not steps:
-            steps = [{"label": "步骤1", "desc": _truncate(body, 60) if body else "待补充"}]
+            steps = [{"label": DEFAULTS["timeline_step_label"], "desc": _truncate(body, 60) if body else DEFAULTS["checklist_fallback"]}]
         props.update({
             "title": title or "流程步骤",
             "steps": steps,
@@ -340,7 +366,7 @@ def build_timeline(script: dict, tier: str = "deep", fps: int = 30) -> dict:
             exit_at = current_frame + card_duration + gap
 
         color = CARD_COLORS[i % len(CARD_COLORS)]
-        element = _build_element(card_type, enter_at, exit_at, script, color, i)
+        element = _build_element(card_type, enter_at, exit_at, script, color)
         elements.append(element)
 
         current_frame = exit_at + gap

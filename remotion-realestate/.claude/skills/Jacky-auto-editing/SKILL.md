@@ -5,7 +5,7 @@ metadata:
   tags: remotion, overlay, alpha-channel, prores-4444, json-timeline, pip, zhuzige, vertical-video, jianying
 ---
 
-# Jacky 自动剪辑 — 口播叠加视频自动生成（2026-06-22 sidaizhai-v1 + Apple v11 生产标准）
+# Jacky 自动剪辑 — 口播叠加视频自动生成（2026-06-22 sidaizhai-v1 + Apple v11 + 半透明战绩卡 v12 生产标准）
 
 ## Overview
 
@@ -567,10 +567,118 @@ GlassCard 参数：`transparentBg`, `showOuterGlow=false`, `disableEntryAnimatio
 - **TollCostComparison**: 过路费对比
 - **DonutChart**: 环形图
 - **NameBadgeCloud**: 名称标签云
+- **ProjectShowcaseCard** ★ v12: 多项目热销战绩展示（主角大卡 + N配角横排对比）
+  - 半透明暖黑容器 `rgba(10,8,6,0.55)` + 金色微边框 + 彩色光点
+  - 布局：标题 → 主角大卡（4列指标网格）→ 金色分隔线 → N配角横排
+  - 独立场景使用（`src/scenes/SidaizhaiProjectsShowcase.tsx` 为参考实现）
 
 ---
 
-## 时间轴 JSON 结构
+## 半透明战绩卡设计模式 ★ v12（2026-06-22 新增）
+
+适用场景：多项目对比、月度战报、竞品PK等需要「主角突出 + 配角参考」的数据展示。
+
+### 容器 Style Token
+
+```tsx
+// 主角大卡（hero）
+backgroundColor: 'rgba(10,8,6,0.55)'       // 深于配角（更突出）
+borderRadius: 18
+border: `1.5px solid ${hexToRgba(color, 0.35)}`
+boxShadow: `0 0 48px ${hexToRgba(color, 0.1)}, inset 0 1px 0 ${hexToRgba(color, 0.08)}`
+padding: '28px 32px 24px'
+
+// 配角小卡（supporting）
+backgroundColor: 'rgba(10,8,6,0.4)'        // 略浅（次于主角）
+borderRadius: 14
+border: `1px solid ${hexToRgba(color, 0.2)}`
+padding: '18px 16px 16px'
+
+// 指标格子（hero 内部）
+backgroundColor: 'rgba(255,255,255,0.03)'  // 微亮底
+borderRadius: 12
+border: '1px solid rgba(255,255,255,0.04)'
+```
+
+### 布局结构
+
+```
+┌─ 标题行 ──────────────────────────────────┐
+│  标题: 38px / 700 / #C8A052 / Georgia      │
+│  副标题: 20px / 400 / rgba(255,255,255,0.35)│
+├─ 主角大卡 ────────────────────────────────┤
+│  彩色圆点(10px) + 项目名(28px/800/彩色)     │
+│  ┌──────┬──────┬──────┬──────┐            │
+│  │ 指标1 │ 指标2 │ 指标3 │ 指标4 │  ← flex │
+│  │label  │label  │label  │label  │  14px   │
+│  │VALUE  │VALUE  │VALUE  │VALUE  │  28px   │
+│  └──────┴──────┴──────┴──────┘  900 mono  │
+├─ 金色分隔线 ──────────────────────────────┤
+│  ──── 同场对比 ────  18px/600/Georgia      │
+├─ 配角横排（flex, gap: 14）─────────────────┤
+│  ┌────────┬────────┬────────┐             │
+│  │ 圆点   │ 圆点   │ 圆点   │  8px 彩色   │
+│  │ 项目名 │ 项目名 │ 项目名 │  17px/700   │
+│  │ METRIC │ METRIC │ METRIC │  28px/900   │
+│  │ detail │ detail │ detail │  14px/400   │
+│  └────────┴────────┴────────┘             │
+└───────────────────────────────────────────┘
+```
+
+### 字体层级
+
+| 层级 | 字号 | 字重 | 颜色 | 字体 |
+|------|------|------|------|------|
+| 总标题 | 38px | 700 | `#C8A052` | Georgia, PingFang SC |
+| 副标题 | 20px | 400 | `rgba(255,255,255,0.35)` | PingFang SC |
+| 主角项目名 | 28px | 800 | `item.color` | PingFang SC |
+| 主角标签 | 14px | 500 | `rgba(255,255,255,0.4)` | PingFang SC |
+| 主角数值 | 28px | 900 | 彩色 | SF Mono |
+| 分隔线标签 | 18px | 600 | `rgba(200,160,82,0.6)` | Georgia |
+| 配角项目名 | 17px | 700 | 彩色 | PingFang SC |
+| 配角数值 | 28px | 900 | 彩色 | SF Mono |
+| 配角详情 | 14px | 400 | `rgba(255,255,255,0.45)` | PingFang SC |
+| 徽章标签 | 16px | 600 | 彩色 | PingFang SC |
+
+### 动效时序（参考: 210f / 7s / 4项目）
+
+| 帧 | 事件 | 弹簧参数 |
+|----|------|---------|
+| 0-15f | 标题 slide-down (-24→0) + fade | — |
+| 6-18f | 副标题 fade-in | — |
+| 10-30f | 主角大卡 spring scale (0.94→1) | damping:22 stiffness:85 mass:1.0 |
+| 20-52f | 4列指标 staggered slide-right (每列+8f) | damping:26 stiffness:70 mass:1.2 |
+| 36-52f | 金色分隔线双向展开 + 「同场对比」fade | — |
+| 52-88f | N配角 staggered slide-left (每卡+12f) | damping:24 stiffness:80 mass:1.0 |
+
+### 配色规则
+
+- **主角色**：红 `#FF4136` 或金 `#F5A623` — 最抢眼
+- **配角色**：从 V[] 6色中选剩余色，相邻项色相差距 ≥ 60°
+- **指标数值光晕**：`textShadow: 0 0 24px ${hexToRgba(color, 0.4)}`
+- **彩色圆点光晕**：`boxShadow: 0 0 10px ${hexToRgba(color, 0.5)}`
+- **主角徽章背景**：`backgroundColor: hexToRgba(color, 0.15)`
+
+### 适配公式
+
+```
+配角数量 N → 总帧数 ≈ 60 + N × 12 + 90(停留)
+配角数量 N → 每卡宽度 ≈ (920 - (N-1)×14) / N  px
+```
+
+| 配角数 | 建议总帧数 | 时长 |
+|--------|-----------|------|
+| 2 | 174f | ~5.8s |
+| 3 | 186f | ~6.2s |
+| 4 | 198f | ~6.6s |
+
+### 参考实现
+
+- 完整代码：[`src/scenes/SidaizhaiProjectsShowcase.tsx`](../../src/scenes/SidaizhaiProjectsShowcase.tsx)
+- 渲染输出：`out/sidaizhai-projects-showcase.mov`（210f / 7s / 121.7 MB）
+- Composition ID: `SidaizhaiProjectsShowcase`
+
+---
 
 ```json
 {
@@ -667,6 +775,7 @@ spring → slideUp → slideUp → slideLeft → slideRight → slideLeft → sl
 | 开场钩子/悬念 | HookCard | 蓝 V[2] | spring |
 | 睇楼场景/背景 | QACard | 金 V[1] | slideUp |
 | 数据揭示/真相 | RevealCard | 蓝 V[2] | slideUp |
+| 多项目热销战绩 ★ v12 | ProjectShowcaseCard | 红(主)+紫/金/绿(配) | 独立场景 |
 | 对比/数字PK | DataComparisonCard | 金 V[1] | slideLeft |
 | 纵向累加/算账 | CalculationCard | 金 V[1] | slideUp |
 | 论点警告/解释 | WarningCard | 红/紫/青/绿 | slideUp/slideLeft |
@@ -768,6 +877,10 @@ spring → slideUp → slideUp → slideLeft → slideRight → slideLeft → sl
 | idle 浮动 | 每卡 Y 轴 1.0-1.8px sin 浮动（不同卡片不同相位，防同步共振） |
 | 数字 settle | 计数完成 1→1.03→1 回弹（RevealCard settleAt=28, DataComparisonCard=36） |
 | PCM 剥离 | 渲染后自动 `ffmpeg -c:v copy -an`，Windows 文件锁时 `-clean.mov` 可手动替换 |
+| 半透明容器底色 | 主角 `rgba(10,8,6,0.55)` / 配角 `rgba(10,8,6,0.4)` · 微亮指标格 `rgba(255,255,255,0.03)` |
+| 金色微边框 | 主角 `1.5px solid rgba(color,0.35)` + inset 高光线 · 配角 `1px solid rgba(color,0.2)` |
+| 彩色圆点指示器 | 10px(主角) / 8px(配角) · `boxShadow: 0 0 10-12px rgba(color,0.5-0.7)` |
+| 分隔线 | `linear-gradient(to right, transparent, gold 0.3, gold 0.3)` · 标签 18px/600 Georgia |
 
 ### 卡间 timing 公式
 

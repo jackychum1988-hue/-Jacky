@@ -21,6 +21,8 @@ import { PipOverlay, PipOverlaySchema } from './scenes/PipOverlay';
 import { FullBgOverlay, FullBgOverlaySchema } from './scenes/FullBgOverlay';
 import { DataSourceCard } from './scenes/DataSourceCard';
 import { CityPriceDataSource } from './scenes/CityPriceDataSource';
+import { SidaizhaiDataSource } from './scenes/SidaizhaiDataSource';
+import { SidaizhaiProjectsShowcase } from './scenes/SidaizhaiProjectsShowcase';
 import { COLORS } from './design-system/tokens';
 import propertyCostRanking from '../config/property-cost-ranking.json';
 import dualContractTimeline from '../config/dual-contract-timeline.json';
@@ -235,6 +237,24 @@ export const RemotionRoot: React.FC = () => {
         id="CityPriceDataSource"
         component={CityPriceDataSource}
         durationInFrames={150}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      {/* 四代住宅数据来源 — 5秒动态卡片 / 5项数据依次入场 */}
+      <Composition
+        id="SidaizhaiDataSource"
+        component={SidaizhaiDataSource}
+        durationInFrames={150}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      {/* 四代宅热销战绩 — 7秒项目展示 / 主角+3配角对比 */}
+      <Composition
+        id="SidaizhaiProjectsShowcase"
+        component={SidaizhaiProjectsShowcase}
+        durationInFrames={210}
         fps={30}
         width={1080}
         height={1920}

@@ -2,7 +2,7 @@
   "width": 1080,
   "height": 1920,
   "fps": 30,
-  "durationInFrames": 3660,
+  "durationInFrames": 3840,
   "elements": [
     {
       "type": "HookCard",
@@ -232,6 +232,50 @@
         "enLabel": "WhatsApp",
         "color": "#F5A623",
         "tags": ["中山买楼", "四代住宅", "空中花园", "避坑指南", "新盘新政策第一时间讲"]
+      }
+    },
+    {
+      "type": "OverlayDataSourceCard",
+      "enterAt": 3675,
+      "exitAt": 3825,
+      "animation": "fade",
+      "position": "safe-center",
+      "offset": { "x": 0, "y": 0 },
+      "props": {
+        "title": "四代住宅 · 数据来源",
+        "subtitle": "中山4.30新政满月 · 四代宅成交 & 土地供应 · 项目数据库",
+        "items": [
+          {
+            "title": "4.30新政满月数据",
+            "value": "住宅网签6,886套 · 好房子196套 · 同比+127.9% · 占全市成交额16%",
+            "source": "中山住建局 2026年5月",
+            "color": "#FF4136"
+          },
+          {
+            "title": "中山楼市的拐点来了吗？",
+            "value": "深度分析四代住宅成交结构、港澳客占比、土地供应转向",
+            "source": "南方日报 2026-06-12",
+            "color": "#1A56DB"
+          },
+          {
+            "title": "中山集中挂牌6宗宅地",
+            "value": "227亩 · 石岐/东区/火炬/小榄 · 全部四代住宅试点",
+            "source": "观点网 2026-06-01",
+            "color": "#10B981"
+          },
+          {
+            "title": "「以旧换新」公积金贷款上浮",
+            "value": "卖旧买新公积金贷款额度上浮 · 四代宅优先适用",
+            "source": "中山公积金中心 2026-06-18",
+            "color": "#F5A623"
+          },
+          {
+            "title": "四代住宅项目专题",
+            "value": "鑫洋·御宸 / 香山颂 / 江山和鸣 / 保利琅悦 / 春风里",
+            "source": "项目数据库 · 实地调研",
+            "color": "#8B5CF6"
+          }
+        ]
       }
     }
   ]

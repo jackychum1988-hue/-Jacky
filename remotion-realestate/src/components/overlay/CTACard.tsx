@@ -1,14 +1,14 @@
 // CTACard — GlassCard + WhatsApp 联系卡 (zhuzige)
-// 上: GlassCard 标题 / 下: WhatsApp 号码卡 + 标签
-// 复用: CTA 场景
+// v15: Full animation upgrade — icon bounce, title entrance, contact staging, exit choreography
 
 import React from 'react';
 import { useCurrentFrame, useVideoConfig, spring, interpolate } from 'remotion';
-import { useOverlayAnimation, positionToStyle, hexToRgba, C, F, textGlow, breathingScale, OverlayElementBase } from './animation';
+import { useOverlayAnimation, positionToStyle, hexToRgba, C, F, textDepth, breathingScale, idleFloat, RADIUS, OverlayElementBase } from './animation';
 import { GlassCard } from '../new/GlassCard';
-import { ColoredAmbience } from './ColoredAmbience';
+import { ICON_MAP } from './iconMap';
 
 interface CTACardProps extends OverlayElementBase {
+  icon?: string;
   headline: string;
   enHeadline?: string;
   contact: string;
@@ -18,7 +18,7 @@ interface CTACardProps extends OverlayElementBase {
 }
 
 export const CTACard: React.FC<CTACardProps> = ({
-  headline,
+  icon, headline,
   enHeadline,
   contact,
   enLabel,
@@ -39,15 +39,57 @@ export const CTACard: React.FC<CTACardProps> = ({
   const posStyle = positionToStyle(position, offset);
 
   const localFrame = Math.max(0, frame - enterAt);
-  const contactSpring = spring({
-    frame: Math.max(0, localFrame - 24),
+  const isExiting = anim.phase === 'exit';
+  const exitP = anim.phaseProgress;
+
+  // Icon bounce — frame 0, matches HookCard timing
+  const iconSpring = spring({
+    frame: Math.max(0, localFrame - 2),
+    fps,
+    config: { damping: 14, stiffness: 120, mass: 0.7 },
+  });
+  const iconScale = isExiting
+    ? interpolate(exitP, [0.5, 0.9], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
+    : interpolate(iconSpring, [0, 1], [0, 1.2]);
+  const iconFinalScale = isExiting ? iconScale : (iconScale > 1 ? 1 + (iconScale - 1) * 0.3 : iconScale);
+
+  // Title entrance — frame 8, letter-spacing breath + fade
+  const titleSpring = spring({
+    frame: Math.max(0, localFrame - 8),
     fps,
     config: { damping: 28, stiffness: 70, mass: 1.3 },
   });
-  const contactOpacity = interpolate(localFrame - 24, [0, 20], [0, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
+  const titleLetterSpacing = isExiting
+    ? interpolate(exitP, [0.3, 0.7], [-0.02, 0.06], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
+    : interpolate(titleSpring, [0, 1], [0.06, -0.02]);
+  const titleOpacity = isExiting
+    ? interpolate(exitP, [0.3, 0.6], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
+    : interpolate(titleSpring, [0, 1], [0, 1]);
+
+  // Contact card — frame 20 (was 24), scale + fade entrance
+  const contactSpring = spring({
+    frame: Math.max(0, localFrame - 20),
+    fps,
+    config: { damping: 28, stiffness: 70, mass: 1.3 },
   });
+  const contactOpacity = isExiting
+    ? interpolate(exitP, [0.1, 0.45], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
+    : interpolate(localFrame - 20, [0, 20], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const contactScale = isExiting
+    ? interpolate(exitP, [0, 0.4], [1, 0.93], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
+    : (0.93 + contactSpring * 0.07);
+
+  // Tags — frame 28, fade entrance
+  const tagsOpacity = isExiting
+    ? interpolate(exitP, [0, 0.3], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
+    : interpolate(localFrame - 28, [0, 15], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+
+  // Phone number breathing — uses localFrame for consistent phase
+  const phoneBreathing = 1 + Math.sin(localFrame * 0.1) * 0.025;
+
+  // Idle floating + container breathing
+  const floatY = idleFloat(frame, 1.2, 0.026);
+  const cardBreath = breathingScale(frame);
 
   const TS = '0 2px 10px rgba(0,0,0,0.5)';
 
@@ -62,19 +104,31 @@ export const CTACard: React.FC<CTACardProps> = ({
         padding: posStyle.padding,
         transform: posStyle.transform,
         pointerEvents: 'none',
+        overflow: 'hidden',
       }}
     >
-      <div style={{ opacity: anim.opacity, maxWidth: 880 }}>
-        <ColoredAmbience color={color} />
+      <div style={{ opacity: anim.opacity, maxWidth: posStyle.maxWidth, width: '100%', transform: `translateY(${floatY}px)` }}>
         <GlassCard
           color={color}
           showLeftBar
           glowIntensity={0.2}
           transparentBg
+          disableEntryAnimation
           padding="36px 48px"
           borderRadius={16}
           maxWidth={880}
         >
+          {/* Icon with bounce (matches HookCard style) */}
+          {icon && ICON_MAP[icon] && (
+            <div style={{
+              marginBottom: 16, textAlign: 'center',
+              opacity: isExiting ? interpolate(exitP, [0.5, 0.8], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) : iconSpring,
+              transform: `scale(${iconFinalScale})`,
+            }}>
+              {React.createElement(ICON_MAP[icon], { size: 48, color, strokeWidth: 2 })}
+            </div>
+          )}
+          {/* Title with letter-spacing breath + entrance fade */}
           <h2
             style={{
               fontSize: 46,
@@ -82,8 +136,10 @@ export const CTACard: React.FC<CTACardProps> = ({
               color: C.text,
               fontFamily: F.display,
               lineHeight: 1.3,
-              textShadow: textGlow(color, 0.4),
+              letterSpacing: `${titleLetterSpacing.toFixed(3)}em`,
+              textShadow: textDepth(0.4),
               margin: 0,
+              opacity: titleOpacity,
               transform: `scale(${breathingScale(frame)})`,
             }}
           >
@@ -92,13 +148,14 @@ export const CTACard: React.FC<CTACardProps> = ({
           {enHeadline && (
             <p
               style={{
-                fontSize: 22,
+                fontSize: 24,
                 fontWeight: 400,
-                color: 'rgba(255,255,255,0.6)',
+                color: 'rgba(255,255,255,0.5)',
                 fontFamily: F.text,
                 letterSpacing: '0.1em',
                 lineHeight: 1.2,
                 margin: '10px 0 0 0',
+                opacity: titleOpacity,
               }}
             >
               {enHeadline}
@@ -111,11 +168,11 @@ export const CTACard: React.FC<CTACardProps> = ({
             marginTop: 32,
             padding: '36px 56px',
             backgroundColor: 'transparent',
-            borderRadius: 16,
-            border: `2.5px solid ${hexToRgba(color, 0.7)}`,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+            borderRadius: RADIUS.contact,
+            border: `1px solid ${hexToRgba(color, 0.20)}`,
+            boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
             opacity: contactOpacity,
-            transform: `scale(${0.93 + contactSpring * 0.07})`,
+            transform: `scale(${contactScale * cardBreath})`,
           }}
         >
           {enLabel && (
@@ -124,7 +181,7 @@ export const CTACard: React.FC<CTACardProps> = ({
                 fontSize: 22,
                 fontFamily: F.text,
                 fontWeight: 400,
-                color: 'rgba(255,255,255,0.6)',
+                color: 'rgba(255,255,255,0.5)',
                 letterSpacing: '0.1em',
                 lineHeight: 1.2,
                 marginBottom: 12,
@@ -141,8 +198,8 @@ export const CTACard: React.FC<CTACardProps> = ({
               fontWeight: 700,
               color: C.text,
               letterSpacing: '0.05em',
-              transform: `scale(${1 + Math.sin(frame * 0.1) * 0.025})`,
-              textShadow: textGlow(color, 0.35),
+              transform: `scale(${phoneBreathing})`,
+              textShadow: textDepth(0.35),
               margin: 0,
             }}
           >
@@ -158,10 +215,7 @@ export const CTACard: React.FC<CTACardProps> = ({
               flexWrap: 'wrap',
               gap: 12,
               justifyContent: 'center',
-              opacity: interpolate(frame - enterAt - 30, [0, 15], [0, 1], {
-                extrapolateLeft: 'clamp',
-                extrapolateRight: 'clamp',
-              }),
+              opacity: tagsOpacity,
             }}
           >
             {tags.map((tag, ti) => (

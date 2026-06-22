@@ -5,14 +5,36 @@ export {
   positionToStyle,
   hexToRgb,
   hexToRgba,
+  textDepth,
   textGlow,
   V,
   C,
   F,
   EN_RATIO,
   enFontSize,
+  splitByHighlights,
+  breathingScale,
+  idleFloat,
+  settleBounce,
+  RADIUS,
+  SAFE_ZONE,
+  SAFE_MAX_WIDTH,
+  SAFE_MAX_WIDTH_WIDE,
+  popScaleValue,
+  reservedPadding,
+  EMPHASIS_CONFIGS,
 } from './animation';
-export type { OverlayElementBase, OverlayTiming, AnimationType, Position9 } from './animation';
+export type {
+  OverlayElementBase,
+  OverlayTiming,
+  AnimationType,
+  Position9,
+  AnimationPhase,
+  HighlightWord,
+  TextSegment,
+  EmphasisLevel,
+  EmphasisConfig,
+} from './animation';
 
 export { KeywordTag } from './KeywordTag';
 export { PriceBadge } from './PriceBadge';
@@ -48,6 +70,15 @@ export { AppleCTACard } from './AppleCTACard';
 export { RankingBarChart } from './RankingBarChart';
 export { TrendLineChart } from './TrendLineChart';
 export { RankingChangeList } from './RankingChangeList';
+export { CalculationCard } from './CalculationCard';
+export { RevealMythCard } from './RevealMythCard';
+export { CountUpSummaryCard } from './CountUpSummaryCard';
+export { SplitSceneCard } from './SplitSceneCard';
+export { OverlayDataSourceCard } from './OverlayDataSourceCard';
+export { OverlayComparisonCards } from './OverlayComparisonCards';
+export { TollCostComparison } from './TollCostComparison';
+export { DonutChart } from './DonutChart';
+export { NameBadgeCloud } from './NameBadgeCloud';
 export { ICON_MAP } from './iconMap';
 
 import type React from 'react';
@@ -84,6 +115,15 @@ import { AppleCTACard } from './AppleCTACard';
 import { RankingBarChart } from './RankingBarChart';
 import { TrendLineChart } from './TrendLineChart';
 import { RankingChangeList } from './RankingChangeList';
+import { CalculationCard } from './CalculationCard';
+import { RevealMythCard } from './RevealMythCard';
+import { CountUpSummaryCard } from './CountUpSummaryCard';
+import { SplitSceneCard } from './SplitSceneCard';
+import { OverlayDataSourceCard } from './OverlayDataSourceCard';
+import { OverlayComparisonCards } from './OverlayComparisonCards';
+import { TollCostComparison } from './TollCostComparison';
+import { DonutChart } from './DonutChart';
+import { NameBadgeCloud } from './NameBadgeCloud';
 
 // type → component 映射表，供 PipOverlay JSON 驱动使用
 export const overlayComponentMap: Record<string, React.FC<any>> = {
@@ -120,4 +160,13 @@ export const overlayComponentMap: Record<string, React.FC<any>> = {
   RankingBarChart,
   TrendLineChart,
   RankingChangeList,
+  CalculationCard,
+  RevealMythCard,
+  CountUpSummaryCard,
+  SplitSceneCard,
+  OverlayDataSourceCard,
+  OverlayComparisonCards,
+  TollCostComparison,
+  DonutChart,
+  NameBadgeCloud,
 };

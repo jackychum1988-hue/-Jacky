@@ -1,0 +1,238 @@
+{
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "durationInFrames": 3660,
+  "elements": [
+    {
+      "type": "HookCard",
+      "enterAt": 0,
+      "exitAt": 240,
+      "animation": "spring",
+      "position": "safe-center",
+      "offset": { "x": 0, "y": 20 },
+      "props": {
+        "label": "楼市真相",
+        "headline": "最好卖嘅 唔系上车盘 系四代住宅",
+        "enText": "Zhongshan's Hottest Sellers Aren't ¥600K Starter Homes — They're ¥20K/sqm 4th-Gen Housing",
+        "icon": "building",
+        "color": "#1A56DB",
+        "staggerFrames": 6,
+        "subline": "六七十万上车盘 vs 成两万蚊一平方四代宅 · 你冇听错",
+        "highlights": [
+          { "word": "四代住宅", "color": "#1A56DB", "emphasis": "stamp" }
+        ]
+      }
+    },
+    {
+      "type": "RevealCard",
+      "enterAt": 270,
+      "exitAt": 570,
+      "animation": "slideUp",
+      "position": "safe-center",
+      "offset": { "x": 0, "y": 25 },
+      "props": {
+        "label": "4.30新政满月",
+        "number": "196",
+        "unit": "套",
+        "sublabel": "「好房子」网签 · 同比暴涨127.9% · 占全市成交额16% · 每6个买家就有1个拣四代宅",
+        "enLabel": "Apr 30 New Policy — 1 Month: 196 'Good Homes' Sold, +127.9% YoY, 16% Market Share",
+        "color": "#FF4136"
+      }
+    },
+    {
+      "type": "QACard",
+      "enterAt": 600,
+      "exitAt": 960,
+      "animation": "slideUp",
+      "position": "safe-center",
+      "offset": { "x": 0, "y": 30 },
+      "props": {
+        "label": "咩叫四代宅？",
+        "icon": "help",
+        "question": "你屋企可以有空中庭院？",
+        "answer": "简单讲：唔系窗台，唔系露台，系真系可以种花种草、摆张台饮茶嘅户外空间。使用率去到130%甚至145%——你买119平方，实际用到嘅面积等于旧式楼150平方。",
+        "enQuestion": "Your Home Comes With a Sky Garden?",
+        "enAnswer": "Simply put: not a bay window, not a balcony — a real outdoor space for plants and tea. Usable area reaches 130-145%: buy 119sqm, get the living space of an old-style 150sqm home.",
+        "color": "#10B981",
+        "questionHighlights": [
+          { "word": "空中庭院", "color": "#10B981", "emphasis": "stamp" }
+        ]
+      }
+    },
+    {
+      "type": "TestimonialCard",
+      "enterAt": 990,
+      "exitAt": 1260,
+      "animation": "slideRight",
+      "position": "safe-center",
+      "offset": { "x": 0, "y": 25 },
+      "props": {
+        "quote": "老公，呢个我要。",
+        "name": "鑫洋·御宸 睇楼现场",
+        "role": "7米挑高空中花园 · 石岐",
+        "enQuote": "\"Honey, I want this one.\"",
+        "enName": "Xinyang Royal Court · On-Site Visit",
+        "color": "#F5A623"
+      }
+    },
+    {
+      "type": "RevealCard",
+      "enterAt": 1290,
+      "exitAt": 1590,
+      "animation": "slideUp",
+      "position": "safe-center",
+      "offset": { "x": 0, "y": 25 },
+      "props": {
+        "label": "城建绿城·江山和鸣",
+        "number": "3",
+        "unit": "亿",
+        "sublabel": "1个钟卖过百套 · 备案价最高2.79万/㎡ · 要摇号先买到 · 港澳客占咗两成",
+        "enLabel": "Chengjian Greentown · Jiangshan Humming — Sold 100+ Units in 1 Hour, ¥300M Revenue",
+        "color": "#FF4136"
+      }
+    },
+    {
+      "type": "DataComparisonCard",
+      "enterAt": 1620,
+      "exitAt": 1950,
+      "animation": "slideLeft",
+      "position": "safe-center",
+      "offset": { "x": 0, "y": 30 },
+      "props": {
+        "label": "四代宅去化速度",
+        "icon": "trending",
+        "leftLabel": "香山颂",
+        "leftValue": "6",
+        "leftUnit": "套尾货",
+        "rightLabel": "保利琅悦",
+        "rightValue": "2.52",
+        "rightUnit": "亿/月",
+        "delta": "鑫洋御宸清盘 · 119卖晒 · 153/179㎡可选",
+        "enLeftLabel": "Xiangshan Song (468→6 Remaining)",
+        "enRightLabel": "Poly Langyue (Mar)",
+        "enDelta": "Xinyang Royal Court: 119sqm sold out, 153/179sqm still available",
+        "color": "#8B5CF6",
+        "cardScale": 1.2
+      }
+    },
+    {
+      "type": "RevealCard",
+      "enterAt": 1980,
+      "exitAt": 2280,
+      "animation": "slideRight",
+      "position": "safe-center",
+      "offset": { "x": 0, "y": 25 },
+      "props": {
+        "label": "小榄菊城·春风里",
+        "number": "130",
+        "unit": "%",
+        "sublabel": "中山最细四代宅 · 96㎡起 · 1.4-1.5万/㎡ · 一样大把人问",
+        "enLabel": "Xiaolan · Chunfengli — Zhongshan's Smallest 4th-Gen, 96sqm From ¥14K/sqm",
+        "color": "#10B981"
+      }
+    },
+    {
+      "type": "RevealCard",
+      "enterAt": 2310,
+      "exitAt": 2610,
+      "animation": "slideUp",
+      "position": "safe-center",
+      "offset": { "x": 0, "y": 25 },
+      "props": {
+        "label": "今日挂牌",
+        "number": "20",
+        "unit": "亿",
+        "sublabel": "6幅四代宅用地 · 227亩 · 石岐/东区/火炬/小榄 · 全部四代住宅试点",
+        "enLabel": "6 New 4th-Gen Land Parcels Listed Today — 227 Mu, All Designated 4th-Gen Pilots",
+        "color": "#8B5CF6"
+      }
+    },
+    {
+      "type": "DataComparisonCard",
+      "enterAt": 2640,
+      "exitAt": 3000,
+      "animation": "slideUp",
+      "position": "safe-center",
+      "offset": { "x": 0, "y": 25 },
+      "props": {
+        "label": "我计过条数",
+        "icon": "calculator",
+        "leftLabel": "普通楼",
+        "leftValue": "100",
+        "leftUnit": "㎡实用",
+        "rightLabel": "四代宅",
+        "rightValue": "130-145",
+        "rightUnit": "㎡实用",
+        "delta": "同样100㎡建筑面积 · 多出30-45㎡ · 多个空中花园 · 折算单价差唔多",
+        "enLeftLabel": "120万总价 · ¥1.2万/㎡",
+        "enRightLabel": "180万总价 · ¥1.8万/㎡",
+        "enDelta": "Same 100sqm footprint — 30-45sqm extra usable space — effective unit price is comparable",
+        "color": "#F5A623",
+        "cardScale": 1.15
+      }
+    },
+    {
+      "type": "WarningCard",
+      "enterAt": 3030,
+      "exitAt": 3300,
+      "animation": "slideLeft",
+      "position": "safe-center",
+      "offset": { "x": 0, "y": 30 },
+      "props": {
+        "label": "唔系叫你盲冲",
+        "n": 1,
+        "title": "有啲四代宅 挂个名",
+        "enTitle": "Some '4th-Gen' Homes Are Just a Label",
+        "desc": "实际使用率得110%，同普通楼冇分别。要睇发展商、睇位置、睇交楼标准。",
+        "enDesc": "If the usable-area ratio is only 110%, it's just a regular home with a marketing label. Check the developer, location, and delivery standards.",
+        "bullets": [
+          "使用率 < 120% = 假四代宅",
+          "睇发展商过往交付记录",
+          "空中花园排水+承重必须验"
+        ],
+        "icon": "alert",
+        "color": "#FF4136",
+        "highlights": [
+          { "word": "挂个名", "color": "#FF4136", "emphasis": "stamp" }
+        ]
+      }
+    },
+    {
+      "type": "ClimaxCard",
+      "enterAt": 3330,
+      "exitAt": 3540,
+      "animation": "spring",
+      "position": "safe-center",
+      "offset": { "x": 0, "y": 30 },
+      "props": {
+        "label": "一句话记住",
+        "icon": "key",
+        "text": "中山嘅楼市规则变紧\n四代宅会成为未来两年主流产品",
+        "enText": "Zhongshan's Market Rules Are Tightening — 4th-Gen Homes Will Become Mainstream Within 2 Years",
+        "author": "关注我，中山有新盘新政策，我第一个同你讲",
+        "color": "#FF4136",
+        "highlights": [
+          { "word": "四代宅", "color": "#FF4136", "emphasis": "stamp" }
+        ]
+      }
+    },
+    {
+      "type": "CTACard",
+      "enterAt": 3570,
+      "exitAt": 3645,
+      "animation": "slideUp",
+      "position": "safe-center",
+      "offset": { "x": 0, "y": 20 },
+      "props": {
+        "icon": "share",
+        "headline": "想知边个四代宅值得买、边个系伏？",
+        "enHeadline": "Which 4th-Gen Homes Are Worth Buying — and Which Are Traps?",
+        "contact": "+852 6672 2526",
+        "enLabel": "WhatsApp",
+        "color": "#F5A623",
+        "tags": ["中山买楼", "四代住宅", "空中花园", "避坑指南", "新盘新政策第一时间讲"]
+      }
+    }
+  ]
+}

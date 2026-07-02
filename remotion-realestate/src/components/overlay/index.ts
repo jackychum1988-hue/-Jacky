@@ -67,6 +67,24 @@ export { AppleHeroCard } from './AppleHeroCard';
 export { AppleFeatureCard } from './AppleFeatureCard';
 export { AppleMetricCard } from './AppleMetricCard';
 export { AppleCTACard } from './AppleCTACard';
+export { BeforeAfterCard } from './BeforeAfterCard';
+export { CausalGraphOverlay } from './CausalGraphOverlay';
+export { DataTableOverlay } from './DataTableOverlay';
+export { DecisionTreeCard } from './DecisionTreeCard';
+export { DefinitionCard } from './DefinitionCard';
+export { FormulaCard } from './FormulaCard';
+export { GenerationCard } from './GenerationCard';
+export { KnowledgeWebOverlay } from './KnowledgeWebOverlay';
+export { MatrixCard } from './MatrixCard';
+export { PriceBandCard } from './PriceBandCard';
+export { PyramidCard } from './PyramidCard';
+export { ROICard } from './ROICard';
+export { RadarChart } from './RadarChart';
+export { RedBlackCard } from './RedBlackCard';
+export { ScoreCard } from './ScoreCard';
+export { SpectrumCard } from './SpectrumCard';
+export { TeardownCard } from './TeardownCard';
+export { VennCard } from './VennCard';
 export { RankingBarChart } from './RankingBarChart';
 export { TrendLineChart } from './TrendLineChart';
 export { RankingChangeList } from './RankingChangeList';
@@ -77,6 +95,10 @@ export { SplitSceneCard } from './SplitSceneCard';
 export { OverlayDataSourceCard } from './OverlayDataSourceCard';
 export { OverlayComparisonCards } from './OverlayComparisonCards';
 export { TollCostComparison } from './TollCostComparison';
+export { StepBreakdownCard } from './StepBreakdownCard';
+export { FearPulseCard } from './FearPulseCard';
+export { ReliefCard } from './ReliefCard';
+export { TeaserCard } from './TeaserCard';
 export { DonutChart } from './DonutChart';
 export { NameBadgeCloud } from './NameBadgeCloud';
 export { ICON_MAP } from './iconMap';
@@ -112,6 +134,24 @@ import { AppleHeroCard } from './AppleHeroCard';
 import { AppleFeatureCard } from './AppleFeatureCard';
 import { AppleMetricCard } from './AppleMetricCard';
 import { AppleCTACard } from './AppleCTACard';
+import { BeforeAfterCard } from './BeforeAfterCard';
+import { CausalGraphOverlay } from './CausalGraphOverlay';
+import { DataTableOverlay } from './DataTableOverlay';
+import { DecisionTreeCard } from './DecisionTreeCard';
+import { DefinitionCard } from './DefinitionCard';
+import { FormulaCard } from './FormulaCard';
+import { GenerationCard } from './GenerationCard';
+import { KnowledgeWebOverlay } from './KnowledgeWebOverlay';
+import { MatrixCard } from './MatrixCard';
+import { PriceBandCard } from './PriceBandCard';
+import { PyramidCard } from './PyramidCard';
+import { ROICard } from './ROICard';
+import { RadarChart } from './RadarChart';
+import { RedBlackCard } from './RedBlackCard';
+import { ScoreCard } from './ScoreCard';
+import { SpectrumCard } from './SpectrumCard';
+import { TeardownCard } from './TeardownCard';
+import { VennCard } from './VennCard';
 import { RankingBarChart } from './RankingBarChart';
 import { TrendLineChart } from './TrendLineChart';
 import { RankingChangeList } from './RankingChangeList';
@@ -124,6 +164,10 @@ import { OverlayComparisonCards } from './OverlayComparisonCards';
 import { TollCostComparison } from './TollCostComparison';
 import { DonutChart } from './DonutChart';
 import { NameBadgeCloud } from './NameBadgeCloud';
+import { StepBreakdownCard } from './StepBreakdownCard';
+import { FearPulseCard } from './FearPulseCard';
+import { ReliefCard } from './ReliefCard';
+import { TeaserCard } from './TeaserCard';
 
 // type → component 映射表，供 PipOverlay JSON 驱动使用
 export const overlayComponentMap: Record<string, React.FC<any>> = {
@@ -169,4 +213,27 @@ export const overlayComponentMap: Record<string, React.FC<any>> = {
   TollCostComparison,
   DonutChart,
   NameBadgeCloud,
+  StepBreakdownCard,
+  FearPulseCard,
+  ReliefCard,
+  TeaserCard,
+  // ── v1 知识分析/好物分析 (2026-07-03) ──
+  BeforeAfterCard,
+  CausalGraphOverlay,
+  DataTableOverlay,
+  DecisionTreeCard,
+  DefinitionCard,
+  FormulaCard,
+  GenerationCard,
+  KnowledgeWebOverlay,
+  MatrixCard,
+  PriceBandCard,
+  PyramidCard,
+  ROICard,
+  RadarChart,
+  RedBlackCard,
+  ScoreCard,
+  SpectrumCard,
+  TeardownCard,
+  VennCard,
 };

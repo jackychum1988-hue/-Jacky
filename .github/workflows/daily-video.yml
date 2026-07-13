@@ -1,9 +1,9 @@
 name: Daily Sanjie Soup Video Agent
 
 on:
-  schedule:
-    # UTC 23:00 = 北京时间 7:00
-    - cron: "0 23 * * *"
+  # schedule:  # DISABLED 2026-06-17 — 每日视频生成已停用
+  #   # UTC 23:00 = 北京时间 7:00
+  #   - cron: "0 23 * * *"
   workflow_dispatch:
 
 permissions:

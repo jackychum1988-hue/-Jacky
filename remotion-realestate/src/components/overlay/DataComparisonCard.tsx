@@ -29,6 +29,8 @@ interface DataComparisonCardProps extends OverlayElementBase {
   color?: string;
   /** Scale the entire card (default 1). Use 1.15-1.25 to make small cards more prominent. */
   cardScale?: number;
+  /** Disable Apple-style idle breathing/float when true */
+  disableBreathing?: boolean;
 }
 
 // Parse "56万" → { num: 56, suffix: "万" }, "0.05%" → { num: 0.05, suffix: "%" }
@@ -73,6 +75,7 @@ export const DataComparisonCard: React.FC<DataComparisonCardProps> = ({
   delta, enDelta,
   color = '#F5A623',
   cardScale = 1,
+  disableBreathing = false,
   enterAt, exitAt, animation, position, offset,
 }) => {
   const frame = useCurrentFrame();
@@ -136,8 +139,8 @@ export const DataComparisonCard: React.FC<DataComparisonCardProps> = ({
 
   const countSpring = spring({ frame: Math.max(0, localFrame - 10), fps, config: { damping: 28, stiffness: 65, mass: 1.0 } });
   const countProgress = isExiting ? interpolate(exitP, [0, 1], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) : countSpring;
-  // Settle bounce: 1→1.03→1 overshoot when counting completes (~36f after entry)
-  const settle = settleBounce(localFrame, fps, 36);
+  // Settle bounce: 1→1.03→1 overshoot when counting completes (~36f after entry) (disabled when disableBreathing=true)
+  const settle = disableBreathing ? { scale: 1, active: false } : settleBounce(localFrame, fps, 36);
   const numberScale = (settle.active ? settle.scale : 1);
   // Text values: fade in; small integers: show immediately; others: count up
   const leftDisplay = leftParsed.isText ? leftValue : (anyRange && leftParsed.isRange ? leftValue : leftSkip ? leftValue : formatCounted(interpolate(countProgress, [0, 1], [0, leftParsed.num]), leftValue));
@@ -171,8 +174,8 @@ export const DataComparisonCard: React.FC<DataComparisonCardProps> = ({
   // Exit: delta badge exits first
   const deltaExitOpacity = isExiting ? interpolate(exitP, [0, 0.35], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) : 1;
 
-  // Idle floating
-  const floatY = idleFloat(frame, 1.5, 0.024);
+  // Idle floating (disabled when disableBreathing=true)
+  const floatY = disableBreathing ? 0 : idleFloat(frame, 1.5, 0.024);
 
   // Reusable panel renderer
   const renderPanel = (
@@ -193,7 +196,7 @@ export const DataComparisonCard: React.FC<DataComparisonCardProps> = ({
       <div style={{
         width: `${connectorW}%`,
         height: 1,
-        background: `linear-gradient(to right, transparent, ${hexToRgba(color, 0.35)}, transparent)`,
+        background: `linear-gradient(to right, transparent, ${hexToRgba(color, 0.5)}, transparent)`,
         margin: '0 auto 10px auto',
         borderRadius: 1,
       }} />
@@ -219,7 +222,7 @@ export const DataComparisonCard: React.FC<DataComparisonCardProps> = ({
       <div style={{
         width: 1,
         height: `${dividerHeight * 100}%`,
-        background: `linear-gradient(to bottom, transparent, ${hexToRgba(color, 0.30)}, ${hexToRgba(color, 0.20)}, transparent)`,
+        background: `linear-gradient(to bottom, transparent, ${hexToRgba(color, 0.45)}, ${hexToRgba(color, 0.30)}, transparent)`,
         borderRadius: 1,
       }} />
     </div>
@@ -233,7 +236,13 @@ export const DataComparisonCard: React.FC<DataComparisonCardProps> = ({
       transform: posStyle.transform, pointerEvents: 'none',
       overflow: 'hidden',
     }}>
-      <div style={{ opacity: anim.opacity, maxWidth: Math.min(posStyle.maxWidth, cardScale > 1 ? posStyle.maxWidth / cardScale : posStyle.maxWidth), overflow: 'hidden', transform: `scale(${cardScale}) translateY(${floatY}px)` }}>
+      <div style={{
+        opacity: anim.opacity,
+        maxWidth: Math.min(posStyle.maxWidth, cardScale > 1 ? posStyle.maxWidth / cardScale : posStyle.maxWidth),
+        width: '100%',
+        overflow: 'hidden',
+        transform: `scale(${cardScale}) translateY(${floatY}px)`,
+      }}>
         {/* Icon with bounce */}
         {icon && ICON_MAP[icon] && (
           <div style={{
@@ -241,7 +250,7 @@ export const DataComparisonCard: React.FC<DataComparisonCardProps> = ({
             opacity: isExiting ? interpolate(exitP, [0.3, 0.6], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) : iconSpring,
             transform: `scale(${iconFinalScale})`,
           }}>
-            {React.createElement(ICON_MAP[icon], { size: 48, color, strokeWidth: 2 })}
+            {React.createElement(ICON_MAP[icon], { size: 56, color, strokeWidth: 2.5 })}
           </div>
         )}
 
@@ -291,7 +300,7 @@ export const DataComparisonCard: React.FC<DataComparisonCardProps> = ({
               padding: '10px 20px',
               backgroundColor: 'transparent',
               borderRadius: 12,
-              border: `1px solid ${hexToRgba(color, 0.22)}`,
+              border: `1px solid ${hexToRgba(color, 0.4)}`,
               textAlign: 'center',
             }}>
               <p style={{ fontSize: 28, fontWeight: 800, color, fontFamily: F.display, margin: 0, lineHeight: 1.2 }}>{delta}</p>

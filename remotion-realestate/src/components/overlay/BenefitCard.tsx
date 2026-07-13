@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { useCurrentFrame, useVideoConfig, spring, interpolate } from 'remotion';
-import { useOverlayAnimation, positionToStyle, C, F, textGlow, hexToRgba, OverlayElementBase } from './animation';
+import { useOverlayAnimation, positionToStyle, C, F, textDepth, hexToRgba, OverlayElementBase } from './animation';
 import { GlassCard } from '../new/GlassCard';
 import { ICON_MAP } from './iconMap';
 
@@ -41,15 +41,20 @@ export const BenefitCard: React.FC<BenefitCardProps> = ({
   const posStyle = positionToStyle(position, offset);
 
   const localFrame = Math.max(0, frame - enterAt);
+  const isExiting = anim.phase === 'exit';
+  const exitP = anim.phaseProgress;
+
   const slideSpring = spring({
     frame: localFrame,
     fps,
     config: { damping: 20, stiffness: 90, mass: 1.2 },
   });
-  const slideX = interpolate(slideSpring, [0, 1], [120, 0], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
+  const slideX = isExiting
+    ? interpolate(exitP, [0, 1], [0, -120], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
+    : interpolate(slideSpring, [0, 1], [120, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+
+  // Exit: title+desc+highlight fade before card slides out
+  const exitContentOpacity = isExiting ? interpolate(exitP, [0, 0.5], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) : 1;
 
   return (
     <div
@@ -64,13 +69,14 @@ export const BenefitCard: React.FC<BenefitCardProps> = ({
         pointerEvents: 'none',
       }}
     >
-      <div style={{ opacity: anim.opacity, transform: `translateX(${slideX}px)` }}>
+      <div style={{ opacity: anim.opacity * exitContentOpacity, transform: `translateX(${slideX}px)` }}>
         <GlassCard
           color={color}
           showLeftBar
           glowIntensity={0.65}
           transparentBg
           showOuterGlow={false}
+          disableEntryAnimation
           padding="44px 48px 40px 56px"
           maxWidth={880}
         >
@@ -88,7 +94,7 @@ export const BenefitCard: React.FC<BenefitCardProps> = ({
               letterSpacing: '-0.5px',
               lineHeight: 1.25,
               marginBottom: 18,
-              textShadow: textGlow(color, 0.5),
+              textShadow: textDepth(0.5),
             }}
           >
             {title}
@@ -96,9 +102,9 @@ export const BenefitCard: React.FC<BenefitCardProps> = ({
           {enTitle && (
             <p
               style={{
-                fontSize: 22,
+                fontSize: 24,
                 fontWeight: 400,
-                color: 'rgba(255,255,255,0.6)',
+                color: 'rgba(255,255,255,0.5)',
                 fontFamily: F.text,
                 letterSpacing: '0.1em',
                 lineHeight: 1.2,
@@ -138,9 +144,9 @@ export const BenefitCard: React.FC<BenefitCardProps> = ({
           {enDesc && (
             <p
               style={{
-                fontSize: 22,
+                fontSize: 24,
                 fontWeight: 400,
-                color: 'rgba(255,255,255,0.6)',
+                color: 'rgba(255,255,255,0.5)',
                 fontFamily: F.text,
                 letterSpacing: '0.1em',
                 lineHeight: 1.2,

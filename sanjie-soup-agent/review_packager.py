@@ -8,6 +8,7 @@ def build_review_package(
     script: dict,
     platform_posts: dict,
     video_result: dict,
+    compliance_result=None,
 ) -> str:
     """构建抖音视频审核包Markdown文本。"""
     today = datetime.now().strftime("%Y-%m-%d")
@@ -36,7 +37,7 @@ def build_review_package(
         title,
         "",
         "## 脚本结构",
-        f"- **开场白**：饮汤啦！我系东凤三姐～",
+        f"- **开场白**：喝好汤，来东凤找三姐～",
         f"- **钩子（1.5s）**：{hook}",
         f"- **互动钩子**：{interaction}",
         f"- **CTA**：{cta}",
@@ -70,12 +71,34 @@ def build_review_package(
         "",
         "## 发布后操作",
         "- [ ] 发布后1小时内三姐本人在评论区互动回复",
-        "- [ ] 置顶一条引导评论（如：你今日饮咗汤未？）",
+        "- [ ] 置顶一条引导评论（如：你最爱喝什么汤？）",
         "- [ ] 发布后2小时查看完播率和互动数据",
         "",
         "---",
         "",
+        "## 🚨 抖音合规检查",
+    ])
+
+    if compliance_result:
+        if compliance_result.passed:
+            lines.append("✅ 通过 — 未发现严重违禁词")
+        else:
+            lines.append("🚫 不通过 — 以下问题必须修改：")
+            for item in compliance_result.severe:
+                lines.append(f"  - {item}")
+        if compliance_result.warnings:
+            lines.append("\n⚠️ 边缘提醒（建议复审）：")
+            for item in compliance_result.warnings:
+                lines.append(f"  - {item}")
+    else:
+        lines.append("（未执行合规检查）")
+
+    lines.extend([
+        "",
+        "---",
+        "",
         "> 🤖 三姐老火靓汤AI智能体自动生成",
+        "> 标语：真材实料老火汤，健康实惠每一天",
         "> 审核通过后请手动发布至抖音",
     ])
 

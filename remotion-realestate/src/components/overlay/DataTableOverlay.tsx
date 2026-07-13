@@ -128,10 +128,10 @@ export const DataTableOverlay: React.FC<DataTableOverlayProps> = ({
               return (
                 <div key={pri} style={{ opacity: rowOpacity, transform: `translateX(${rowX}px)` }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
-                    <span style={{ fontSize: 24, fontWeight: 600, color: C.text, fontFamily: F.text }}>
+                    <span style={{ fontSize: 28, fontWeight: 600, color: C.text, fontFamily: F.text, textShadow: textDepth(0.15) }}>
                       {pr.label}
                     </span>
-                    <span style={{ fontSize: 24, fontWeight: 800, color: pColor, fontFamily: F.mono }}>
+                    <span style={{ fontSize: 28, fontWeight: 800, color: pColor, fontFamily: F.mono, textShadow: `0 0 16px ${hexToRgba(pColor, 0.4)}` }}>
                       {pr.value}/{maxV}
                     </span>
                   </div>
@@ -153,15 +153,15 @@ export const DataTableOverlay: React.FC<DataTableOverlayProps> = ({
             {columns && (
               <div style={{
                 display: 'flex', gap: 8, padding: '10px 16px',
-                borderBottom: `2px solid ${hexToRgba(color, 0.3)}`,
-                marginBottom: 8, opacity: headerOpacity,
+                borderBottom: `2px solid ${hexToRgba(color, 0.5)}`,
+                marginBottom: 12, opacity: headerOpacity,
               }}>
                 {columns.map((col) => (
                   <div key={col.key} style={{
                     flex: col.width ?? 1,
                     textAlign: col.align ?? 'left',
                   }}>
-                    <span style={{ fontSize: 22, fontWeight: 700, color, fontFamily: F.text }}>
+                    <span style={{ fontSize: 28, fontWeight: 700, color, fontFamily: F.text, textShadow: `0 0 16px ${hexToRgba(color, 0.4)}` }}>
                       {col.title}
                     </span>
                   </div>
@@ -186,8 +186,8 @@ export const DataTableOverlay: React.FC<DataTableOverlayProps> = ({
               return (
                 <div key={ri} style={{
                   display: 'flex', gap: 8, padding: '12px 16px',
-                  borderBottom: '1px solid rgba(255,255,255,0.04)',
-                  backgroundColor: isHighlighted ? hexToRgba(color, 0.08) : 'transparent',
+                  borderBottom: '1px solid rgba(255,255,255,0.08)',
+                  backgroundColor: isHighlighted ? hexToRgba(color, 0.12) : 'transparent',
                   borderRadius: isHighlighted ? RADIUS.panel : 0,
                   opacity: rowOpacity,
                   transform: `translateX(${rowX}px)`,
@@ -201,10 +201,10 @@ export const DataTableOverlay: React.FC<DataTableOverlayProps> = ({
                         textAlign: col.align ?? 'left',
                       }}>
                         <span style={{
-                          fontSize: 22, fontWeight: isHighlightCol ? 700 : 400,
-                          color: isHighlightCol ? color : (isHighlighted ? C.text : C.textSecondary),
+                          fontSize: 26, fontWeight: isHighlightCol ? 800 : 500,
+                          color: isHighlightCol ? color : (isHighlighted ? C.text : C.text),
                           fontFamily: col.key === 'value' || col.key === 'price' ? F.mono : F.text,
-                          textShadow: isHighlightCol ? `0 0 12px ${hexToRgba(color, 0.3)}` : textDepth(0.1),
+                          textShadow: isHighlightCol ? `0 0 18px ${hexToRgba(color, 0.5)}` : textDepth(0.15),
                         }}>
                           {cellVal}
                         </span>

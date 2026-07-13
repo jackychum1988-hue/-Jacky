@@ -21,6 +21,8 @@ interface WarningCardProps extends OverlayElementBase {
   bullets?: string[];
   /** Keywords to highlight in title with kinetic pop animation */
   highlights?: HighlightWord[];
+  /** Disable Apple-style idle breathing/float when true */
+  disableBreathing?: boolean;
 }
 
 export const WarningCard: React.FC<WarningCardProps> = ({
@@ -34,6 +36,7 @@ export const WarningCard: React.FC<WarningCardProps> = ({
   color = '#FF4136',
   bullets,
   highlights,
+  disableBreathing = false,
   enterAt,
   exitAt,
   animation,
@@ -98,9 +101,9 @@ export const WarningCard: React.FC<WarningCardProps> = ({
   // Exit: card content fades before slide completes
   const exitContentOpacity = isExiting ? interpolate(exitP, [0, 0.7], [1, 0.3], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) : 1;
 
-  // Idle breathing
-  const floatY = idleFloat(frame, 1.3, 0.024);
-  const cardBreath = breathingScale(frame);
+  // Idle breathing (disabled when disableBreathing=true)
+  const floatY = disableBreathing ? 0 : idleFloat(frame, 1.3, 0.024);
+  const cardBreath = disableBreathing ? 1 : breathingScale(frame);
 
   return (
     <div
@@ -154,7 +157,7 @@ export const WarningCard: React.FC<WarningCardProps> = ({
                 opacity: iconSpring,
                 transform: `rotate(${iconRotate}deg) scale(${iconScale > 1 ? 1 : iconScale})`,
               }}>
-                {React.createElement(ICON_MAP[icon], { size: 48, color, strokeWidth: 2 })}
+                {React.createElement(ICON_MAP[icon], { size: 56, color, strokeWidth: 2.5 })}
               </div>
             )}
           </div>
@@ -170,7 +173,7 @@ export const WarningCard: React.FC<WarningCardProps> = ({
               lineHeight: 1.2,
               letterSpacing: `${titleLetterSpacing.toFixed(3)}em`,
               opacity: titleOpacity,
-              transform: `scale(${breathingScale(frame)})`,
+              transform: `scale(${disableBreathing ? 1 : breathingScale(frame)})`,
             }}
           >
             {highlights && highlights.length > 0 ? (

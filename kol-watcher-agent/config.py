@@ -54,6 +54,8 @@ YOUTUBE_KOLS = [
     {"name": "Nana珠海中山置業頻道", "query": "Nana珠海中山置業頻道"},
     {"name": "灣區順易置業", "query": "灣區順易置業 中山"},
     {"name": "灣區博士沈永年", "query": "灣區博士沈永年 大灣區"},
+    {"name": "A House", "query": "A House 中山 珠海 买房"},
+    {"name": "沙溪佬", "query": "沙溪佬 中山 买房"},
 ]
 
 # === YouTube discovery queries (find NEW Zhongshan property creators) ===

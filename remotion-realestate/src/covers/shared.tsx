@@ -18,7 +18,7 @@ export const SERIES_LABELS: Record<SeriesType, string> = {
 
 export const SERIES_COLORS: Record<SeriesType, string> = {
   sundip: '#FF6B35',
-  data: '#00D4FF',
+  data: '#FF6B35',
   opinion: '#39FF14',
   warning: '#FF3366',
 };
@@ -38,40 +38,22 @@ function getSeriesTextColor(bgColor: string): string {
 
 export const SeriesBadge: React.FC<{
   series: SeriesType;
-  episodeNumber: number;
-}> = ({ series, episodeNumber }) => {
+  episodeNumber?: number;
+}> = ({ series }) => {
   const color = SERIES_COLORS[series];
   return (
     <div
       style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: `${SIZES.spacing.md}px ${SIZES.spacing.lg}px 0 ${SIZES.spacing.lg}px`,
+        backgroundColor: color,
+        color: getSeriesTextColor(color),
+        padding: `${SIZES.spacing.xs}px ${SIZES.spacing.sm}px`,
+        borderRadius: SIZES.radius.xl,
+        fontSize: SIZES.body,
+        fontFamily: FONTS.text,
+        fontWeight: 900,
       }}
     >
-      <div
-        style={{
-          backgroundColor: color,
-          color: getSeriesTextColor(color),
-          padding: `${SIZES.spacing.xs}px ${SIZES.spacing.sm}px`,
-          borderRadius: SIZES.radius.xl,
-          fontSize: SIZES.body,
-          fontFamily: FONTS.text,
-          fontWeight: 900,
-        }}
-      >
-        {SERIES_LABELS[series]}
-      </div>
-      <div
-        style={{
-          color,
-          fontSize: SIZES.caption,
-          fontFamily: FONTS.text,
-        }}
-      >
-        EP.{episodeNumber}
-      </div>
+      {SERIES_LABELS[series]}
     </div>
   );
 };

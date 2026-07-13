@@ -30,9 +30,9 @@ kol-watcher-agent/
 ### 模块职责
 
 **`shared/script_writer.py`**：
-- `extract_topic_suggestions(analysis_text: str) -> list[str]` — 从 AI 分析中提取「话题建议」段落
-- `generate_scripts(suggestions: list[str], persona: str, context: dict) -> list[dict]` — 调用 DeepSeek 生成口播脚本
-- `format_scripts_for_push(scripts: list[dict]) -> str` — 格式化为 PushPlus Markdown
+- `_extract_topic_suggestions(analysis_text: str) -> list[str]` — 从 AI 分析中提取「话题建议」段落（内部函数）
+- `generate_scripts(suggestions: list[str], ...) -> list[dict]` — 调用 DeepSeek 生成口播脚本
+- `format_scripts_for_push(scripts: list[dict], date_str: str = "") -> str` — 格式化为 PushPlus Markdown
 - `generate_and_push(analysis_text: str, persona: str, context: dict) -> bool` — 一站式：提取→生成→推送
 
 ## 脚本格式
@@ -84,15 +84,15 @@ kol-watcher-agent/
 ## 推送格式
 
 ```
-🎙 Jacky今日口播 | MM/DD
+🎙 **Jacky今日口播** | MM/DD
 
-【选题1】<标题>
+**【选题1】**<标题>
 🎣 钩子：<hook>
 📖 正文：<body>
 🎯 结尾：<cta>
 
 ━━━━━━━━━━━━━━━━━━
-📝 完整读稿：
+📝 **完整读稿：**
 <full_script>
 
 ---

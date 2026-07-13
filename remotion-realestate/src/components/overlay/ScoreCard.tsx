@@ -143,25 +143,26 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
                 {/* Name + icon row */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                   {item.icon && ICON_MAP[item.icon] && (
-                    <div style={{ opacity: 0.8 }}>
-                      {React.createElement(ICON_MAP[item.icon], { size: 24, color: sColor, strokeWidth: 2 })}
+                    <div style={{ opacity: 1 }}>
+                      {React.createElement(ICON_MAP[item.icon], { size: 28, color: sColor, strokeWidth: 2 })}
                     </div>
                   )}
                   <span style={{
-                    fontSize: 26,
+                    fontSize: 28,
                     fontWeight: 600,
                     color: C.text,
                     fontFamily: F.text,
                     lineHeight: 1.2,
                     flex: 1,
+                    textShadow: textDepth(0.15),
                   }}>
                     {item.name}
                   </span>
                   {item.enName && (
                     <span style={{
-                      fontSize: enFontSize(26),
+                      fontSize: 20,
                       fontWeight: 400,
-                      color: 'rgba(255,255,255,0.4)',
+                      color: 'rgba(255,255,255,0.5)',
                       fontFamily: F.text,
                       letterSpacing: '0.1em',
                     }}>
@@ -184,17 +185,17 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
 
                 {/* Score bar */}
                 <div style={{
-                  height: 8,
-                  borderRadius: 4,
-                  backgroundColor: 'rgba(255,255,255,0.06)',
+                  height: 10,
+                  borderRadius: 5,
+                  backgroundColor: 'rgba(255,255,255,0.12)',
                   overflow: 'hidden',
                 }}>
                   <div style={{
                     width: `${barWidth}%`,
                     height: '100%',
-                    borderRadius: 4,
-                    background: `linear-gradient(to right, ${hexToRgba(sColor, 0.4)}, ${sColor})`,
-                    boxShadow: `0 0 12px ${hexToRgba(sColor, 0.3)}`,
+                    borderRadius: 5,
+                    background: `linear-gradient(to right, ${hexToRgba(sColor, 0.5)}, ${sColor})`,
+                    boxShadow: `0 0 16px ${hexToRgba(sColor, 0.5)}`,
                   }} />
                 </div>
               </div>

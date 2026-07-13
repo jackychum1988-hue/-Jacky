@@ -33,7 +33,7 @@ type Props = z.infer<typeof PipOverlaySchema>;
 
 export const PipOverlay: React.FC<Props> = ({ elements }) => {
   return (
-    <AbsoluteFill style={{ backgroundColor: 'transparent' }}>
+    <AbsoluteFill style={{ backgroundColor: 'transparent', overflow: 'hidden' }}>
       {elements.map((el, i) => {
         const Component = overlayComponentMap[el.type];
         if (!Component) {

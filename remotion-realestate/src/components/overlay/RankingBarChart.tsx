@@ -12,6 +12,7 @@ interface RankingItem {
   name: string;
   value: number;
   changePct?: number;
+  color?: string;
 }
 
 interface RankingBarChartProps extends OverlayElementBase {
@@ -102,12 +103,12 @@ export const RankingBarChart: React.FC<RankingBarChartProps> = ({
         >
           <defs>
             <linearGradient id={`bar-gold-${uid}`} x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor={color} stopOpacity={0.5} />
+              <stop offset="0%" stopColor={color} stopOpacity={0.55} />
               <stop offset="100%" stopColor={color} stopOpacity={1} />
             </linearGradient>
-            <linearGradient id={`bar-bronze-${uid}`} x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#6B7B8D" stopOpacity={0.4} />
-              <stop offset="100%" stopColor="#8B9DAD" stopOpacity={0.75} />
+            <linearGradient id={`bar-gray-${uid}`} x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#6B7B8D" stopOpacity={0.35} />
+              <stop offset="100%" stopColor="#8B9DAD" stopOpacity={0.65} />
             </linearGradient>
           </defs>
 
@@ -144,13 +145,14 @@ export const RankingBarChart: React.FC<RankingBarChartProps> = ({
             );
 
             const y = CHART_PADDING + i * (BAR_HEIGHT + BAR_GAP);
-            const isTop3 = i < 3;
-            const badgeFill = isTop3
-              ? `url(#bar-gold-${uid})`
-              : 'rgba(90,84,70,0.60)';
-            const barFill = isTop3
-              ? `url(#bar-gold-${uid})`
-              : `url(#bar-bronze-${uid})`;
+            const itemColor = item.color ?? (i < 3 ? color : '#6B7B8D');
+            const hasCustomColor = item.color !== undefined;
+            // Badge: per-item solid color (color identity)
+            const badgeFill = itemColor;
+            // Bar: unified gold gradient for visual cohesion, gray for last item
+            const barFill = (hasCustomColor && i === items.length - 1)
+              ? `url(#bar-gray-${uid})`
+              : `url(#bar-gold-${uid})`;
 
             return (
               <g key={item.name} opacity={rowOpacity}>
@@ -178,7 +180,7 @@ export const RankingBarChart: React.FC<RankingBarChartProps> = ({
                   y={y + BAR_HEIGHT / 2 + 1}
                   textAnchor="middle"
                   dominantBaseline="central"
-                  fill={isTop3 ? '#1A1815' : '#F5F0E8'}
+                  fill={'#1A1815'}
                   fontSize={20}
                   fontWeight={800}
                   fontFamily={F.mono}
@@ -215,7 +217,7 @@ export const RankingBarChart: React.FC<RankingBarChartProps> = ({
                   x={BADGE_SIZE + 16 + NAME_WIDTH + barWidth + 12}
                   y={y + BAR_HEIGHT / 2 + 1}
                   dominantBaseline="central"
-                  fill={isTop3 ? color : '#C8BFA8'}
+                  fill={hasCustomColor ? itemColor! : (i < 3 ? color : '#C8BFA8')}
                   fontSize={24}
                   fontWeight={800}
                   fontFamily={F.mono}
@@ -239,13 +241,13 @@ export const RankingBarChart: React.FC<RankingBarChartProps> = ({
                             ? `${svgW - 90},${y + BAR_HEIGHT / 2 - 8} ${svgW - 90},${y + BAR_HEIGHT / 2 + 8} ${svgW - 78},${y + BAR_HEIGHT / 2}`
                             : `${svgW - 90},${y + BAR_HEIGHT / 2 + 8} ${svgW - 90},${y + BAR_HEIGHT / 2 - 8} ${svgW - 78},${y + BAR_HEIGHT / 2}`
                         }
-                        fill={item.changePct > 0 ? color : '#6B7B8D'}
+                        fill={item.changePct > 0 ? itemColor : '#6B7B8D'}
                       />
                       <text
                         x={svgW - 72}
                         y={y + BAR_HEIGHT / 2 + 1}
                         dominantBaseline="central"
-                        fill={item.changePct > 0 ? color : '#6B7B8D'}
+                        fill={item.changePct > 0 ? itemColor : '#6B7B8D'}
                         fontSize={19}
                         fontWeight={700}
                         fontFamily={F.mono}

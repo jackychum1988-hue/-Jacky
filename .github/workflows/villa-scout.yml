@@ -1,9 +1,9 @@
 name: Villa Scout Brief
 
 on:
-  schedule:
-    # UTC 1:00 Mon = 北京时间周一 9:00, UTC 1:00 Thu = 北京时间周四 9:00
-    - cron: "0 1 * * 1,4"
+  # schedule:  # DISABLED 2026-07-13 — 中山壹号墅选题简报已停用
+  #   # UTC 1:00 Mon = 北京时间周一 9:00, UTC 1:00 Thu = 北京时间周四 9:00
+  #   - cron: "0 1 * * 1,4"
   workflow_dispatch:
 
 jobs:

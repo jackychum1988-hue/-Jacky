@@ -23,12 +23,15 @@ import { DataSourceCard } from './scenes/DataSourceCard';
 import { CityPriceDataSource } from './scenes/CityPriceDataSource';
 import { SidaizhaiDataSource } from './scenes/SidaizhaiDataSource';
 import { SidaizhaiProjectsShowcase } from './scenes/SidaizhaiProjectsShowcase';
+import { SeazenMotionDemo } from './scenes/SeazenMotionDemo';
 import { COLORS } from './design-system/tokens';
 import propertyCostRanking from '../config/property-cost-ranking.json';
 import dualContractTimeline from '../config/dual-contract-timeline.json';
 import parkSeasonsInfo from '../config/park-seasons-info.json';
 import parkSeasonsResettlement from '../config/park-seasons-resettlement.json';
 import zhongshanComparison from '../config/zhongshan-comparison.json';
+import renovationTrapsTimeline from '../config/renovation-traps-v1.json';
+import seazenFundSafetyTimeline from '../config/seazen-fund-safety-v1.json';
 import { SundipCover, DataCover, OpinionCover, WarningCover } from './covers';
 
 // ====== 主 Root 组件 ======
@@ -255,6 +258,50 @@ export const RemotionRoot: React.FC = () => {
         id="SidaizhaiProjectsShowcase"
         component={SidaizhaiProjectsShowcase}
         durationInFrames={210}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+
+      {/* 装修避坑 — 三招搵笨套路拆解 / 75秒 / 9卡 */}
+      <Composition
+        id="RenovationTrapsOverlay"
+        component={PipOverlay}
+        durationInFrames={2250}
+        fps={30}
+        width={1080}
+        height={1920}
+        schema={PipOverlaySchema}
+        calculateMetadata={({ props }) => ({
+          durationInFrames: props.durationInFrames ?? 6000,
+          width: props.width ?? 1080,
+          height: props.height ?? 1920,
+        })}
+        defaultProps={renovationTrapsTimeline}
+      />
+
+      {/* 新城控股爆雷 — 预售资金监管账户 / 126秒 / 11卡 */}
+      <Composition
+        id="SeazenFundSafetyOverlay"
+        component={PipOverlay}
+        durationInFrames={3780}
+        fps={30}
+        width={1080}
+        height={1920}
+        schema={PipOverlaySchema}
+        calculateMetadata={({ props }) => ({
+          durationInFrames: props.durationInFrames ?? 6000,
+          width: props.width ?? 1080,
+          height: props.height ?? 1920,
+        })}
+        defaultProps={seazenFundSafetyTimeline}
+      />
+
+      {/* 新城控股爆雷动效展示 */}
+      <Composition
+        id="SeazenMotionDemo"
+        component={SeazenMotionDemo}
+        durationInFrames={300}
         fps={30}
         width={1080}
         height={1920}

@@ -54,3 +54,6 @@ export { PropertyCard } from './PropertyCard';
 
 // 图标库 (65+ SVG)
 export * from './Icons';
+// 暖金浮雕图标渲染器
+export { GoldIcon, GoldIconLabel } from './GoldIcon';
+export type { PlateShape } from './GoldIcon';

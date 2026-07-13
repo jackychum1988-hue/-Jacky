@@ -15,10 +15,10 @@ interface ClimaxCardProps extends OverlayElementBase {
   enText?: string;
   color?: string;
   author?: string;
-  /** @deprecated Substring within text to emphasize — use highlights array instead */
-  highlight?: string;
-  /** Keywords to highlight with kinetic pop animation (takes precedence over highlight) */
+  /** Keywords to highlight with kinetic pop animation */
   highlights?: HighlightWord[];
+  /** Disable Apple-style idle breathing/float when true */
+  disableBreathing?: boolean;
 }
 
 export const ClimaxCard: React.FC<ClimaxCardProps> = ({
@@ -28,8 +28,8 @@ export const ClimaxCard: React.FC<ClimaxCardProps> = ({
   enText,
   color = '#C0392B',
   author,
-  highlight,
   highlights,
+  disableBreathing = false,
   enterAt,
   exitAt,
   animation,
@@ -98,7 +98,7 @@ export const ClimaxCard: React.FC<ClimaxCardProps> = ({
   const colorPulse = 1 + Math.sin(frame * 0.05) * 0.08;
 
   // Idle floating
-  const floatY = idleFloat(frame, 1.6, 0.023);
+  const floatY = disableBreathing ? 0 : idleFloat(frame, 1.6, 0.023);
 
   return (
     <div
@@ -119,7 +119,7 @@ export const ClimaxCard: React.FC<ClimaxCardProps> = ({
         display: 'flex',
         flexDirection: 'column',
         gap: 16,
-        transform: `scale(${breathingScale(frame) * boxScale}) translateY(${floatY}px)`,
+        transform: `scale(${(disableBreathing ? 1 : breathingScale(frame)) * boxScale}) translateY(${floatY}px)`,
         alignItems: 'center',
         maxWidth: posStyle.maxWidth,
       }}>
@@ -142,7 +142,7 @@ export const ClimaxCard: React.FC<ClimaxCardProps> = ({
             opacity: isExiting ? interpolate(exitP, [0.2, 0.5], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) : iconSpring,
             transform: `scale(${iconScaleRaw})`,
           }}>
-            {React.createElement(ICON_MAP[icon], { size: 48, color, strokeWidth: 2 })}
+            {React.createElement(ICON_MAP[icon], { size: 56, color, strokeWidth: 2.5 })}
           </div>
         )}
 
@@ -165,7 +165,7 @@ export const ClimaxCard: React.FC<ClimaxCardProps> = ({
                         const emphasis = EMPHASIS_CONFIGS[seg.highlight.emphasis ?? 'pop'];
                         const hScale = seg.highlight.scale ?? emphasis.scale;
                         const hDelay = seg.highlight.delay ?? 16;
-                        const hColor = seg.highlight.color || '#FFFFFF';
+                        const hColor = seg.highlight.color || color;
 
                         const popSpring = spring({
                           frame: Math.max(0, localFrame - 10 - hDelay),
@@ -197,25 +197,6 @@ export const ClimaxCard: React.FC<ClimaxCardProps> = ({
                       }
                       return <span key={si} style={{ color: C.textSecondary }}>{seg.text}</span>;
                     });
-                  })() : highlight && line.includes(highlight) ? (() => {
-                    const idx = line.indexOf(highlight);
-                    const before = line.slice(0, idx);
-                    const after = line.slice(idx + highlight.length);
-                    const pulseScale = 1 + Math.sin(frame * 0.12) * 0.06;
-                    return (
-                      <>
-                        {before}
-                        <span style={{
-                          color: '#FFFFFF',
-                          textShadow: `0 0 16px ${hexToRgba(color, 0.55)}, 0 0 32px ${hexToRgba(color, 0.25)}`,
-                          transform: `scale(${pulseScale})`,
-                          display: 'inline-block',
-                        }}>
-                          {highlight}
-                        </span>
-                        {after}
-                      </>
-                    );
                   })() : line}
                 </React.Fragment>
               ));

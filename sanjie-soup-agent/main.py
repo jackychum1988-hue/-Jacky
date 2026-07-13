@@ -5,6 +5,7 @@ from topic_selector import select_topic, save_to_history, load_history
 from script_writer import build_script, build_platform_posts
 from video_generator import generate_video
 from review_packager import build_review_package, push_to_wechat
+from compliance_check import check_script, print_report
 
 
 def main():
@@ -42,6 +43,15 @@ def main():
     douyin_post = platform_posts.get("抖音", {})
     print(f"  抖音发布文案已生成")
 
+    # ③.⑤ 抖音合规检查（阻断式）
+    print("\n[合规检查] 扫描违禁词...")
+    compliance_result = check_script(script)
+    print(print_report(compliance_result))
+    if not compliance_result.passed:
+        print("\n⚠️ 合规检查不通过！请修改后重新生成。")
+        print("   以上标有 🚫 的项必须修改。")
+        # 不阻断流程，但标记结果供审核包使用
+
     # ④ 视频生成
     print("\n[4/5] 生成视频制作包...")
     try:
@@ -55,7 +65,7 @@ def main():
 
     # ⑤ 审核推送
     print("\n[5/5] 打包推送到微信...")
-    review_content = build_review_package(topic_info, script, platform_posts, video_result)
+    review_content = build_review_package(topic_info, script, platform_posts, video_result, compliance_result)
     push_result = push_to_wechat(review_content)
 
     # 记录到历史

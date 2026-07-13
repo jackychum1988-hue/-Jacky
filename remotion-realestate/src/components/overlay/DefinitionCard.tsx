@@ -111,7 +111,7 @@ export const DefinitionCard: React.FC<DefinitionCardProps> = ({
             marginBottom: 16,
             opacity: catOpacity * catExit,
           }}>
-            <span style={{ fontSize: 20, fontWeight: 600, color, fontFamily: F.text, letterSpacing: '0.06em' }}>
+            <span style={{ fontSize: 22, fontWeight: 600, color, fontFamily: F.text, letterSpacing: '0.06em' }}>
               {category}
             </span>
           </div>

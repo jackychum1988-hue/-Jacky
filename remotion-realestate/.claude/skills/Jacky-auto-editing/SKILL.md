@@ -5,13 +5,90 @@ metadata:
   tags: remotion, overlay, alpha-channel, prores-4444, json-timeline, pip, zhuzige, vertical-video, jianying
 ---
 
-# Jacky 自动剪辑 — 口播叠加视频自动生成（2026-06-22 sidaizhai-v1 + Apple v11 + 半透明战绩卡 v12 生产标准）
+# Jacky 自动剪辑 — 口播叠加视频自动生成（2026-07-01 逐句拆解 v13 + sidaizhai-v1 + Apple v11 + 半透明战绩卡 v12 生产标准）
 
 ## Overview
 
 JSON 时间线驱动的 Remotion 透明叠加视频生成系统。写一个 JSON 配置 → 一条命令渲染 ProRes 4444 alpha 视频 → 拖入剪映画中画（正常模式，Alpha 自动抠底）。
 
 **核心理念**：文案决定时间轴 → 时间轴决定 JSON → JSON 决定渲染 → 输出直接可用。
+
+---
+
+## 文案拆解→卡片生成 全流程 ★ v13（2026-07-01 強制）
+
+### 第一步：逐句分段
+
+拿到口播文案後，**必須**將全文拆成獨立的敘事節拍，每個節拍對應一張卡片。不可跳過、不可合併。
+
+**拆解標準**：
+- 每個完整句子 = 一個潛在節拍
+- 每個情緒轉折 = 一個節拍
+- 每個數據/事實 = 一個節拍
+- 每個警告/反轉 = 一個節拍
+- 過渡句 = 一個節拍（用輕量卡片）
+
+**目標卡數**：14-17 卡（教育型/避坑型詳細版）
+
+### 第二步：為每個節拍選擇最佳卡片類型
+
+按內容本質選卡，優先使用多樣化卡片類型：
+
+| 內容本質 | 首選卡片 | 為何 |
+|---------|---------|------|
+| 開場鉤子/反直覺衝擊 | **HookCard** | 88px 大字+stagger+stamp 重音 |
+| 「你以為 vs 真相」反轉 | **RevealMythCard** | 紅線劃過謊言→真相彈入 |
+| 大數字揭示/數據衝擊 | **RevealCard** | 120px 發光數字 |
+| 一問一答/科普解釋 | **QACard** | Q 滑入→A 滑入+邊框 |
+| 段落分隔/內容預告 | **TeaserCard** | 40px 標題+bullets 預覽 |
+| 警告/陷阱/須知（含 bullets） | **WarningCard** | GlassCard+NumberBadge+bullets |
+| 兩方數值 PK | **DataComparisonCard** | 左右數字動畫+delta |
+| 三招/三步/多項並列 | **WarningCard** ×N | 用不同顏色+動效區分 |
+| 左右分鏡雙軌對比 | **SplitSceneCard** | 藍vs紅 5 項逐條對比 |
+| 情緒消化/低壓停頓 | **FearPulseCard** | 低透明度+慢呼吸 pulse |
+| 恐懼→安撫轉折 | **ReliefCard** | 兩段式：恐懼淡入→安撫 slam-in |
+| 金句收尾/理念總結 | **ClimaxCard** | PunchLineBox 68px+stamp |
+| 好處/情緒收尾 | **BenefitCard** | 暖色+icon 緩和 |
+| 清單/步驟/動作項 | **ChecklistCard** | checkbox 逐行勾選 |
+| 行動號召 | **CTACard** | icon→headline→contact→tags |
+
+### 第三步：分配顏色（均分原則）
+
+17 卡顏色分配目標：**每色 2-3 次**，不得有顏色只用一次或超過三次。
+
+```
+藍×2  紅×3  青×2  綠×2  紫×3  金×3  灰(中性)×1  SplitScene(雙色)
+```
+
+**相鄰強制**：相鄰單色卡片顏色不重複。SplitSceneCard 用 leftColor/rightColor（不入單色輪）。FearPulseCard 中性灰不入色輪。
+
+### 第四步：分配動效（交替原則）
+
+8 種動效交替使用，**相鄰卡片動效不重複**：
+
+```
+spring → slideUp → fade → slideRight → spring → slideLeft → slideUp → spring → fade → slideRight → slideUp → slideRight → slideLeft → slideUp → spring → slideRight → slideUp
+```
+
+### 第五步：設定高亮詞（一卡一詞）
+
+- 每卡 **≤1 高亮詞**
+- emphasis 全部用 **stamp**（一卡一詞場景）
+- 高亮色 = 卡片 accent 色（不引入新色）
+- 延遲：14f（Hook/Warning/QA）/ 16f（Climax）
+
+### 第六步：自我驗證（生成 JSON 後必須執行）
+
+- [ ] 相鄰類型不重複
+- [ ] 相鄰動效不重複
+- [ ] 相鄰顏色不重複
+- [ ] 每色 2-3 次（均分）
+- [ ] 每卡 ≤1 高亮詞
+- [ ] 卡間 gap 統一 30f
+- [ ] CTACard ≥ 75f（2.5s）
+- [ ] 總幀數 ≈ 口播時長 × 30fps
+
+---
 
 ## 渲染管线
 
@@ -396,12 +473,11 @@ GlassCard 参数：`transparentBg`, `showOuterGlow=false`, `disableEntryAnimatio
 | text | string | — | 金句 68px/700（支持 `\n` 换行） |
 | enText | string? | — | 英文 24px |
 | author | string? | — | 署名 22px/400（逆序先退） |
-| highlight | string? | — | ⚠️ deprecated — 单高亮词（用 highlights 替代） |
-| highlights | HighlightWord[]? | — | ★ 多关键词 kinetic pop 动画（scale:1.5, 弹簧更强） |
+| highlights | HighlightWord[]? | — | ★ 关键词 kinetic pop 动画（emphasis-driven: pop/pulse/stamp, 高亮色=卡片accent色） |
 | icon | string? | — | ICON_MAP key, 48px accent色 |
 | color | string? | V[0] 红 | 卡片色 |
 
-**动效时序**：00f label fade → 04f icon bounce → 10f PunchLineBox + letter-spacing → 30f author slide-up
+**动效时序**：00f label fade → 04f icon bounce → 10f PunchLineBox + letter-spacing → 10f+ keyword pop（delay 16f）→ 30f author slide-up
 
 ### CTACard（行动号召 — GlassCard + 联系卡）
 
@@ -822,7 +898,7 @@ spring → slideUp → slideUp → slideLeft → slideRight → slideLeft → sl
 | 11 | ClimaxCard | 3330-3540 | 7s | 🔴 红 V[0] | spring | 1词 stamp |
 | 12 | CTACard | 3570-3645 | 2.5s | 🟠 金 V[1] | slideUp | — |
 
-**总帧数**：3660 / 30fps / 122s
+**总帧数**：3840 / 30fps / 128s（含 OverlayDataSourceCard 数据来源尾卡）
 
 ### 色彩流动（12 卡）
 
@@ -926,8 +1002,9 @@ exitEnd = exitAt + 15f (ENTER_DURATION)
 00f  label fade-in
 04f  icon bounce
 10f  PunchLineBox enter + letter-spacing 0.08em→-0.02em
+10f+ keyword pop (delay 16f, emphasis-driven spring + weight + glow)
 30f  author slide-up (translateY 12→0) + fade-in
-退出: author 先退 → EN text → PunchLineBox → icon → label
+退出: keyword descale → author → EN text → PunchLineBox → icon → label
 ```
 
 ### CTACard

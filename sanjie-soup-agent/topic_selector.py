@@ -1,17 +1,15 @@
 import json
 import os
 from datetime import datetime
-from openai import OpenAI
 from config import (
-    DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL,
+    DEEPSEEK_API_KEY, deepseek_chat,
     SOUP_MENU, SNACK_MENU, DRINK_MENU,
     TOPIC_TYPES, SHOP_NAME, SHOP_LOCATION, SHOP_PERSONA,
-    HISTORY_FILE,
+    HISTORY_FILE, SOUP_HOOK_MAP,
 )
 
 
 def build_menu_text() -> str:
-    """构建菜单文本供AI理解。"""
     lines = ["## 汤品菜单"]
     for s in SOUP_MENU:
         lines.append(f"- {s['name']}（{s['effect']}）{s['price']}元")
@@ -25,7 +23,6 @@ def build_menu_text() -> str:
 
 
 def load_history() -> list[dict]:
-    """加载已发布主题历史。"""
     if os.path.exists(HISTORY_FILE):
         try:
             with open(HISTORY_FILE, "r", encoding="utf-8") as f:
@@ -36,25 +33,21 @@ def load_history() -> list[dict]:
 
 
 def save_to_history(topic: str, script_title: str):
-    """保存今日主题到历史记录，用于防重复。"""
     history = load_history()
     history.append({
         "date": datetime.now().strftime("%Y-%m-%d"),
         "topic": topic,
         "title": script_title,
     })
-    # 仅保留最近30条
     history = history[-30:]
     with open(HISTORY_FILE, "w", encoding="utf-8") as f:
         json.dump(history, f, ensure_ascii=False, indent=2)
 
 
 def select_topic(competitor_summary: str) -> dict:
-    """调用DeepSeek API选定今日视频主题。"""
+    """调用 DeepSeek API 选定今日视频主题。"""
     if not DEEPSEEK_API_KEY:
         return _fallback_topic()
-
-    client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url=DEEPSEEK_BASE_URL)
 
     menu_text = build_menu_text()
     history = load_history()
@@ -84,46 +77,31 @@ def select_topic(competitor_summary: str) -> dict:
 ## 可选选题类型
 {chr(10).join(f'{i+1}. {t}' for i, t in enumerate(TOPIC_TYPES))}
 
-请从以下角度综合判断，选出今日最佳视频主题：
-1. **硬性规则：15天内已发布的汤品+选题类型组合绝对不能重复使用。**
-    - 如果某汤品已在15天内出现过，必须选不同的汤品。
-    - 如果某种切入角度近期已用，必须换一个新角度。
-2. 参考竞品热门方向但要有差异化
-3. 结合当前季节/天气，选最应季的汤品
-4. 优先选择价格适中、受众广的汤品（13-18元价位）
+请综合判断，选出今日最佳视频主题：
+1. **硬性规则：15天内已发布的汤品+选题类型组合绝对不能重复。**
+2. **优先「经验分享」和「单品深挖」**：这两类内容卖点+经验感最强，最容易出爆款。
+3. 参考竞品热门方向和爆款文案模式，但要做出差异化。
+4. 结合当前季节/天气，选最应季的汤品。
+5. 优先选择价格适中、受众广的汤品（13-18元价位）。
 
-请严格按JSON格式返回：
-{{"topic_type": "选题类型", "main_soup": "主打汤品名称", "angle": "切入角度（一句话）", "reason": "选题理由（为什么今天选这个）", "target_audience": "目标人群"}}"""
+严格按 JSON 返回：
+{{"topic_type": "选题类型", "main_soup": "主打汤品名称", "angle": "切入角度（一句话）", "reason": "选题理由", "target_audience": "目标人群"}}"""
 
     try:
-        resp = client.chat.completions.create(
-            model="deepseek-chat",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.8,
-            max_tokens=500,
-        )
-        text = resp.choices[0].message.content.strip()
+        text = deepseek_chat(prompt, max_tokens=500, temperature=0.8)
         if text.startswith("```"):
             text = text.split("\n", 1)[1].rsplit("```", 1)[0]
         topic_info = json.loads(text)
 
-        # 标准化 topic_type：如果是完整描述，截取简写
         raw_type = topic_info.get("topic_type", "")
         if "：" in raw_type:
             topic_info["topic_type"] = raw_type.split("：")[0]
 
-        # 硬校验：15天内不得重复
         if _is_topic_duplicate(topic_info, recent_15):
             print("  ⚠ 检测到15天内重复主题，自动重试...")
             excluded = _build_exclusion_list(recent_15)
             retry_prompt = prompt + f"\n\n⚠ 以下主题在15天内已使用过，请严格避开：\n{excluded}\n请重新选择一个完全不同的汤品和角度。"
-            resp = client.chat.completions.create(
-                model="deepseek-chat",
-                messages=[{"role": "user", "content": retry_prompt}],
-                temperature=0.9,
-                max_tokens=500,
-            )
-            text = resp.choices[0].message.content.strip()
+            text = deepseek_chat(retry_prompt, max_tokens=500, temperature=0.9)
             if text.startswith("```"):
                 text = text.split("\n", 1)[1].rsplit("```", 1)[0]
             topic_info = json.loads(text)
@@ -148,20 +126,14 @@ def _get_season_info(now: datetime) -> str:
     elif month in [9, 10, 11]:
         return "秋季，干燥转凉，适合滋补润肺类汤品（花旗参乌鸡汤、板栗煲老鸡汤、猪脚花生汤）"
     else:
-        return "冬季，寒冷，适合驱寒暖胃类汤品（胡椒猪肚鸡汤、当归羊肉汤、滋补牛鞭汤）"
+        return "冬季，寒冷，适合暖身暖胃类汤品（胡椒猪肚鸡汤、当归羊肉汤、滋补牛鞭汤）"
 
 
 def _is_topic_duplicate(topic_info: dict, recent_history: list[dict]) -> bool:
-    """检查选题是否在近期历史中重复。
-
-    判断标准：主打汤品相同 且 选题类型相同 → 视为重复。
-    """
     main_soup = topic_info.get("main_soup", "").strip()
     topic_type = topic_info.get("topic_type", "").strip()
-
     if not main_soup or not topic_type:
         return False
-
     for h in recent_history:
         h_topic = h.get("topic", "")
         if main_soup in h_topic and topic_type in h_topic:
@@ -170,19 +142,13 @@ def _is_topic_duplicate(topic_info: dict, recent_history: list[dict]) -> bool:
 
 
 def _build_exclusion_list(recent_history: list[dict]) -> str:
-    """构建近期已用主题的排除列表文本。"""
-    lines = []
-    for h in recent_history:
-        lines.append(f"- {h['date']}: {h.get('topic', '')}")
-    return "\n".join(lines)
+    return "\n".join(f"- {h['date']}: {h.get('topic', '')}" for h in recent_history)
 
 
 def _fallback_topic() -> dict:
-    """离线话题选择：按历史排除已用汤品，按季节优先推荐。"""
     history = load_history()
     recent_15 = history[-15:]
 
-    # 提取15天内已用的所有汤品名称
     used_soups = set()
     used_types = set()
     for h in recent_15:
@@ -194,12 +160,10 @@ def _fallback_topic() -> dict:
             if t.split("：")[0] in topic:
                 used_types.add(t.split("：")[0])
 
-    # 过滤出可用的汤品
     available = [s for s in SOUP_MENU if s["name"] not in used_soups]
     if not available:
-        available = SOUP_MENU  # 都轮过了就重新开始
+        available = SOUP_MENU
 
-    # 按季节排序：应季在前
     now = datetime.now()
     month = now.month
     if month in [3, 4, 5]:
@@ -211,21 +175,20 @@ def _fallback_topic() -> dict:
     else:
         seasonal = ["胡椒猪肚鸡汤", "当归羊肉汤", "滋补牛鞭汤"]
 
-    # 应季的排前面
     available.sort(key=lambda s: (s["name"] not in seasonal, s["name"]))
-
     soup = available[0]
 
-    # 选没被用过的选题类型（只用简写，与AI返回格式一致）
-    available_types = [t.split("：")[0] for t in TOPIC_TYPES if t.split("：")[0] not in used_types]
+    all_types = [t.split("：")[0] for t in TOPIC_TYPES]
+    available_types = [t for t in all_types if t not in used_types]
     if not available_types:
-        available_types = [t.split("：")[0] for t in TOPIC_TYPES]
-    topic_type = available_types[0]
+        available_types = all_types
+    priority = ["经验分享", "单品深挖"]
+    topic_type = next((t for t in priority if t in available_types), available_types[0])
 
     return {
         "topic_type": topic_type,
         "main_soup": soup["name"],
-        "angle": f"{soup['name']}{soup['effect']}，{soup['price']}元实惠价",
-        "reason": f"离线模式：按季节和历史轮换，自动避开15天内已用汤品",
-        "target_audience": "东凤上班族、社区居民",
+        "angle": f"{soup['name']}怎么煲才好喝？三姐分享十几年经验",
+        "reason": f"离线模式：按季节和历史轮换，优先{topic_type}类型",
+        "target_audience": "东凤上班族、社区家庭、养生爱好者",
     }

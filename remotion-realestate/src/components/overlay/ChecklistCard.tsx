@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { useCurrentFrame, useVideoConfig, spring, interpolate } from 'remotion';
-import { useOverlayAnimation, positionToStyle, C, F, hexToRgba, textGlow, breathingScale, enFontSize, OverlayElementBase } from './animation';
+import { useOverlayAnimation, positionToStyle, C, F, hexToRgba, textDepth, breathingScale, enFontSize, OverlayElementBase } from './animation';
 
 interface ChecklistItem {
   label: string;
@@ -17,6 +17,8 @@ interface ChecklistCardProps extends OverlayElementBase {
   enTitle?: string;
   items: ChecklistItem[];
   color?: string;
+  /** Disable Apple-style idle breathing/float when true */
+  disableBreathing?: boolean;
 }
 
 // SVG checkmark icon rendered inline
@@ -29,6 +31,7 @@ const CheckIcon: React.FC<{ size: number; color: string }> = ({ size, color }) =
 export const ChecklistCard: React.FC<ChecklistCardProps> = ({
   label, title, enTitle, items,
   color = '#10B981',
+  disableBreathing = false,
   enterAt, exitAt, animation, position, offset,
 }) => {
   const frame = useCurrentFrame();
@@ -39,8 +42,13 @@ export const ChecklistCard: React.FC<ChecklistCardProps> = ({
 
   const posStyle = positionToStyle(position, offset);
   const localFrame = Math.max(0, frame - enterAt);
+  const isExiting = anim.phase === 'exit';
+  const exitP = anim.phaseProgress;
   const enTSize = enFontSize(28);
   const enISize = enFontSize(26);
+
+  // Exit: items exit in reverse order
+  const itemCount = items.length;
 
   return (
     <div style={{
@@ -49,16 +57,40 @@ export const ChecklistCard: React.FC<ChecklistCardProps> = ({
       alignItems: posStyle.alignItems, padding: posStyle.padding,
       transform: posStyle.transform, pointerEvents: 'none',
     }}>
-      <div style={{ opacity: anim.opacity, maxWidth: 880 }}>
+      <div style={{
+        opacity: anim.opacity,
+        maxWidth: 880,
+        width: '100%',
+        padding: '32px 40px 28px 52px',
+        backgroundColor: 'rgba(10,8,6,0.5)',
+        borderRadius: 18,
+        border: `1.5px solid ${hexToRgba(color, 0.4)}`,
+        boxShadow: `
+          0 0 28px ${hexToRgba(color, 0.15)},
+          0 0 64px ${hexToRgba(color, 0.05)},
+          inset 0 1px 0 ${hexToRgba(color, 0.12)},
+          inset 0 -1px 0 rgba(0,0,0,0.25)
+        `,
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {/* Left accent bar */}
+        <div style={{
+          position: 'absolute',
+          left: 0, top: 9, bottom: 9,
+          width: 5, borderRadius: '0 9px 9px 0',
+          backgroundColor: color,
+          boxShadow: `0 0 8px ${hexToRgba(color, 0.5)}, 0 0 18px ${hexToRgba(color, 0.2)}`,
+        }} />
         {/* Label: 彩色小字标注 */}
         {label && (
-          <p style={{ fontSize: 30, fontWeight: 600, color, fontFamily: F.text, letterSpacing: '0.08em', lineHeight: 1.3, textShadow: textGlow(color, 0.3), margin: '0 0 12px 0' }}>{label}</p>
+          <p style={{ fontSize: 36, fontWeight: 600, color, fontFamily: F.text, letterSpacing: '0.08em', lineHeight: 1.3, textShadow: textDepth(0.3), margin: '0 0 12px 0' }}>{label}</p>
         )}
         {title && (
-          <h2 style={{ fontSize: 44, fontWeight: 800, color, fontFamily: F.display, lineHeight: 1.2, margin: '0 0 8px 0', textShadow: textGlow(color, 0.25), transform: `scale(${breathingScale(frame)})` }}>{title}</h2>
+          <h2 style={{ fontSize: 44, fontWeight: 800, color, fontFamily: F.display, lineHeight: 1.2, margin: '0 0 8px 0', textShadow: textDepth(0.25), transform: `scale(${disableBreathing ? 1 : breathingScale(frame)})` }}>{title}</h2>
         )}
         {enTitle && (
-          <p style={{ fontSize: enFontSize(44), fontWeight: 400, color: 'rgba(255,255,255,0.6)', fontFamily: F.text, letterSpacing: '0.1em', lineHeight: 1.2, margin: '0 0 28px 0' }}>{enTitle}</p>
+          <p style={{ fontSize: enFontSize(44), fontWeight: 400, color: 'rgba(255,255,255,0.5)', fontFamily: F.text, letterSpacing: '0.1em', lineHeight: 1.2, margin: '0 0 28px 0' }}>{enTitle}</p>
         )}
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -73,10 +105,20 @@ export const ChecklistCard: React.FC<ChecklistCardProps> = ({
             const checkFrame = Math.max(0, localFrame - delay - 12);
             const checkProgress = spring({ frame: checkFrame, fps, config: { damping: 26, stiffness: 70, mass: 1.3 } });
 
+            // Exit: reverse stagger — last item exits first
+            const exitDelay = (itemCount - 1 - i) * 6;
+            const exitItemOpacity = isExiting
+              ? interpolate(exitP, [exitDelay / 20, (exitDelay + 12) / 20], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
+              : 1;
+            const exitItemX = isExiting
+              ? interpolate(exitP, [exitDelay / 20, (exitDelay + 12) / 20], [0, 30], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
+              : 0;
+
             return (
               <div key={i} style={{
                 display: 'flex', alignItems: 'flex-start', gap: 20,
-                opacity: itemOpacity, transform: `translateX(${itemX}px)`,
+                opacity: isExiting ? itemOpacity * exitItemOpacity : itemOpacity,
+                transform: `translateX(${isExiting ? exitItemX : itemX}px)`,
               }}>
                 {/* Checkbox */}
                 <div style={{
@@ -96,7 +138,7 @@ export const ChecklistCard: React.FC<ChecklistCardProps> = ({
                 <div>
                   <p style={{ fontSize: 28, fontWeight: 600, color: C.text, fontFamily: F.text, lineHeight: 1.4, margin: 0 }}>{item.label}</p>
                   {item.enLabel && (
-                    <p style={{ fontSize: enISize, fontWeight: 400, color: 'rgba(255,255,255,0.6)', fontFamily: F.text, letterSpacing: '0.1em', lineHeight: 1.2, margin: '4px 0 0 0' }}>{item.enLabel}</p>
+                    <p style={{ fontSize: enISize, fontWeight: 400, color: 'rgba(255,255,255,0.5)', fontFamily: F.text, letterSpacing: '0.1em', lineHeight: 1.2, margin: '4px 0 0 0' }}>{item.enLabel}</p>
                   )}
                 </div>
               </div>

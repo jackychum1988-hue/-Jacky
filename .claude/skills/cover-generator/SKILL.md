@@ -24,26 +24,52 @@ Generate transparent-background video cover PNGs for 视频号/小红书 using t
 | Series | Still ID | Best for | Neon Color | Title Size |
 |--------|----------|----------|------------|------------|
 | 🔥 笋盘速报 | `CoverSundip` | 楼盘讲解、价格冲击 | 电光橙 #FF6B35 | 260px (price) |
-| 📊 数据拆解 | `CoverData` | 市场分析、港中对比 | 霓虹青 #00D4FF | 120px |
+| 📊 数据拆解 | `CoverData` | 市场分析、港中对比 | 电光橙 #FF6B35 | 156px |
 | 💡 Jacky观点 | `CoverOpinion` | 口播观点、经验分享 | 荧光绿 #39FF14 | 130px |
-| ⚠️ 避坑指南 | `CoverWarning` | 法律风险、买房陷阱 | 电光粉 #FF3366 | 124px |
+| ⚠️ 避坑指南 | `CoverWarning` | 法律风险、买房陷阱 | 电光粉 #FF3366 | 164px |
+
+### V4 Unified Standard (all series)
+
+| Rule | Value | Applies to |
+|------|-------|------------|
+| **fontWeight** | `900` only — no 600/700/800 anywhere | All 4 |
+| **letterSpacing** | `-0.04em` on all text | All 4 |
+| **lineHeight** | `1.02` (title), `1.2` (body) | All 4 |
+| **SHADOW** | `0 8px 36px rgba(0,0,0,0.95)` | All 4 |
+| **Top fade-out** | 48px gradient `transparent → color+5%` | All 4 |
+| **Last-line color** | Title final line = series neon color | Data/Opinion/Warning |
+| **No EP number** | SeriesBadge shows label only | All 4 |
+| **Right-aligned bottom** | All bottom zone content flush right | All 4 |
+| **6px top bar + 10px accent** | `height: 6, background: color` + `10×42px` strip | All 4 |
+| **Gradient lines** | Top: `transparent → color`, Bottom: `color → transparent` | All 4 |
 
 ## Layout
 
 ```
 ┌──────────────────────────┐
-│ ████ 6px neon top bar    │
+│ ████ 6px neon top bar    │  ← all 4 series
 │ ▌ 10px accent strip      │
-│ SeriesBadge               │  ← top zone: headline
+│ SeriesBadge (no EP)       │
 │                           │
-│ 120-260px TITLE (900 wt)  │
+│ 130-260px TITLE (900 wt)  │  last line = neon color
+│ ░░░░ 48px fade-out ░░░░  │  smooth → transparent
 │                           │
-│                           │
-│   (transparent middle)    │  ← middle zone: talking-head video visible
-│                           │
+│ ▌ faint spine (Warning)   │  ← talking-head visible
+│   (transparent middle)    │
 │                           │
 │             ╮gradient line│
-│    info/hook/tags ╯      │  ← bottom zone: right-aligned
+│  ┌─ Warning ─────────────────────────┐
+│  │ 「hook」60px → divider → ①②③ 72px │
+│  └───────────────────────────────────┘
+│  ┌─ Data ────────────────────────────┐
+│  │ Labels 52px → 青132 VS 橙132 → Insight 72px │
+│  └───────────────────────────────────┘
+│  ┌─ Opinion ─────────────────────────┐
+│  │          hook 56px right-aligned  │
+│  └───────────────────────────────────┘
+│  ┌─ Sundip ──────────────────────────┐
+│  │  highlight 56px → tags 32px       │
+│  └───────────────────────────────────┘
 │ ████ 5px accent bar       │
 │        BrandBar            │
 └──────────────────────────┘
@@ -54,17 +80,28 @@ Generate transparent-background video cover PNGs for 视频号/小红书 using t
 ### Step 1: Pick series by content type
 
 - **楼盘价格/笋盘/户型** → `CoverSundip`
-- **数据对比/市场分析/VS** → `CoverData`  
+- **数据对比/市场分析/VS** → `CoverData`
 - **观点输出/个人见解/经验** → `CoverOpinion`
 - **风险警告/避坑/法律** → `CoverWarning`
 
 ### Step 2: Write text content
 
 Rules for text at these sizes:
-- **Title per line:** ≤8 characters (130px will overflow beyond)
+- **Title per line:** ≤7 at 164px (Warning), ≤7 at 156px (Data), ≤7 at 260px (Sundip), ≤8 at 130px (Opinion)
 - **Total title lines:** 2-3 max
-- **Hook/insight:** one punchy sentence, Cantonese or Mandarin
-- **Tags:** 2-4 keywords, ≤6 chars each
+- **Last line** of Warning/Opinion/Data titles renders in the **series neon color** (auto) — the punch line pops
+- **Hook (Warning):** one punchy sentence, 「」 auto-wrapped, 60px
+- **Hook (Opinion):** one curiosity-driving sentence, 56px
+- **Items (Warning):** 3-5 items, 72px, ≤8 chars each
+- **VS values (Data):** 132px, ≤4 chars each — left 青 #00D4FF, right 橙 #FF6B35
+- **VS labels (Data):** 52px, short labels
+- **VS sub (Data):** 40px, one line each
+- **VS badge (Data):** 80px, centered between values
+- **Insight (Data):** 72px, 900wt — 与 Warning items 同级
+- **Price (Sundip):** 260px number + 100px unit, electric orange
+- **Property name (Sundip):** 72px, 900wt, -0.04em
+- **Highlight label (Sundip):** 56px, orange, right-aligned
+- **Tags (Sundip):** 32px, 900wt, white border badges
 
 ### Step 3: Compose props
 
@@ -75,8 +112,13 @@ Rules for text at these sizes:
 
 **CoverData:**
 ```json
-{"series":"data","episodeNumber":N,"title":"香港 vs 中山\\n买楼成本大对比","leftLabel":"香港","leftValue":"$800万","leftSub":"200呎·纳米楼","rightLabel":"中山","rightValue":"$80万","rightSub":"900呎·三房","insight":"港人每月悭供款 $12,000"}
+{"series":"data","episodeNumber":N,"title":"中山最好卖嘅楼\\n系四代住宅","leftLabel":"普通住宅","leftValue":"120万","leftSub":"100㎡·实得80㎡","rightLabel":"四代宅","rightValue":"180万","rightSub":"100㎡·实得145㎡","insight":"计返实用面积，单价其实差唔多"}
 ```
+
+DataCover color notes:
+- `leftValue` and its label/sub are always **青 #00D4FF** (cool, contrasts with series orange)
+- `rightValue` and VS badge are **series color** 橙 #FF6B35
+- Insight is white 72px — one line summary
 
 **CoverOpinion:**
 ```json
@@ -85,8 +127,20 @@ Rules for text at these sizes:
 
 **CoverWarning:**
 ```json
-{"series":"warning","episodeNumber":N,"title":"买卖合同\\n3大陷阱","items":["公摊面积模糊","交付标准缩水","违约责任不对等"]}
+{"series":"warning","episodeNumber":N,"title":"Sales冇讲嘅\\n深中城际真相","hook":"你供完楼，条虚线都未变实线","items":["连批都未批","最快要等十年","城际唔系地铁"]}
 ```
+
+Warning props notes:
+- `title`: first lines = topic setup (white), **last line** = punch/reveal (neon series color)
+- `hook`: **optional** emotional punchline, rendered in series color with 「」 brackets above items. Omit for straight factual warnings
+- `items`: 3-5 items, ≤8 chars each, opinionated Cantonese tone recommended
+
+### Unified treatments (all series)
+
+- **Top-zone fade-out**: 48px gradient `transparent → color+5%` below title, smoothing transition to transparent middle
+- **Last-line coloring**: Warning/Opinion/Data titles auto-color the last line in the series neon color
+- **Neon glow**: Warning item badges have `boxShadow: 0 0 18px color60, 0 0 36px color27`
+- **Left spine**: Warning has a 2px faint vertical connector at x=60 bridging top and bottom zones
 
 ### Step 4: Render
 
@@ -112,8 +166,14 @@ Tell user: output path, series, colors, text content, dimensions.
 
 | Mistake | Fix |
 |---------|-----|
-| Title line >8 chars | Split across more lines with `\\n` |
+| Warning title line >7 chars | Split — at 164px only 7 chars fit per line |
+| Data title line >7 chars | Split — at 156px only 7 chars fit per line |
+| Opinion title line >8 chars | Split — at 130px only 8 chars fit per line |
+| Data VS left/right colors too close | Left must be 青 #00D4FF, right 橙 #FF6B35 — never both warm |
 | Props JSON broken | Use single quotes: `--props='{"key":"val"}'` |
 | Wrong Still ID | Double-check Quick Reference table |
 | Not in remotion-realestate dir | `cd remotion-realestate` first |
 | Wrong series for content | Check Step 1 mapping |
+| Warning without hook when script has emotional punchline | Extract the best gut-punch line from script, wrapped in 「」 |
+| Items too "news headline" tone | Rewrite in Jacky voice: opinionated, Cantonese, short |
+| Text too small to read on phone | 156-164px title / 72px body minimum — don't go smaller |

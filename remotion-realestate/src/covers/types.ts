@@ -52,6 +52,8 @@ export interface WarningCoverProps extends CoverBaseProps {
   series: 'warning';
   /** 警告标题 */
   title: string;
+  /** 情绪钩子，显示在要点上方（可选） */
+  hook?: string;
   /** 问题条目 (3-5条) */
   items: string[];
 }

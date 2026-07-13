@@ -23,6 +23,8 @@ interface HookCardProps extends OverlayElementBase {
   sublineSeparator?: string;
   /** Keywords to highlight with kinetic pop animation (scale + color change) */
   highlights?: HighlightWord[];
+  /** Disable Apple-style idle breathing/float when true */
+  disableBreathing?: boolean;
 }
 
 export const HookCard: React.FC<HookCardProps> = ({
@@ -35,6 +37,7 @@ export const HookCard: React.FC<HookCardProps> = ({
   staggerFrames = STAGGER_FRAMES,
   sublineSeparator,
   highlights,
+  disableBreathing = false,
   enterAt,
   exitAt,
   animation,
@@ -107,9 +110,9 @@ export const HookCard: React.FC<HookCardProps> = ({
     : null;
   const totalWords = wordOffset;
 
-  // Idle breathing
-  const floatY = idleFloat(frame, 1.5, 0.022);
-  const labelBreath = breathingScale(frame);
+  // Idle breathing (disabled when disableBreathing=true)
+  const floatY = disableBreathing ? 0 : idleFloat(frame, 1.5, 0.022);
+  const labelBreath = disableBreathing ? 1 : breathingScale(frame);
 
   return (
     <div
@@ -132,7 +135,7 @@ export const HookCard: React.FC<HookCardProps> = ({
             opacity: isExiting ? interpolate(exitP, [0, 0.4], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) : iconSpring,
             transform: `scale(${iconFinalScale})`,
           }}>
-            {React.createElement(ICON_MAP[icon], { size: 56, color, strokeWidth: 2 })}
+            {React.createElement(ICON_MAP[icon], { size: 64, color, strokeWidth: 2.5 })}
           </div>
         )}
         <p
@@ -158,7 +161,7 @@ export const HookCard: React.FC<HookCardProps> = ({
             letterSpacing: `${dynamicLetterSpacing.toFixed(3)}em`,
             lineHeight: 1.05,
             opacity: isExiting ? interpolate(exitP, [0.15, 0.55], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) : headlineDelay,
-            transform: `scale(${(0.95 + headlineDelay * 0.05) * breathingScale(frame)})`,
+            transform: `scale(${(0.95 + headlineDelay * 0.05) * (disableBreathing ? 1 : breathingScale(frame))})`,
             textShadow: textDepth(0.5),
             margin: 0,
           }}
@@ -292,7 +295,7 @@ export const HookCard: React.FC<HookCardProps> = ({
             lineHeight: 1.4,
             margin: '16px 0 0 0',
             maxWidth: 700,
-            transform: `scale(${breathingScale(frame)})`,
+            transform: `scale(${disableBreathing ? 1 : breathingScale(frame)})`,
           };
           // Staggered segments by separator (e.g. "+" for cost breakdown)
           if (sublineSeparator) {

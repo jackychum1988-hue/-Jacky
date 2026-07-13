@@ -74,29 +74,30 @@ const BranchLevel: React.FC<{
                 flexShrink: 0,
               }} />
 
-              {/* Condition (diamond-like tag) */}
+              {/* Condition (rounded tag) */}
               <span style={{
-                fontSize: 22, fontWeight: 700, color,
+                fontSize: 26, fontWeight: 700, color,
                 fontFamily: F.text, lineHeight: 1.3,
-                padding: '6px 14px',
-                backgroundColor: hexToRgba(color, 0.1),
+                padding: '8px 18px',
+                backgroundColor: hexToRgba(color, 0.12),
                 borderRadius: RADIUS.tag,
-                border: `1px solid ${hexToRgba(color, 0.3)}`,
+                border: `1.5px solid ${hexToRgba(color, 0.35)}`,
                 whiteSpace: 'nowrap',
+                textShadow: `0 0 12px ${hexToRgba(color, 0.3)}`,
               }}>
                 {b.condition}
               </span>
 
               {/* Arrow */}
-              <span style={{ fontSize: 20, color: 'rgba(255,255,255,0.3)', fontFamily: F.mono, flexShrink: 0 }}>
+              <span style={{ fontSize: 22, color: hexToRgba(color, 0.5), fontFamily: F.mono, flexShrink: 0 }}>
                 →
               </span>
 
               {/* Result */}
               <span style={{
-                fontSize: 24, fontWeight: 600, color: C.text,
+                fontSize: 28, fontWeight: 600, color: C.text,
                 fontFamily: F.text, lineHeight: 1.3,
-                textShadow: textDepth(0.15),
+                textShadow: textDepth(0.2),
               }}>
                 {b.result}
               </span>
@@ -178,7 +179,7 @@ export const DecisionTreeCard: React.FC<DecisionTreeCardProps> = ({
             fontFamily: F.display, margin: 0, lineHeight: 1.25,
             textShadow: textDepth(0.3),
           }}>
-            ❓ {question}
+            {question}
           </p>
         </div>
 

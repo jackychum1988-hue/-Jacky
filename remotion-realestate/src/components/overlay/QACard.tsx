@@ -18,12 +18,15 @@ interface QACardProps extends OverlayElementBase {
   questionHighlights?: HighlightWord[];
   /** Keywords to highlight in answer with kinetic pop animation */
   answerHighlights?: HighlightWord[];
+  /** Disable Apple-style idle breathing/float when true */
+  disableBreathing?: boolean;
 }
 
 export const QACard: React.FC<QACardProps> = ({
   label, icon, question, answer, enQuestion, enAnswer,
   color = '#1A56DB',
   questionHighlights, answerHighlights,
+  disableBreathing = false,
   enterAt, exitAt, animation, position, offset,
 }) => {
   const frame = useCurrentFrame();
@@ -55,12 +58,11 @@ export const QACard: React.FC<QACardProps> = ({
     ? interpolate(exitP, [0, 0.35], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
     : aSpring;
 
-  const aBorderAlpha = 0.10;
+  const aBorderAlpha = 0.35;
 
-  // Idle breathing — Q and A float independently (slightly different phase for depth)
-  const qFloatY = idleFloat(frame, 1.2, 0.022);
-  const aFloatY = idleFloat(frame, 1.0, 0.028);
-  const qBreath = breathingScale(frame);
+  // Idle breathing — Q and A float independently (disabled when disableBreathing=true)
+  const qFloatY = disableBreathing ? 0 : idleFloat(frame, 1.2, 0.022);
+  const aFloatY = disableBreathing ? 0 : idleFloat(frame, 1.0, 0.028);
 
   return (
     <div style={{
@@ -70,7 +72,31 @@ export const QACard: React.FC<QACardProps> = ({
       transform: posStyle.transform, pointerEvents: 'none',
       overflow: 'hidden',
     }}>
-      <div style={{ opacity: anim.opacity, maxWidth: posStyle.maxWidth, width: '100%' }}>
+      <div style={{
+        opacity: anim.opacity,
+        maxWidth: posStyle.maxWidth ?? 880,
+        width: '100%',
+        padding: '32px 40px 28px 52px',
+        backgroundColor: 'rgba(10,8,6,0.5)',
+        borderRadius: 18,
+        border: `1.5px solid ${hexToRgba(color, 0.4)}`,
+        boxShadow: `
+          0 0 28px ${hexToRgba(color, 0.15)},
+          0 0 64px ${hexToRgba(color, 0.05)},
+          inset 0 1px 0 ${hexToRgba(color, 0.12)},
+          inset 0 -1px 0 rgba(0,0,0,0.25)
+        `,
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {/* Left accent bar */}
+        <div style={{
+          position: 'absolute',
+          left: 0, top: 9, bottom: 9,
+          width: 5, borderRadius: '0 9px 9px 0',
+          backgroundColor: color,
+          boxShadow: `0 0 8px ${hexToRgba(color, 0.5)}, 0 0 18px ${hexToRgba(color, 0.2)}`,
+        }} />
         {/* Label: 彩色小字标注，统一卡片开头格式 */}
         {label && (
           <p style={{
@@ -84,7 +110,7 @@ export const QACard: React.FC<QACardProps> = ({
         )}
         {icon && ICON_MAP[icon] && (
           <div style={{ marginBottom: 16, opacity: qOpacity, transform: `translateY(${qY}px)` }}>
-            {React.createElement(ICON_MAP[icon], { size: 48, color, strokeWidth: 2 })}
+            {React.createElement(ICON_MAP[icon], { size: 56, color, strokeWidth: 2.5 })}
           </div>
         )}
         {/* Q: 问句 */}
@@ -99,7 +125,7 @@ export const QACard: React.FC<QACardProps> = ({
             textShadow: textDepth(0.3),
           }}>Q</span>
           <div>
-            <p style={{ fontSize: 44, fontWeight: 700, color: C.text, fontFamily: F.text, lineHeight: 1.4, margin: 0, transform: `scale(${breathingScale(frame)})` }}>
+            <p style={{ fontSize: 44, fontWeight: 700, color: C.text, fontFamily: F.text, lineHeight: 1.4, margin: 0, transform: `scale(${disableBreathing ? 1 : breathingScale(frame)})` }}>
               {questionHighlights && questionHighlights.length > 0 ? (
                 splitByHighlights(question, questionHighlights).map((seg, si) => {
                   if (seg.highlight) {
@@ -158,7 +184,7 @@ export const QACard: React.FC<QACardProps> = ({
             lineHeight: 1, textShadow: textDepth(0.3),
           }}>A</span>
           <div>
-            <p style={{ fontSize: 36, fontWeight: 500, color: C.text, fontFamily: F.text, lineHeight: 1.55, margin: 0, transform: `scale(${breathingScale(frame)})` }}>
+            <p style={{ fontSize: 36, fontWeight: 500, color: C.text, fontFamily: F.text, lineHeight: 1.55, margin: 0, transform: `scale(${disableBreathing ? 1 : breathingScale(frame)})` }}>
               {answerHighlights && answerHighlights.length > 0 ? (
                 splitByHighlights(answer, answerHighlights).map((seg, si) => {
                   if (seg.highlight) {

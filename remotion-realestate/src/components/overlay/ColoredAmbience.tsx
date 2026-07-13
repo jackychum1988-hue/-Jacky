@@ -24,9 +24,9 @@ interface ColoredAmbienceProps {
   particleAlpha?: number;
 }
 
-const DEFAULT_COUNT = 8;
-const DEFAULT_GLOW_ALPHA = 0.025;
-const DEFAULT_PARTICLE_ALPHA = 0.08;
+const DEFAULT_COUNT = 6;
+const DEFAULT_GLOW_ALPHA = 0.008;
+const DEFAULT_PARTICLE_ALPHA = 0.04;
 
 const generateParticles = (count: number): Particle[] =>
   Array.from({ length: count }, (_, i) => {
@@ -72,12 +72,12 @@ export const ColoredAmbience: React.FC<ColoredAmbienceProps> = ({
         overflow: 'hidden',
       }}
     >
-      {/* 彩色径向渐变光 */}
+      {/* 彩色径向渐变光 — 极度扩散，无可见光圈 */}
       <div
         style={{
           position: 'absolute',
-          inset: 0,
-          background: `radial-gradient(ellipse at 50% 40%, ${hexToRgba(color, breathingGlow)} 0%, transparent 65%)`,
+          inset: '-20%',
+          background: `radial-gradient(ellipse at 50% 50%, ${hexToRgba(color, breathingGlow)} 0%, ${hexToRgba(color, breathingGlow * 0.3)} 35%, transparent 70%)`,
         }}
       />
 

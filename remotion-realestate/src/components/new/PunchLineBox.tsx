@@ -9,6 +9,13 @@ const F = {
   display: '-apple-system, BlinkMacSystemFont, "Inter", "Noto Sans SC", sans-serif',
 };
 
+const hexToRgba = (hex: string, alpha: number): string => {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+};
+
 type PunchLineBoxProps = {
   children: React.ReactNode;
   color?: string;
@@ -49,7 +56,7 @@ export const PunchLineBox: React.FC<PunchLineBoxProps> = ({
           padding: '16px 36px',
           backgroundColor: 'transparent',
           borderRadius: 14,
-          border: `1.5px solid ${color}`,
+          border: `1px solid ${hexToRgba(color, 0.30)}`,
           transform: `scale(${0.5 + boxScale * 0.5})`,
         }}
       >
@@ -59,7 +66,7 @@ export const PunchLineBox: React.FC<PunchLineBoxProps> = ({
             fontWeight: 700,
             color,
             fontFamily: F.display,
-            textShadow: '0 2px 8px rgba(0,0,0,0.4)',
+            textShadow: '0 1px 4px rgba(0,0,0,0.2)',
             margin: 0,
           }}
         >

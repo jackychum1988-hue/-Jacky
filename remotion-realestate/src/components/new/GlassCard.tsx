@@ -24,6 +24,8 @@ type GlassCardProps = {
   bgAlpha?: number;
   transparentBg?: boolean;
   showOuterGlow?: boolean;      // 外擴散光暈（單卡 true / 連續卡 false）
+  /** Skip internal entry animation — caller controls all motion (prevents double-animation with component-level springs) */
+  disableEntryAnimation?: boolean;
   children: React.ReactNode;
   style?: React.CSSProperties;
 };
@@ -39,23 +41,31 @@ export const GlassCard: React.FC<GlassCardProps> = ({
   bgAlpha = 0.48,
   transparentBg = false,
   showOuterGlow = true,
+  disableEntryAnimation = false,
   children,
   style,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const cardOpacity = interpolate(frame, [0, 16], [0, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-    easing: Easing.out(Easing.quad),
-  });
-  const cardY = interpolate(frame, [0, 20], [50, 0], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-    easing: Easing.out(Easing.back(1.3)),
-  });
-  const cardScale = spring({ frame, fps, config: { damping: 18, stiffness: 85, mass: 1.2 } });
+  // When caller controls animation, render at full opacity with no transform
+  const cardOpacity = disableEntryAnimation
+    ? 1
+    : interpolate(frame, [0, 16], [0, 1], {
+        extrapolateLeft: 'clamp',
+        extrapolateRight: 'clamp',
+        easing: Easing.out(Easing.quad),
+      });
+  const cardY = disableEntryAnimation
+    ? 0
+    : interpolate(frame, [0, 20], [50, 0], {
+        extrapolateLeft: 'clamp',
+        extrapolateRight: 'clamp',
+        easing: Easing.out(Easing.back(1.3)),
+      });
+  const cardScaleVal = disableEntryAnimation
+    ? 1
+    : 0.92 + spring({ frame, fps, config: { damping: 18, stiffness: 85, mass: 1.2 } }) * 0.08;
 
   const g = glowIntensity;
 
@@ -98,7 +108,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
         boxShadow,
         border: effectiveBorderWidth > 0 ? `${effectiveBorderWidth}px solid ${hexToRgba(color, borderAlpha)}` : 'none',
         opacity: cardOpacity,
-        transform: `translateY(${cardY}px) scale(${0.92 + cardScale * 0.08})`,
+        transform: `translateY(${cardY}px) scale(${cardScaleVal})`,
         ...style,
       }}
     >

@@ -15,6 +15,8 @@ interface CTACardProps extends OverlayElementBase {
   enLabel?: string;
   color?: string;
   tags?: string[];
+  /** Disable Apple-style idle breathing/float when true */
+  disableBreathing?: boolean;
 }
 
 export const CTACard: React.FC<CTACardProps> = ({
@@ -24,6 +26,7 @@ export const CTACard: React.FC<CTACardProps> = ({
   enLabel,
   color = '#F5A623',
   tags,
+  disableBreathing = false,
   enterAt,
   exitAt,
   animation,
@@ -88,8 +91,8 @@ export const CTACard: React.FC<CTACardProps> = ({
   const phoneBreathing = 1 + Math.sin(localFrame * 0.1) * 0.025;
 
   // Idle floating + container breathing
-  const floatY = idleFloat(frame, 1.2, 0.026);
-  const cardBreath = breathingScale(frame);
+  const floatY = disableBreathing ? 0 : idleFloat(frame, 1.2, 0.026);
+  const cardBreath = disableBreathing ? 1 : breathingScale(frame);
 
   const TS = '0 2px 10px rgba(0,0,0,0.5)';
 
@@ -125,7 +128,7 @@ export const CTACard: React.FC<CTACardProps> = ({
               opacity: isExiting ? interpolate(exitP, [0.5, 0.8], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) : iconSpring,
               transform: `scale(${iconFinalScale})`,
             }}>
-              {React.createElement(ICON_MAP[icon], { size: 48, color, strokeWidth: 2 })}
+              {React.createElement(ICON_MAP[icon], { size: 56, color, strokeWidth: 2.5 })}
             </div>
           )}
           {/* Title with letter-spacing breath + entrance fade */}
@@ -140,7 +143,7 @@ export const CTACard: React.FC<CTACardProps> = ({
               textShadow: textDepth(0.4),
               margin: 0,
               opacity: titleOpacity,
-              transform: `scale(${breathingScale(frame)})`,
+              transform: `scale(${disableBreathing ? 1 : breathingScale(frame)})`,
             }}
           >
             {headline}

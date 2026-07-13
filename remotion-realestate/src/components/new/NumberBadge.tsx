@@ -51,8 +51,8 @@ export const NumberBadge: React.FC<NumberBadgeProps> = ({
           height: size,
           minWidth: size,
           borderRadius: size / 4,
-          backgroundColor: hexToRgba(color, 0.3),
-          border: `1px solid ${hexToRgba(color, 0.5)}`,
+          backgroundColor: 'transparent',
+          border: `1px solid ${hexToRgba(color, 0.25)}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -61,7 +61,6 @@ export const NumberBadge: React.FC<NumberBadgeProps> = ({
           color,
           fontFamily: F.display,
           transform: `scale(${0.5 + numScale * 0.5})`,
-          boxShadow: `0 0 20px ${hexToRgba(color, 0.3)}`,
         }}
       >
         {number}
@@ -74,7 +73,7 @@ export const NumberBadge: React.FC<NumberBadgeProps> = ({
             fontFamily: F.text,
             letterSpacing: '0.2em',
             textTransform: 'uppercase' as const,
-            textShadow: `0 0 12px ${hexToRgba(color, 0.35)}`,
+            textShadow: '0 1px 3px rgba(0,0,0,0.2)',
           }}
         >
           {label}

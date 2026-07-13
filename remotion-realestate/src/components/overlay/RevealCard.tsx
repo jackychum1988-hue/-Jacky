@@ -13,6 +13,8 @@ interface RevealCardProps extends OverlayElementBase {
   sublabel?: string;
   enLabel?: string;
   color?: string;
+  /** Disable Apple-style idle breathing/float/settle when true */
+  disableBreathing?: boolean;
 }
 
 export const RevealCard: React.FC<RevealCardProps> = ({
@@ -22,6 +24,7 @@ export const RevealCard: React.FC<RevealCardProps> = ({
   sublabel,
   enLabel,
   color = '#F5A623',
+  disableBreathing = false,
   enterAt,
   exitAt,
   animation,
@@ -57,8 +60,8 @@ export const RevealCard: React.FC<RevealCardProps> = ({
     ? interpolate(exitP, [0.05, 0.35], [1, 0.95], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
     : interpolate(numSpring, [0, 1], [0.88, 1]);
 
-  // Number settle bounce: tiny 1→1.03→1 overshoot after spring peaks
-  const settle = settleBounce(localFrame - 6, fps, 28);
+  // Number settle bounce: tiny 1→1.03→1 overshoot after spring peaks (disabled when disableBreathing=true)
+  const settle = disableBreathing ? { scale: 1, active: false } : settleBounce(localFrame - 6, fps, 28);
   const finalNumScale = numScale * (settle.active ? settle.scale : 1);
 
   // Label: enters with container
@@ -76,9 +79,9 @@ export const RevealCard: React.FC<RevealCardProps> = ({
     ? interpolate(exitP, [0, 0.25], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
     : interpolate(localFrame - 16, [0, 14], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 
-  // ── Idle breathing ──
-  const floatY = idleFloat(frame, 1.8, 0.022); // ~4.7s cycle, 1.8px amplitude
-  const numberBreath = breathingScale(frame);
+  // ── Idle breathing (disabled when disableBreathing=true) ──
+  const floatY = disableBreathing ? 0 : idleFloat(frame, 1.8, 0.022);
+  const numberBreath = disableBreathing ? 1 : breathingScale(frame);
 
   // ── Exit overlay fade for container ──
   const exitContainerOpacity = isExiting
@@ -154,7 +157,7 @@ export const RevealCard: React.FC<RevealCardProps> = ({
               fontFamily: F.display,
               textShadow: `0 0 24px ${hexToRgba(color, 0.3)}`,
               opacity: unitOpacity,
-              transform: `scale(${breathingScale(frame)})`,
+              transform: `scale(${disableBreathing ? 1 : breathingScale(frame)})`,
             }}
           >
             {unit}
@@ -171,7 +174,7 @@ export const RevealCard: React.FC<RevealCardProps> = ({
               fontWeight: 500,
               margin: '16px 0 0 0',
               opacity: sublabelOpacity,
-              transform: `scale(${breathingScale(frame)})`,
+              transform: `scale(${disableBreathing ? 1 : breathingScale(frame)})`,
             }}
           >
             {sublabel}
